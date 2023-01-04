@@ -7,7 +7,7 @@ import UserProfile from "../screens/general/dashboard/user-profile";
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeNav() {
+export default function DiscoverNav() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Discover" component={Discover} />

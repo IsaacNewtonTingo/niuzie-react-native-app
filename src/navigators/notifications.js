@@ -7,7 +7,7 @@ import NotificationDetails from "../screens/general/dashboard/notification-detai
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeNav() {
+export default function NotificationsNav() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Notifications" component={Notifications} />

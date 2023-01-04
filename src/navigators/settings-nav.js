@@ -8,7 +8,7 @@ import EditProfile from "../screens/general/dashboard/edit-profile";
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeNav() {
+export default function SettingsNav() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Settings" component={Settings} />

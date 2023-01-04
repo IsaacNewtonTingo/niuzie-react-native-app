@@ -6,7 +6,7 @@ import PostProduct from "../screens/seller/post-product";
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeNav() {
+export default function PostProductNav() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="PostProduct" component={PostProduct} />
