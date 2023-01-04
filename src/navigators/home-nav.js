@@ -13,7 +13,13 @@ const Stack = createNativeStackNavigator();
 export default function HomeNav() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{
+          headerTitle: "",
+        }}
+      />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
       <Stack.Screen name="Subcategories" component={Subcategories} />
       <Stack.Screen
