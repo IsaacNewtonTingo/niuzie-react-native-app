@@ -17,7 +17,8 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: colors.orange,
+        tabBarActiveTintColor: "#ffddcc",
+        tabBarInactiveTintColor: colors.lightBlue,
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -30,9 +31,7 @@ export default function TabNavigator() {
         component={HomeNav}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
-            return (
-              <Ionicons name="md-home" size={24} color={colors.lightBlue} />
-            );
+            return <Ionicons name="md-home" size={24} color={color} />;
           },
         }}
       />
@@ -56,13 +55,7 @@ export default function TabNavigator() {
         component={PostProductNav}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
-            return (
-              <MaterialIcons
-                name="add-box"
-                size={26}
-                color={colors.lightBlue}
-              />
-            );
+            return <MaterialIcons name="add-box" size={26} color={color} />;
           },
         }}
       />
@@ -75,7 +68,7 @@ export default function TabNavigator() {
               <MaterialCommunityIcons
                 name="bell-outline"
                 size={26}
-                color={colors.lightBlue}
+                color={color}
               />
             );
           },
@@ -86,13 +79,7 @@ export default function TabNavigator() {
         component={SettingsNav}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
-            return (
-              <MaterialIcons
-                name="settings"
-                size={26}
-                color={colors.lightBlue}
-              />
-            );
+            return <MaterialIcons name="settings" size={26} color={color} />;
           },
         }}
       />

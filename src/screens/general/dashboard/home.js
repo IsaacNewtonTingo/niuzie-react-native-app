@@ -18,11 +18,13 @@ import styles from "../../../componets/styles/global-styles";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import VerticalProductCard from "../../../componets/cards/vertical-product";
+import HorizontalCard from "../../../componets/cards/horizontal-card";
 
 const { width } = Dimensions.get("window");
 
 const categoriesData = require("../../../assets/data/categories.json");
 const topProductsData = require("../../../assets/data/top-products.json");
+const recentViewsData = require("../../../assets/data/top-products.json");
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -92,6 +94,31 @@ export default function Home() {
               rating={product.rating}
             />
           ))}
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.subText}>Recently viewed</Text>
+        <View style={homeStyles.miniCatContainer}>
+          <FlatList
+            scrollEnabled
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={recentViewsData}
+            renderItem={({ item }) => (
+              <HorizontalCard
+                key={item.productName}
+                productImage={item.image1}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                rating={item.rating}
+              />
+            )}
+          />
         </View>
       </View>
     </ScrollView>
