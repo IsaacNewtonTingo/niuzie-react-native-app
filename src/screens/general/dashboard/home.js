@@ -78,9 +78,19 @@ export default function Home() {
           <Text style={styles.viewAll}>View all</Text>
         </View>
 
-        <View>
+        <View style={homeStyles.miniCatContainer}>
           {topProductsData.map((product) => (
-            <VerticalProductCard productName={product.productName} />
+            <VerticalProductCard
+              key={product.productName}
+              productImage={product.image1}
+              productName={product.productName}
+              price={product.price}
+              condition={product.condition}
+              description={product.description}
+              county={product.user.county}
+              subCounty={product.user.subCounty}
+              rating={product.rating}
+            />
           ))}
         </View>
       </View>
@@ -113,7 +123,6 @@ const homeStyles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
-    width: width,
   },
   categoryImage: {
     width: 30,

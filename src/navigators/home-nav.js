@@ -7,6 +7,7 @@ import ProductDetails from "../screens/general/dashboard/product-details";
 import Subcategories from "../screens/general/dashboard/subcategories";
 import SubcategoryProducts from "../screens/general/dashboard/subcategory-products";
 import UserProfile from "../screens/general/dashboard/user-profile";
+import colors from "../componets/colors/colors";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,9 @@ export default function HomeNav() {
         component={Home}
         options={{
           headerTitle: "",
+          headerStyle: {
+            backgroundColor: colors.bar,
+          },
         }}
       />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />

@@ -1,7 +1,7 @@
 [
   {
-    "image1": "",
-    "productName": "",
+    "image1": "https://www.digitaltrends.com/wp-content/uploads/2022/09/iPhone-14-Pro-Back-Purple-Hand.jpg?p=1",
+    "productName": "iPhone 14 pro max",
     "user": {
       "userName": "Padre Pascal",
       "county": "Nairobi",
@@ -13,8 +13,8 @@
     "rating": 4.5
   },
   {
-    "image1": "",
-    "productName": "",
+    "image1": "https://www.digitaltrends.com/wp-content/uploads/2022/09/iPhone-14-Pro-Back-Purple-Hand.jpg?p=1",
+    "productName": "Jordan 4s",
     "user": {
       "userName": "Padre Pascal",
       "county": "Nairobi",
@@ -26,8 +26,8 @@
     "rating": 4.5
   },
   {
-    "image1": "",
-    "productName": "",
+    "image1": "https://www.digitaltrends.com/wp-content/uploads/2022/09/iPhone-14-Pro-Back-Purple-Hand.jpg?p=1",
+    "productName": "Chicago",
     "user": {
       "userName": "Padre Pascal",
       "county": "Nairobi",
@@ -39,8 +39,8 @@
     "rating": 4.5
   },
   {
-    "image1": "",
-    "productName": "",
+    "image1": "https://www.digitaltrends.com/wp-content/uploads/2022/09/iPhone-14-Pro-Back-Purple-Hand.jpg?p=1",
+    "productName": "Bulls",
     "user": {
       "userName": "Padre Pascal",
       "county": "Nairobi",

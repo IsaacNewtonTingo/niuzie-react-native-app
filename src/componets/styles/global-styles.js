@@ -4,10 +4,11 @@ import colors from "../colors/colors";
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.dark,
-    padding: 10,
   },
 
-  searchContainer: {},
+  searchContainer: {
+    marginTop: 20,
+  },
 
   searchIcon: {
     position: "absolute",
@@ -27,6 +28,8 @@ const styles = StyleSheet.create({
   subText: {
     color: colors.lightBlue,
     fontWeight: "800",
+    fontSize: 18,
+    marginBottom: 20,
   },
   section: {
     marginVertical: 20,
