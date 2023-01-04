@@ -1,12 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import styles from "../../componets/styles/global-styles";
 
 export default function PostProduct() {
-  return (
-    <View>
-      <Text>PostProduct</Text>
-    </View>
-  );
+  return <ScrollView style={styles.container}></ScrollView>;
 }
-
-const styles = StyleSheet.create({});

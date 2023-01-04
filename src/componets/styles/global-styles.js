@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textDecorationLine: "underline",
   },
+  // flatList:{
+  //   flexDirection:'row',
+
+  // }
 });
 
 export default styles;

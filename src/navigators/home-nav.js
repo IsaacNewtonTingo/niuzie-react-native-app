@@ -13,17 +13,16 @@ const Stack = createNativeStackNavigator();
 
 export default function HomeNav() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{
-          headerTitle: "",
-          headerStyle: {
-            backgroundColor: colors.bar,
-          },
-        }}
-      />
+    <Stack.Navigator
+      screenOptions={{
+        headerTitle: "",
+        headerStyle: {
+          backgroundColor: colors.bar,
+        },
+      }}
+    >
+      <Stack.Screen name="Home" component={Home} />
+
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
       <Stack.Screen name="Subcategories" component={Subcategories} />
       <Stack.Screen

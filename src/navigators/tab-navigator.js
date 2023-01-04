@@ -39,12 +39,13 @@ export default function TabNavigator() {
         name="DiscoverNav"
         component={DiscoverNav}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
             return (
               <MaterialIcons
                 name="local-fire-department"
                 size={27}
-                color={colors.lightBlue}
+                color={color}
               />
             );
           },
