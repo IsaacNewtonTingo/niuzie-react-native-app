@@ -1,10 +1,11 @@
 export default {
-  dark: "#000033",
+  dark: "#02030C",
   lightBlue: "#e6e6ff",
-  cardColor: "#00264d",
+  cardColor: "#12163b",
   linkText: "#99ccff",
-  gray: "#ccccff",
+  gray: "#636ecf",
   orange: "#e65c00",
   abitGray: "#e6e6ff",
-  bar: "#006699",
+  bar: "#070A25",
+  inputBG: "#CDDEFF",
 };

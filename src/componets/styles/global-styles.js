@@ -44,10 +44,24 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textDecorationLine: "underline",
   },
-  // flatList:{
-  //   flexDirection:'row',
-
-  // }
+  textInputContainer: {
+    marginVertical: 10,
+  },
+  textInput: {
+    height: 50,
+    width: "100%",
+    backgroundColor: colors.inputBG,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#0066FF",
+    paddingHorizontal: 35,
+    color: colors.lightBlue,
+    fontSize: 12,
+  },
+  label: {
+    fontWeight: "800",
+    color: colors.lightBlue,
+  },
 });
 
 export default styles;
