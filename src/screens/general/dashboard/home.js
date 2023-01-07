@@ -25,13 +25,14 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { ENDPOINT } from "@env";
 import LoadingSkeleton from "../../../componets/preloader/skeleton";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 const { width } = Dimensions.get("window");
 
 const topProductsData = require("../../../assets/data/top-products.json");
 const recentViewsData = require("../../../assets/data/top-products.json");
 
-export default function Home() {
+export default function Home({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,9 +41,9 @@ export default function Home() {
   useEffect(() => {
     getCategories();
 
-    return () => {
-      getCategories();
-    };
+    // return () => {
+    //   getCategories();
+    // };
   }, []);
 
   async function getCategories() {
@@ -61,7 +62,7 @@ export default function Home() {
   }
 
   if (loadingData) {
-    return <LoadingSkeleton />;
+    return <LoadingIndicator />;
   }
 
   return (
@@ -94,8 +95,14 @@ export default function Home() {
         <View style={homeStyles.miniCatContainer}>
           {categories.map((category) => (
             <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Subcategories", {
+                  categoryID: category._id,
+                  categoryName: category.categoryName,
+                })
+              }
               style={homeStyles.miniCatItem}
-              key={category.categoryName}
+              key={category._id}
             >
               <Image
                 style={homeStyles.categoryImage}

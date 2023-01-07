@@ -4,6 +4,7 @@ import colors from "../colors/colors";
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.dark,
+    flex: 1,
   },
 
   searchContainer: {

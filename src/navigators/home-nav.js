@@ -15,16 +15,29 @@ export default function HomeNav() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitle: "",
+        headerTintColor: colors.lightBlue,
+        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: colors.bar,
         },
       }}
     >
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen
+        options={{
+          headerTitle: "",
+        }}
+        name="Home"
+        component={Home}
+      />
 
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
-      <Stack.Screen name="Subcategories" component={Subcategories} />
+      <Stack.Screen
+        options={({ route }) => ({
+          title: route.params.categoryName,
+        })}
+        name="Subcategories"
+        component={Subcategories}
+      />
       <Stack.Screen
         name="SubcategoryProducts"
         component={SubcategoryProducts}
