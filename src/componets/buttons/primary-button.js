@@ -4,8 +4,10 @@ import colors from "../colors/colors";
 
 export default function PrimaryButton(props) {
   const title = props.buttonTitle;
+  const onPress = props.onPress;
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={{
         width: "100%",
         height: 50,

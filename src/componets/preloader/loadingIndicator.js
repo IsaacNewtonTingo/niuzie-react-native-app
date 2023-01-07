@@ -17,7 +17,7 @@ import styles from "../styles/global-styles";
 export default function LoadingIndicator() {
   return (
     <View style={styles.container}>
-      <BarIndicator color="white" />
+      <BarIndicator size={20} color="white" />
     </View>
   );
 }

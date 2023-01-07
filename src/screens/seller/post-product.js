@@ -25,12 +25,16 @@ import SecondaryButton from "../../componets/buttons/secondary-button";
 const { width } = Dimensions.get("window");
 
 export default function PostProduct() {
-  const [maxPosts, setMaxPosts] = useState(true);
+  const [maxPosts, setMaxPosts] = useState(false);
+
+  const [productName, setProductName] = useState("");
+
   const [category, setCategory] = useState("Clothes & apparel");
   const [subCategory, setSubCetCategory] = useState("Jackets");
 
-  const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
+  const [price, setPrice] = useState();
+
   const [condition, setCondition] = useState("");
 
   const [firstName, setFirstName] = useState("Isaac");
@@ -93,6 +97,7 @@ export default function PostProduct() {
           />
           <Text style={postStyles.catText}>{category}</Text>
         </TouchableOpacity>
+
         <Text style={styles.label}>Sub category</Text>
         <TouchableOpacity
           style={[
@@ -108,12 +113,14 @@ export default function PostProduct() {
           />
           <Text style={postStyles.catText}>{subCategory}</Text>
         </TouchableOpacity>
+
         <View style={styles.textComb}>
           <Text style={styles.label}>Description</Text>
           <Text style={[styles.label, { color: "gray" }]}>
             {description.length}/200
           </Text>
         </View>
+
         <View style={styles.textInputContainer}>
           <Foundation
             style={styles.searchIcon}
@@ -130,6 +137,7 @@ export default function PostProduct() {
             maxLength={200}
           />
         </View>
+
         <Text style={styles.label}>Price (KSH.)</Text>
         <View style={styles.textInputContainer}>
           <MaterialCommunityIcons
@@ -234,7 +242,7 @@ export default function PostProduct() {
 
         <SecondaryButton iconName="address-book-o" buttonTitle={subCounty} />
 
-        <PrimaryButton buttonTitle="Post product" />
+        <PrimaryButton onPress={() => {}} buttonTitle="Post product" />
       </View>
     </ScrollView>
   );
