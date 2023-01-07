@@ -240,7 +240,7 @@ export default function PostProduct() {
   );
 }
 
-const postStyles = StyleSheet.create({
+export const postStyles = StyleSheet.create({
   holdingContainer: {
     margin: 20,
     padding: 20,

@@ -22,7 +22,7 @@ import HorizontalCard from "../../../componets/cards/horizontal-card";
 
 const { width } = Dimensions.get("window");
 
-const categoriesData = require("../../../assets/data/categories.json");
+const categoriesData = require("../../../assets/data/categories");
 const topProductsData = require("../../../assets/data/top-products.json");
 const recentViewsData = require("../../../assets/data/top-products.json");
 
@@ -64,7 +64,7 @@ export default function Home() {
             >
               <Image
                 style={homeStyles.categoryImage}
-                source={{ uri: category.categoryImage }}
+                source={category.categoryImage}
               />
               <Text style={homeStyles.categoryText}>
                 {category.categoryName}

@@ -17,7 +17,7 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#ffddcc",
+        tabBarActiveTintColor: colors.orange,
         tabBarInactiveTintColor: colors.lightBlue,
         headerShown: false,
         tabBarShowLabel: false,
