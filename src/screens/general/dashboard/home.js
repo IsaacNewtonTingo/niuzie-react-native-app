@@ -11,23 +11,58 @@ import {
   Animated,
   LayoutAnimation,
 } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
+import axios from "axios";
 
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
 
-import { FontAwesome5 } from "@expo/vector-icons";
 import VerticalProductCard from "../../../componets/cards/vertical-product";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 
+import { FontAwesome5 } from "@expo/vector-icons";
+
+import { ENDPOINT } from "@env";
+import LoadingSkeleton from "../../../componets/preloader/skeleton";
+
 const { width } = Dimensions.get("window");
 
-const categoriesData = require("../../../assets/data/categories");
 const topProductsData = require("../../../assets/data/top-products.json");
 const recentViewsData = require("../../../assets/data/top-products.json");
 
 export default function Home() {
+  const [loadingData, setLoadingData] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    getCategories();
+
+    return () => {
+      getCategories();
+    };
+  }, []);
+
+  async function getCategories() {
+    const url = `${ENDPOINT}/admin/get-categories`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setCategories(response.data.data);
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  if (loadingData) {
+    return <LoadingSkeleton />;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -57,14 +92,14 @@ export default function Home() {
         <Text style={styles.subText}>Categories</Text>
 
         <View style={homeStyles.miniCatContainer}>
-          {categoriesData.map((category) => (
+          {categories.map((category) => (
             <TouchableOpacity
               style={homeStyles.miniCatItem}
               key={category.categoryName}
             >
               <Image
                 style={homeStyles.categoryImage}
-                source={category.categoryImage}
+                source={{ uri: category.categoryImage }}
               />
               <Text style={homeStyles.categoryText}>
                 {category.categoryName}
