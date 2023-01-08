@@ -53,9 +53,9 @@ export default function HorizontalCard(props) {
         </Text>
 
         <View style={verticalProductCardStyles.locationAndRating}>
-          <Text style={verticalProductCardStyles.locationText}>
+          {/* <Text style={verticalProductCardStyles.locationText}>
             {county},{subCounty}
-          </Text>
+          </Text> */}
 
           <View style={verticalProductCardStyles.ratingContainer}>
             <AntDesign name="star" size={14} color={colors.orange} />

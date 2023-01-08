@@ -63,6 +63,31 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.lightBlue,
   },
+  optTextSign: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+    alignSelf: "center",
+  },
+  firstText: {
+    color: colors.lightBlue,
+    fontWeight: "800",
+    marginRight: 10,
+  },
+  opt2Text: {
+    fontWeight: "800",
+    color: colors.orange,
+  },
+  backDrop: {
+    backgroundColor: "rgba(0,0,0,0.9)",
+    height: "100%",
+    position: "absolute",
+    zIndex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
 });
 
 export default styles;

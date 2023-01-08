@@ -1,11 +1,41 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import styles from "../../../componets/styles/global-styles";
 
-const allProducts = require("../../../assets/data/top-products.json");
+import { ENDPOINT } from "@env";
+import axios from "axios";
+
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 export default function Discover() {
+  const [allProducts, setAllProducts] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
+
+  async function getAllProducts() {
+    const url = `${ENDPOINT}/product/get-all-products`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setLoadingData(false);
+        setAllProducts(response.data);
+        console.log(response.data[0]);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -23,7 +53,7 @@ export default function Discover() {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
-            rating={item.rating}
+            rating={item.rating.$numberDecimal}
           />
         )}
       />

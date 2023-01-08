@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import TabNavigator from "./src/navigators/tab-navigator";
 
 import { NativeBaseProvider, extendTheme } from "native-base";
+import AuthNav from "./src/navigators/auth-nav";
 
 const newColorTheme = {
   brand: {
@@ -18,7 +19,7 @@ export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
       <NavigationContainer>
-        <TabNavigator />
+        <AuthNav />
       </NavigationContainer>
     </NativeBaseProvider>
   );
