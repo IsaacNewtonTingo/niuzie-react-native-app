@@ -4,7 +4,7 @@ import styles from "../styles/global-styles";
 import { VStack, HStack, IconButton, Alert, CloseIcon } from "native-base";
 
 export default function CenteredAlert(props) {
-  const errorMessage = props.errorMessage;
+  const alertMessage = props.alertMessage;
   const alertStatus = props.alertStatus;
   const onPress = props.onPress;
 
@@ -16,7 +16,7 @@ export default function CenteredAlert(props) {
             <HStack space={2} flexShrink={1}>
               <Alert.Icon mt="1" />
               <Text fontSize="md" color="coolGray.800">
-                {errorMessage}
+                {alertMessage}
               </Text>
             </HStack>
 
