@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import styles from "../../../componets/styles/global-styles";
 import { postStyles } from "../../seller/post-product";
@@ -19,6 +19,8 @@ import colors from "../../../componets/colors/colors";
 import TopAlert from "../../../componets/alerts/top-alert";
 import { useEffect } from "react";
 import axios from "axios";
+import { CredentialsContext } from "../../../componets/context/credentials-context";
+import * as SecureStore from "expo-secure-store";
 
 export default function Login({ navigation, route }) {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -29,6 +31,11 @@ export default function Login({ navigation, route }) {
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertStatus, setAlertStatus] = useState("");
+
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials;
 
   useEffect(() => {
     if (route.params.alertMessage) {
@@ -50,6 +57,7 @@ export default function Login({ navigation, route }) {
     } else {
       setSubmitting(true);
       const url = `${process.env.ENDPOINT}/user/login`;
+      console.log(url);
       await axios
         .post(url, {
           phoneNumber: parseInt(phoneNumber),
@@ -62,6 +70,10 @@ export default function Login({ navigation, route }) {
             setAlertMessage(response.data.message);
             setAlertStatus("success");
             setAlert(true);
+
+            const { data } = response.data;
+
+            storeCredentials({ data });
           } else {
             setAlertMessage(response.data.message);
             setAlertStatus("error");
@@ -73,6 +85,17 @@ export default function Login({ navigation, route }) {
           console.log(err);
         });
     }
+  }
+
+  async function storeCredentials(values) {
+    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
+      .then(() => {
+        setStoredCredentials(values);
+        console.log(values);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   return (

@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import colors from "../colors/colors";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BarIndicator } from "react-native-indicators";
+
+import colors from "../colors/colors";
 
 export default function PrimaryButton(props) {
   const title = props.buttonTitle;
@@ -33,5 +34,3 @@ export default function PrimaryButton(props) {
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({});

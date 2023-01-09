@@ -40,10 +40,6 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     getCategories();
-
-    // return () => {
-    //   getCategories();
-    // };
   }, []);
 
   async function getCategories() {

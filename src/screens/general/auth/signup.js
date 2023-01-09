@@ -22,6 +22,8 @@ import axios from "axios";
 import { BottomSheet } from "react-native-btr";
 import CenteredAlert from "../../../componets/alerts/centered-alert";
 
+import { ENDPOINT } from "@env";
+
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -72,7 +74,8 @@ export default function SignUp({ navigation }) {
       setAlert(true);
       setAlertMessage("Passwords don't match");
     } else {
-      const url = `${process.env.ENDPOINT}/user/signup`;
+      const url = `https://niuzie.herokuapp.com/api/user/signup`;
+      console.log(url);
       setSubmitting(true);
 
       await axios
@@ -119,6 +122,7 @@ export default function SignUp({ navigation }) {
             alertMessage: "Code verified successfuly. Please login",
             alertStatus: "success",
           });
+          setVisible(false);
         } else {
           setAlert(true);
           setAlertMessage(response.data.message);

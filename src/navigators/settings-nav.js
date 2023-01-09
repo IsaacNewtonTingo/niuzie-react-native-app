@@ -27,5 +27,3 @@ export default function SettingsNav() {
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({});
