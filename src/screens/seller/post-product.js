@@ -7,7 +7,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
 import { RadioButton } from "react-native-paper";
 
@@ -21,32 +21,143 @@ import { Foundation } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import PrimaryButton from "../../componets/buttons/primary-button";
 import SecondaryButton from "../../componets/buttons/secondary-button";
+import axios from "axios";
+
+import { CredentialsContext } from "../../componets/context/credentials-context";
+import CenteredAlert from "../../componets/alerts/centered-alert";
+import TopAlert from "../../componets/alerts/top-alert";
 
 const { width } = Dimensions.get("window");
 
-export default function PostProduct() {
+export default function PostProduct({ navigation }) {
   const [maxPosts, setMaxPosts] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [productName, setProductName] = useState("");
-
-  const [category, setCategory] = useState("Clothes & apparel");
-  const [subCategory, setSubCetCategory] = useState("Jackets");
-
+  const [category, setCategory] = useState("63b9945570b977b9b624ff2e");
+  const [subCategory, setSubCetCategory] = useState("63b9aa969bcab5044ad1b418");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState();
-
   const [condition, setCondition] = useState("");
+  const [image1, setImage1] = useState("");
+  const [image2, setImage2] = useState("");
+  const [image3, setImage3] = useState("");
+  const [image4, setImage4] = useState("");
 
-  const [firstName, setFirstName] = useState("Isaac");
-  const [lastName, setLastName] = useState("Tingo");
-  const [phoneNumber, setPhoneNumber] = useState("+254724753175");
-  const [county, setCounty] = useState("Nairobi");
-  const [subCounty, setSubCounty] = useState("Kasarani");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
+
+  const [alert, setAlert] = useState(true);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertStatus, setAlertStatus] = useState("");
 
   const userName = firstName + " " + lastName;
 
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials;
+  const userID = data.userID;
+
+  useEffect(() => {
+    getUserData();
+    checkUserProducts();
+  }, [(loading, navigation)]);
+
+  navigation.addListener("focus", () => setLoading(!loading));
+
+  async function getUserData() {
+    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
+    await axios
+      .get(url)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setFirstName(response.data.data.firstName);
+          setLastName(response.data.data.lastName);
+          setPhoneNumber(response.data.data.phoneNumber);
+          setCounty(response.data.data.county);
+          setSubCounty(response.data.data.subCounty);
+        } else {
+          setFirstName("");
+          setLastName("");
+          setPhoneNumber("");
+          setCounty("");
+          setSubCounty("");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function checkUserProducts() {
+    const url = `${process.env.ENDPOINT}/product/get-number/${userID}`;
+    await axios
+      .get(url)
+      .then((response) => {
+        if (response.data.data >= 2) {
+          setMaxPosts(true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function postProduct() {
+    const url = `${process.env.ENDPOINT}/product/post-product`;
+    setSubmitting(true);
+
+    await axios
+      .post(url, {
+        userID,
+        phoneNumber,
+        productName,
+        category,
+        subCategory,
+        condition,
+        description,
+        price,
+        image1,
+        image2,
+        image3,
+        image4,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setSubmitting(false);
+        if (response.data.status == "Success") {
+          setAlert(true);
+          setAlertMessage(response.data.message);
+          setAlertStatus("success");
+
+          checkUserProducts();
+        } else {
+          setAlert(true);
+          setAlertMessage(response.data.message);
+          setAlertStatus("error");
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
   return (
     <ScrollView style={styles.container}>
+      {alert && (
+        <CenteredAlert
+          onPress={() => setAlert(false)}
+          alertMessage={alertMessage}
+          alertStatus={alertStatus}
+        />
+      )}
+
       {maxPosts == true && (
         <View style={postStyles.holdingContainer}>
           <View style={postStyles.warningContainer}>
@@ -242,7 +353,12 @@ export default function PostProduct() {
 
         <SecondaryButton iconName="address-book-o" buttonTitle={subCounty} />
 
-        <PrimaryButton onPress={() => {}} buttonTitle="Post product" />
+        <PrimaryButton
+          disabled={submitting}
+          submitting={submitting}
+          onPress={postProduct}
+          buttonTitle="Post product"
+        />
       </View>
     </ScrollView>
   );
