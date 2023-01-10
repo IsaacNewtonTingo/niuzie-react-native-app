@@ -26,6 +26,9 @@ import axios from "axios";
 import { CredentialsContext } from "../../componets/context/credentials-context";
 import CenteredAlert from "../../componets/alerts/centered-alert";
 import TopAlert from "../../componets/alerts/top-alert";
+import PrimaryTextInput from "../../componets/textInput/primary-text-input";
+import SignUpComponent from "../../componets/auth/signup";
+import LoginComponent from "../../componets/auth/login";
 
 const { width } = Dimensions.get("window");
 
@@ -55,17 +58,24 @@ export default function PostProduct({ navigation }) {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertStatus, setAlertStatus] = useState("");
 
+  const [loginAlert, setLoginAlert] = useState(true);
+  const [showAuthComponent, setShowAuthComponent] = useState(false);
+
   const userName = firstName + " " + lastName;
 
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
-  const { data } = storedCredentials;
-  const userID = data.userID;
+  const { data } = storedCredentials ? storedCredentials : "";
+  const userID = storedCredentials ? data.userID : "";
 
   useEffect(() => {
-    getUserData();
-    checkUserProducts();
+    if (userID) {
+      getUserData();
+      checkUserProducts();
+    } else {
+      setLoginAlert(true);
+    }
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
@@ -148,219 +158,280 @@ export default function PostProduct({ navigation }) {
       });
   }
 
+  // const inputs = [
+  //   {
+  //     value: productName,
+  //     onChangeText: setProductName,
+  //     keyboardType: "",
+  //     maxLength: 20,
+  //   },
+  // ];
+
   return (
-    <ScrollView style={styles.container}>
-      {alert && (
-        <CenteredAlert
-          onPress={() => setAlert(false)}
-          alertMessage={alertMessage}
-          alertStatus={alertStatus}
-        />
-      )}
+    <>
+      {loginAlert ? (
+        <View style={styles.container}>
+          {!showAuthComponent ? (
+            <>
+              <View style={postStyles.holdingContainer}>
+                <View style={postStyles.warningContainer}>
+                  <Text style={postStyles.warnText}>Unauthorized !</Text>
+                  <Text style={postStyles.warnDetailsText}>
+                    In order to post a product that you are selling or looking
+                    for, you need to have logged in first. If you don't have an
+                    account, please signup first.
+                  </Text>
+                </View>
+              </View>
 
-      {maxPosts == true && (
-        <View style={postStyles.holdingContainer}>
-          <View style={postStyles.warningContainer}>
-            <Text style={postStyles.warnText}>Warning !</Text>
-            <Text style={postStyles.warnDetailsText}>
-              You had already posted 2 products. To upload more products, you
-              will need to pay KSH. 300 per product to publish them.
-            </Text>
+              <View style={postStyles.btnsContainer}>
+                <PrimaryButton
+                  style={{ width: "45%" }}
+                  buttonTitle="Login"
+                  onPress={() => setShowAuthComponent(true)}
+                />
+                <PrimaryButton
+                  onPress={() => setShowAuthComponent(true)}
+                  style={{
+                    width: "45%",
+                    backgroundColor: colors.dark,
+                    borderWidth: 1,
+                    borderColor: "#0066FF",
+                  }}
+                  buttonTitle="Signup"
+                />
+              </View>
+            </>
+          ) : (
+            <LoginComponent />
+          )}
+        </View>
+      ) : (
+        <ScrollView style={styles.container}>
+          {alert && (
+            <CenteredAlert
+              onPress={() => setAlert(false)}
+              alertMessage={alertMessage}
+              alertStatus={alertStatus}
+            />
+          )}
+
+          {maxPosts == true && (
+            <View style={postStyles.holdingContainer}>
+              <View style={postStyles.warningContainer}>
+                <Text style={postStyles.warnText}>Warning !</Text>
+                <Text style={postStyles.warnDetailsText}>
+                  You had already posted 2 products. To upload more products,
+                  you will need to pay KSH. 300 per product to publish them.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <View style={postStyles.holdingContainer}>
+            <View style={styles.textComb}>
+              <Text style={styles.label}>Product name</Text>
+              <Text style={[styles.label, { color: "gray" }]}>
+                {productName.length}/20
+              </Text>
+            </View>
+
+            <View style={styles.textInputContainer}>
+              <FontAwesome
+                style={styles.searchIcon}
+                name="mobile-phone"
+                size={24}
+                color={colors.dark}
+              />
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g iPhone 14 pro max"
+                placeholderTextColor="gray"
+                value={productName}
+                onChangeText={setProductName}
+                maxLength={20}
+              />
+            </View>
+            <Text style={styles.label}>Category</Text>
+            <TouchableOpacity
+              style={[
+                styles.textInput,
+                { marginVertical: 10, justifyContent: "center" },
+              ]}
+            >
+              <Ionicons
+                style={styles.searchIcon}
+                name="shirt"
+                size={16}
+                color={colors.dark}
+              />
+              <Text style={postStyles.catText}>{category}</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Sub category</Text>
+            <TouchableOpacity
+              style={[
+                styles.textInput,
+                { marginVertical: 10, justifyContent: "center" },
+              ]}
+            >
+              <MaterialCommunityIcons
+                style={styles.searchIcon}
+                name="shoe-sneaker"
+                size={20}
+                color={colors.dark}
+              />
+              <Text style={postStyles.catText}>{subCategory}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.textComb}>
+              <Text style={styles.label}>Description</Text>
+              <Text style={[styles.label, { color: "gray" }]}>
+                {description.length}/200
+              </Text>
+            </View>
+
+            <View style={styles.textInputContainer}>
+              <Foundation
+                style={styles.searchIcon}
+                name="clipboard-notes"
+                size={18}
+                color={colors.dark}
+              />
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g Perfect phone for..."
+                placeholderTextColor="gray"
+                value={description}
+                onChangeText={setDescription}
+                maxLength={200}
+              />
+            </View>
+
+            <Text style={styles.label}>Price (KSH.)</Text>
+            <View style={styles.textInputContainer}>
+              <MaterialCommunityIcons
+                style={styles.searchIcon}
+                name="hand-coin-outline"
+                size={18}
+                color={colors.dark}
+              />
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g iPhone 14 pro max"
+                placeholderTextColor="gray"
+                keyboardType="numeric"
+              />
+            </View>
           </View>
-        </View>
-      )}
 
-      <View style={postStyles.holdingContainer}>
-        <View style={styles.textComb}>
-          <Text style={styles.label}>Product name</Text>
-          <Text style={[styles.label, { color: "gray" }]}>
-            {productName.length}/20
-          </Text>
-        </View>
-        <View style={styles.textInputContainer}>
-          <FontAwesome
-            style={styles.searchIcon}
-            name="mobile-phone"
-            size={24}
-            color={colors.dark}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="e.g iPhone 14 pro max"
-            placeholderTextColor="gray"
-            value={productName}
-            onChangeText={setProductName}
-            maxLength={20}
-          />
-        </View>
-        <Text style={styles.label}>Category</Text>
-        <TouchableOpacity
-          style={[
-            styles.textInput,
-            { marginVertical: 10, justifyContent: "center" },
-          ]}
-        >
-          <Ionicons
-            style={styles.searchIcon}
-            name="shirt"
-            size={16}
-            color={colors.dark}
-          />
-          <Text style={postStyles.catText}>{category}</Text>
-        </TouchableOpacity>
+          <View style={postStyles.holdingContainer}>
+            <Text style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}>
+              Condition
+            </Text>
 
-        <Text style={styles.label}>Sub category</Text>
-        <TouchableOpacity
-          style={[
-            styles.textInput,
-            { marginVertical: 10, justifyContent: "center" },
-          ]}
-        >
-          <MaterialCommunityIcons
-            style={styles.searchIcon}
-            name="shoe-sneaker"
-            size={20}
-            color={colors.dark}
-          />
-          <Text style={postStyles.catText}>{subCategory}</Text>
-        </TouchableOpacity>
+            <View style={postStyles.radioContainer}>
+              <RadioButton
+                value="New"
+                status={condition === "New" ? "checked" : "unchecked"}
+                onPress={() => {
+                  setCondition("New");
+                }}
+              />
+              <Text style={postStyles.radioText}>New</Text>
+            </View>
 
-        <View style={styles.textComb}>
-          <Text style={styles.label}>Description</Text>
-          <Text style={[styles.label, { color: "gray" }]}>
-            {description.length}/200
-          </Text>
-        </View>
+            <View style={postStyles.radioContainer}>
+              <RadioButton
+                value="Used, in working conditions"
+                status={
+                  condition === "Used, in working conditions"
+                    ? "checked"
+                    : "unchecked"
+                }
+                onPress={() => {
+                  setCondition("Used, in working conditions");
+                }}
+              />
+              <Text style={postStyles.radioText}>
+                Used, in working conditions
+              </Text>
+            </View>
 
-        <View style={styles.textInputContainer}>
-          <Foundation
-            style={styles.searchIcon}
-            name="clipboard-notes"
-            size={18}
-            color={colors.dark}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="e.g Perfect phone for..."
-            placeholderTextColor="gray"
-            value={description}
-            onChangeText={setDescription}
-            maxLength={200}
-          />
-        </View>
+            <View style={postStyles.radioContainer}>
+              <RadioButton
+                value="Used, with minor defects"
+                status={
+                  condition === "Used, with minor defects"
+                    ? "checked"
+                    : "unchecked"
+                }
+                onPress={() => {
+                  setCondition("Used, with minor defects");
+                }}
+              />
+              <Text style={postStyles.radioText}>Used, with minor defects</Text>
+            </View>
+          </View>
 
-        <Text style={styles.label}>Price (KSH.)</Text>
-        <View style={styles.textInputContainer}>
-          <MaterialCommunityIcons
-            style={styles.searchIcon}
-            name="hand-coin-outline"
-            size={18}
-            color={colors.dark}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="e.g iPhone 14 pro max"
-            placeholderTextColor="gray"
-            keyboardType="numeric"
-          />
-        </View>
-      </View>
+          <View style={postStyles.holdingContainer}>
+            <Text style={styles.label}>Add images</Text>
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              style={postStyles.horImaCont}
+            >
+              <TouchableOpacity style={postStyles.imageContainer}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
 
-      <View style={postStyles.holdingContainer}>
-        <Text style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}>
-          Condition
-        </Text>
+              <TouchableOpacity style={postStyles.imageContainer}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
 
-        <View style={postStyles.radioContainer}>
-          <RadioButton
-            value="New"
-            status={condition === "New" ? "checked" : "unchecked"}
-            onPress={() => {
-              setCondition("New");
-            }}
-          />
-          <Text style={postStyles.radioText}>New</Text>
-        </View>
+              <TouchableOpacity style={postStyles.imageContainer}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
 
-        <View style={postStyles.radioContainer}>
-          <RadioButton
-            value="Used, in working conditions"
-            status={
-              condition === "Used, in working conditions"
-                ? "checked"
-                : "unchecked"
-            }
-            onPress={() => {
-              setCondition("Used, in working conditions");
-            }}
-          />
-          <Text style={postStyles.radioText}>Used, in working conditions</Text>
-        </View>
+              <TouchableOpacity style={postStyles.imageContainer}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
 
-        <View style={postStyles.radioContainer}>
-          <RadioButton
-            value="Used, with minor defects"
-            status={
-              condition === "Used, with minor defects" ? "checked" : "unchecked"
-            }
-            onPress={() => {
-              setCondition("Used, with minor defects");
-            }}
-          />
-          <Text style={postStyles.radioText}>Used, with minor defects</Text>
-        </View>
-      </View>
+          <View style={postStyles.holdingContainer}>
+            <Text style={styles.label}>Full name</Text>
 
-      <View style={postStyles.holdingContainer}>
-        <Text style={styles.label}>Add images</Text>
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          style={postStyles.horImaCont}
-        >
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+            <SecondaryButton iconName="user" buttonTitle={userName} />
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+            <Text style={styles.label}>Phone number</Text>
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+            <SecondaryButton
+              iconName="phone-square"
+              buttonTitle={phoneNumber}
+            />
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+            <Text style={styles.label}>County</Text>
+
+            <SecondaryButton iconName="address-book" buttonTitle={county} />
+
+            <Text style={styles.label}>Sub county</Text>
+
+            <SecondaryButton
+              iconName="address-book-o"
+              buttonTitle={subCounty}
+            />
+
+            <PrimaryButton
+              disabled={submitting}
+              submitting={submitting}
+              onPress={postProduct}
+              buttonTitle="Post product"
+            />
+          </View>
         </ScrollView>
-      </View>
-
-      <View style={postStyles.holdingContainer}>
-        <Text style={styles.label}>Full name</Text>
-
-        <SecondaryButton iconName="user" buttonTitle={userName} />
-
-        <Text style={styles.label}>Phone number</Text>
-
-        <SecondaryButton iconName="phone-square" buttonTitle={phoneNumber} />
-
-        <Text style={styles.label}>County</Text>
-
-        <SecondaryButton iconName="address-book" buttonTitle={county} />
-
-        <Text style={styles.label}>Sub county</Text>
-
-        <SecondaryButton iconName="address-book-o" buttonTitle={subCounty} />
-
-        <PrimaryButton
-          disabled={submitting}
-          submitting={submitting}
-          onPress={postProduct}
-          buttonTitle="Post product"
-        />
-      </View>
-    </ScrollView>
+      )}
+    </>
   );
 }
 
@@ -408,5 +479,10 @@ export const postStyles = StyleSheet.create({
   },
   horImaCont: {
     marginVertical: 10,
+  },
+  btnsContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    justifyContent: "space-between",
   },
 });

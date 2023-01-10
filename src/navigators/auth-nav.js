@@ -8,6 +8,7 @@ import PhoneOtp from "../screens/general/auth/phone-otp";
 import EmailOtp from "../screens/general/auth/email-otp";
 import ResetPassword from "../screens/general/auth/reset-password";
 import colors from "../componets/colors/colors";
+import TabNavigator from "./tab-navigator";
 
 const Stack = createNativeStackNavigator();
 

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import PostProduct from "../screens/seller/post-product";
 import colors from "../componets/colors/colors";
+import AuthNav from "./auth-nav";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,14 @@ export default function PostProductNav() {
         options={{
           headerTitle: "Post product",
         }}
+      />
+
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="AuthNav"
+        component={AuthNav}
       />
     </Stack.Navigator>
   );

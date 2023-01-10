@@ -10,19 +10,19 @@ import React, { useState, useEffect, useContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
-import styles from "../../../componets/styles/global-styles";
-import { postStyles } from "../../seller/post-product";
+import styles from "../styles/global-styles";
+import { postStyles } from "../../screens/seller/post-product";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 
-import PrimaryButton from "../../../componets/buttons/primary-button";
-import colors from "../../../componets/colors/colors";
-import TopAlert from "../../../componets/alerts/top-alert";
+import PrimaryButton from "../buttons/primary-button";
+import colors from "../colors/colors";
+import TopAlert from "../alerts/top-alert";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import { CredentialsContext } from "../context/credentials-context";
 
-export default function Login({ navigation, route }) {
+export default function LoginComponent({ navigation, route }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,16 +36,6 @@ export default function Login({ navigation, route }) {
     useContext(CredentialsContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
-
-  useEffect(() => {
-    if (route.params) {
-      if (route.params.alertMessage) {
-        setAlert(true);
-        setAlertMessage(route.params.alertMessage);
-        setAlertStatus(route.params.alertStatus);
-      }
-    }
-  }, []);
 
   async function login() {
     if (!phoneNumber) {
@@ -154,13 +144,6 @@ export default function Login({ navigation, route }) {
           <Text style={styles.firstText}>Don't have an account ?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
             <Text style={styles.opt2Text}>Signup</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.optTextSign}>
-          <Text style={styles.firstText}>Forgot password ?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-            <Text style={styles.opt2Text}>Reset</Text>
           </TouchableOpacity>
         </View>
       </View>
