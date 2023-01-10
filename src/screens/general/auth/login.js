@@ -123,6 +123,7 @@ export default function Login({ navigation, route }) {
             onChangeText={setPhoneNumber}
             style={[styles.textInput, { color: colors.dark }]}
             placeholder="e.g +254724753175"
+            keyboardType="phone-pad"
           />
         </View>
 

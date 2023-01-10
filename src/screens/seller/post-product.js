@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+
 import PrimaryButton from "../../componets/buttons/primary-button";
 import SecondaryButton from "../../componets/buttons/secondary-button";
 import axios from "axios";
@@ -54,11 +55,11 @@ export default function PostProduct({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
-  const [alert, setAlert] = useState(true);
+  const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertStatus, setAlertStatus] = useState("");
 
-  const [loginAlert, setLoginAlert] = useState(true);
+  const [loginAlert, setLoginAlert] = useState(false);
   const [showAuthComponent, setShowAuthComponent] = useState(false);
 
   const userName = firstName + " " + lastName;
@@ -81,7 +82,8 @@ export default function PostProduct({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getUserData() {
-    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
+    const url = `https://niuzie.herokuapp.com/api/user/get-user-data/${userID}`;
+    console.log(url);
     await axios
       .get(url)
       .then((response) => {
@@ -171,40 +173,38 @@ export default function PostProduct({ navigation }) {
     <>
       {loginAlert ? (
         <View style={styles.container}>
-          {!showAuthComponent ? (
-            <>
-              <View style={postStyles.holdingContainer}>
-                <View style={postStyles.warningContainer}>
-                  <Text style={postStyles.warnText}>Unauthorized !</Text>
-                  <Text style={postStyles.warnDetailsText}>
-                    In order to post a product that you are selling or looking
-                    for, you need to have logged in first. If you don't have an
-                    account, please signup first.
-                  </Text>
-                </View>
-              </View>
+          <View style={postStyles.holdingContainer}>
+            <View style={postStyles.warningContainer}>
+              <Text style={postStyles.warnText}>Unauthorized !</Text>
+              <Text style={postStyles.warnDetailsText}>
+                In order to post a product that you are selling or looking for,
+                you need to have logged in first. If you don't have an account,
+                please signup first.
+              </Text>
+            </View>
+          </View>
 
-              <View style={postStyles.btnsContainer}>
-                <PrimaryButton
-                  style={{ width: "45%" }}
-                  buttonTitle="Login"
-                  onPress={() => setShowAuthComponent(true)}
-                />
-                <PrimaryButton
-                  onPress={() => setShowAuthComponent(true)}
-                  style={{
-                    width: "45%",
-                    backgroundColor: colors.dark,
-                    borderWidth: 1,
-                    borderColor: "#0066FF",
-                  }}
-                  buttonTitle="Signup"
-                />
-              </View>
-            </>
-          ) : (
-            <LoginComponent />
-          )}
+          <View style={postStyles.btnsContainer}>
+            <PrimaryButton
+              style={{ width: "45%" }}
+              buttonTitle="Login"
+              onPress={() =>
+                navigation.navigate("AuthNav", { screen: "Login" })
+              }
+            />
+            <PrimaryButton
+              onPress={() =>
+                navigation.navigate("AuthNav", { screen: "SignUp" })
+              }
+              style={{
+                width: "45%",
+                backgroundColor: colors.dark,
+                borderWidth: 1,
+                borderColor: "#0066FF",
+              }}
+              buttonTitle="Signup"
+            />
+          </View>
         </View>
       ) : (
         <ScrollView style={styles.container}>

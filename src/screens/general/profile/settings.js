@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Avatar } from "react-native-paper";
 
 import styles from "../../../componets/styles/global-styles";
@@ -17,8 +17,18 @@ import { postStyles } from "../../seller/post-product";
 import colors from "../../../componets/colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
+import { CredentialsContext } from "../../../componets/context/credentials-context";
+import axios from "axios";
 
-export default function Settings() {
+export default function Settings({ navigation }) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials ? storedCredentials : "";
+  const userID = storedCredentials ? data.userID : "";
+
+  const [loading, setLoading] = useState(false);
+
   const settingList = [
     {
       title: "Saved products",
@@ -57,8 +67,34 @@ export default function Settings() {
     },
   ];
 
-  const [firstName, setFirstName] = useState("Isaac");
-  const [LastName, setLastName] = useState("Tingo");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  useEffect(() => {
+    if (userID) {
+      getUserData();
+    }
+  }, [(loading, navigation)]);
+
+  navigation.addListener("focus", () => setLoading(!loading));
+
+  async function getUserData() {
+    const url = `https://niuzie.herokuapp.com/api/user/get-user-data/${userID}`;
+    await axios
+      .get(url)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setFirstName(response.data.data.firstName);
+          setLastName(response.data.data.lastName);
+        } else {
+          setFirstName("");
+          setLastName("");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -72,7 +108,7 @@ export default function Settings() {
 
           <View>
             <Text style={settingsStyls.name}>
-              {firstName} {LastName}
+              {firstName} {lastName}
             </Text>
             <Text style={settingsStyls.prof}>View profile</Text>
           </View>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { LogBox } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import TabNavigator from "./src/navigators/tab-navigator";
@@ -8,6 +9,8 @@ import AuthNav from "./src/navigators/auth-nav";
 
 import { CredentialsContext } from "./src/componets/context/credentials-context";
 import * as SecureStore from "expo-secure-store";
+
+LogBox.ignoreAllLogs();
 
 const newColorTheme = {
   brand: {
