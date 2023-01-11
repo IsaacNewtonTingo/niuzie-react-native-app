@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  FlatList,
+  Image,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
@@ -26,21 +28,26 @@ import axios from "axios";
 
 import { CredentialsContext } from "../../componets/context/credentials-context";
 import CenteredAlert from "../../componets/alerts/centered-alert";
-import TopAlert from "../../componets/alerts/top-alert";
-import PrimaryTextInput from "../../componets/textInput/primary-text-input";
-import SignUpComponent from "../../componets/auth/signup";
-import LoginComponent from "../../componets/auth/login";
+
+import { BottomSheet } from "react-native-btr";
 
 const { width } = Dimensions.get("window");
+
+import { homeStyles } from "../general/dashboard/home";
+import SubCategoryList from "../../componets/lists/sub-category-list";
+import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 
 export default function PostProduct({ navigation }) {
   const [maxPosts, setMaxPosts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
   const [productName, setProductName] = useState("");
-  const [category, setCategory] = useState("63b9945570b977b9b624ff2e");
-  const [subCategory, setSubCetCategory] = useState("63b9aa969bcab5044ad1b418");
+  const [category, setCategory] = useState("");
+  const [categoryID, setCategoryID] = useState("");
+  const [subCategory, setSubCatCategory] = useState("");
+  const [subCategoryID, setSubCatCategoryID] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState();
   const [condition, setCondition] = useState("");
@@ -61,6 +68,12 @@ export default function PostProduct({ navigation }) {
 
   const [loginAlert, setLoginAlert] = useState(false);
   const [showAuthComponent, setShowAuthComponent] = useState(false);
+
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [showCatSheet, setShowCatSheet] = useState(false);
+  const [showSubCatSheet, setShowSubCatSheet] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
 
   const userName = firstName + " " + lastName;
 
@@ -83,7 +96,6 @@ export default function PostProduct({ navigation }) {
 
   async function getUserData() {
     const url = `https://niuzie.herokuapp.com/api/user/get-user-data/${userID}`;
-    console.log(url);
     await axios
       .get(url)
       .then((response) => {
@@ -107,7 +119,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function checkUserProducts() {
-    const url = `${process.env.ENDPOINT}/product/get-number/${userID}`;
+    const url = `https://niuzie.herokuapp.com/api/product/get-number/${userID}`;
     await axios
       .get(url)
       .then((response) => {
@@ -129,8 +141,8 @@ export default function PostProduct({ navigation }) {
         userID,
         phoneNumber,
         productName,
-        category,
-        subCategory,
+        category: categoryID,
+        subCategory: subCategoryID,
         condition,
         description,
         price,
@@ -160,14 +172,49 @@ export default function PostProduct({ navigation }) {
       });
   }
 
-  // const inputs = [
-  //   {
-  //     value: productName,
-  //     onChangeText: setProductName,
-  //     keyboardType: "",
-  //     maxLength: 20,
-  //   },
-  // ];
+  async function handleCategory() {
+    setShowBottomSheet(true);
+    setShowCatSheet(true);
+    setShowSubCatSheet(false);
+    getCategories();
+  }
+
+  async function handleSubCategory() {
+    setShowBottomSheet(true);
+    setShowSubCatSheet(true);
+    setShowCatSheet(false);
+    getSubCategories();
+  }
+
+  async function getCategories() {
+    const url = `https://niuzie.herokuapp.com/api/admin/get-categories`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setCategories(response.data.data);
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  async function getSubCategories() {
+    const url = `https://niuzie.herokuapp.com/api/admin/get-sub-categories/${categoryID}`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setSubCategories(response.data.data);
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
 
   return (
     <>
@@ -254,6 +301,7 @@ export default function PostProduct({ navigation }) {
             </View>
             <Text style={styles.label}>Category</Text>
             <TouchableOpacity
+              onPress={handleCategory}
               style={[
                 styles.textInput,
                 { marginVertical: 10, justifyContent: "center" },
@@ -270,6 +318,7 @@ export default function PostProduct({ navigation }) {
 
             <Text style={styles.label}>Sub category</Text>
             <TouchableOpacity
+              onPress={handleSubCategory}
               style={[
                 styles.textInput,
                 { marginVertical: 10, justifyContent: "center" },
@@ -429,6 +478,58 @@ export default function PostProduct({ navigation }) {
               buttonTitle="Post product"
             />
           </View>
+
+          <BottomSheet
+            visible={showBottomSheet}
+            onBackButtonPress={() => setShowBottomSheet(false)}
+            onBackdropPress={() => setShowBottomSheet(false)}
+          >
+            <View style={postStyles.sheetContainer}>
+              {showCatSheet ? (
+                <View style={homeStyles.miniCatContainer}>
+                  {categories.map((category) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCategory(category.categoryName);
+                        setCategoryID(category._id);
+
+                        setSubCatCategory("");
+                        setSubCatCategoryID("");
+                        setShowBottomSheet(false);
+                      }}
+                      style={homeStyles.miniCatItem}
+                      key={category._id}
+                    >
+                      <Image
+                        style={homeStyles.categoryImage}
+                        source={{ uri: category.categoryImage }}
+                      />
+                      <Text style={homeStyles.categoryText}>
+                        {category.categoryName}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : showSubCatSheet ? (
+                <FlatList
+                  data={subCategories}
+                  renderItem={({ item }) => (
+                    <PostSubCategoryList
+                      onPress={() => {
+                        setSubCatCategory(item.subCategoryName);
+                        setSubCatCategoryID(item._id);
+                        setShowBottomSheet(false);
+                      }}
+                      subCategoryID={item._id}
+                      subCategoryName={item.subCategoryName}
+                    />
+                  )}
+                />
+              ) : (
+                <></>
+              )}
+            </View>
+          </BottomSheet>
         </ScrollView>
       )}
     </>
@@ -458,7 +559,7 @@ export const postStyles = StyleSheet.create({
     color: colors.lightBlue,
   },
   catText: {
-    color: "gray",
+    color: colors.dark,
     fontSize: 13,
   },
   radioContainer: {
@@ -484,5 +585,13 @@ export const postStyles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 20,
     justifyContent: "space-between",
+  },
+  sheetContainer: {
+    backgroundColor: colors.lightBlue,
+    width: "100%",
+    paddingVertical: 40,
+    borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
+    paddingHorizontal: 10,
   },
 });

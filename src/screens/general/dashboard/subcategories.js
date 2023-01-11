@@ -17,14 +17,10 @@ export default function Subcategories({ route, navigation }) {
 
   useEffect(() => {
     getSubCategories();
-
-    // return () => {
-    //   getSubCategories();
-    // };
   }, []);
 
   async function getSubCategories() {
-    const url = `${ENDPOINT}/admin/get-sub-categories/${categoryID}`;
+    const url = `https://niuzie.herokuapp.com/api/admin/get-sub-categories/${categoryID}`;
 
     await axios
       .get(url)

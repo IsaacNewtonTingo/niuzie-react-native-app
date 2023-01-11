@@ -43,7 +43,7 @@ export default function Home({ navigation }) {
   }, []);
 
   async function getCategories() {
-    const url = `${ENDPOINT}/admin/get-categories`;
+    const url = `https://niuzie.herokuapp.com/api/admin/get-categories`;
 
     await axios
       .get(url)
@@ -91,12 +91,12 @@ export default function Home({ navigation }) {
         <View style={homeStyles.miniCatContainer}>
           {categories.map((category) => (
             <TouchableOpacity
-              onPress={() =>
+              onPress={() => {
                 navigation.navigate("Subcategories", {
                   categoryID: category._id,
                   categoryName: category.categoryName,
-                })
-              }
+                });
+              }}
               style={homeStyles.miniCatItem}
               key={category._id}
             >
@@ -163,7 +163,7 @@ export default function Home({ navigation }) {
   );
 }
 
-const homeStyles = StyleSheet.create({
+export const homeStyles = StyleSheet.create({
   imageCarousel: {
     width: width,
     height: width / 1.8,
@@ -177,7 +177,6 @@ const homeStyles = StyleSheet.create({
     width: width / 4.5,
     height: width / 4.5,
     backgroundColor: colors.cardColor,
-    marginRight: 10,
     marginBottom: 10,
     borderRadius: 10,
     alignItems: "center",
