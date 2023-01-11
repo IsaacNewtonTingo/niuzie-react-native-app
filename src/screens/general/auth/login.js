@@ -58,7 +58,7 @@ export default function Login({ navigation, route }) {
       setAlert(true);
     } else {
       setSubmitting(true);
-      const url = `${process.env.ENDPOINT}/user/login`;
+      const url = `https://niuzie.herokuapp.com/api/user/login`;
       console.log(url);
       await axios
         .post(url, {
@@ -101,7 +101,7 @@ export default function Login({ navigation, route }) {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
       {alert && (
         <TopAlert
           onPress={() => setAlert(false)}
