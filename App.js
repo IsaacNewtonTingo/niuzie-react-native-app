@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
 import { LogBox } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -47,6 +48,7 @@ export default function App() {
       <NativeBaseProvider theme={theme}>
         <NavigationContainer>
           <TabNavigator />
+          <StatusBar style="light" />
         </NavigationContainer>
       </NativeBaseProvider>
     </CredentialsContext.Provider>

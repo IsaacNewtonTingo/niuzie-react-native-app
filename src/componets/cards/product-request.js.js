@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,7 +25,7 @@ export default function ProductRequest(props) {
   const date = props.item.date;
 
   return (
-    <>
+    <TouchableOpacity>
       <LinearGradient
         start={[0.0, 0.5]}
         end={[1.0, 0.5]}
@@ -53,7 +59,7 @@ export default function ProductRequest(props) {
             fontSize: 12,
           }}
         >
-          {content.length <= 70 ? content : content.slice(0, 69) + "..."}
+          {content.length <= 60 ? content : content.slice(0, 59) + "..."}
         </Text>
 
         <View
@@ -82,14 +88,14 @@ export default function ProductRequest(props) {
           </Text>
         </View>
       </LinearGradient>
-    </>
+    </TouchableOpacity>
   );
 }
 
 const gradientStyles = StyleSheet.create({
   background: {
-    height: 120,
-    width: width / 1.2,
+    height: 140,
+    width: width / 1.5,
     marginRight: 10,
     padding: 20,
     borderWidth: 1,

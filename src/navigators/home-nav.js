@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, Image } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -10,6 +10,15 @@ import UserProfile from "../screens/general/dashboard/user-profile";
 import colors from "../componets/colors/colors";
 
 const Stack = createNativeStackNavigator();
+
+function Logo() {
+  return (
+    <Image
+      style={{ width: 25, height: 25 }}
+      source={require("../assets/images/niuzie-logo.png")}
+    />
+  );
+}
 
 export default function HomeNav() {
   return (
@@ -24,7 +33,8 @@ export default function HomeNav() {
     >
       <Stack.Screen
         options={{
-          headerTitle: "",
+          title: "",
+          headerTitle: (props) => <Logo {...props} />,
         }}
         name="Home"
         component={Home}

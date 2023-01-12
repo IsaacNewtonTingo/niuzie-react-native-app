@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
 
   searchContainer: {
     marginTop: 20,
+    marginHorizontal: 10,
   },
 
   searchIcon: {
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginVertical: 20,
+    marginHorizontal: 10,
   },
   textComb: {
     flexDirection: "row",

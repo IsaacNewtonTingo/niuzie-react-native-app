@@ -98,7 +98,10 @@ export default function Settings({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={settingsListStyles.btn}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Profile")}
+        style={settingsListStyles.btn}
+      >
         <View style={settingsListStyles.close}>
           <Avatar.Image
             style={{ marginRight: 20 }}

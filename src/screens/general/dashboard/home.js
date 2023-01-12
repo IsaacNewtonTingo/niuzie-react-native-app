@@ -105,6 +105,10 @@ export default function Home({ navigation }) {
       </View>
 
       <View style={styles.section}>
+        <View style={styles.textComb}>
+          <Text style={styles.subText}>Buyer requests</Text>
+          <Text style={styles.viewAll}>View all</Text>
+        </View>
         <View style={homeStyles.miniCatContainer}>
           <FlatList
             horizontal
@@ -113,13 +117,6 @@ export default function Home({ navigation }) {
             renderItem={({ item }) => <ProductRequest item={item} />}
           />
         </View>
-      </View>
-
-      <View style={homeStyles.carouselContainer}>
-        <Image
-          style={homeStyles.imageCarousel}
-          source={require("../../../assets/images/promo.jpg")}
-        />
       </View>
 
       <View style={styles.section}>
@@ -209,6 +206,7 @@ export const homeStyles = StyleSheet.create({
 
   carouselContainer: {
     marginTop: 20,
+    marginHorizontal: 10,
   },
   miniCatItem: {
     width: width / 4.5,
