@@ -27,6 +27,8 @@ import { ENDPOINT } from "@env";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import ProductRequest from "../../../componets/cards/product-request.js";
 
+import { AutoScrollFlatList } from "react-native-autoscroll-flatlist";
+
 const { width } = Dimensions.get("window");
 
 const topProductsData = require("../../../assets/data/top-products.json");
@@ -105,6 +107,8 @@ export default function Home({ navigation }) {
       <View style={styles.section}>
         <View style={homeStyles.miniCatContainer}>
           <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
             data={productRequests}
             renderItem={({ item }) => <ProductRequest item={item} />}
           />
