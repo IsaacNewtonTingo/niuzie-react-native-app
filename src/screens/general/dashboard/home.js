@@ -24,8 +24,8 @@ import HorizontalCard from "../../../componets/cards/horizontal-card";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { ENDPOINT } from "@env";
-import LoadingSkeleton from "../../../componets/preloader/skeleton";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import ProductRequest from "../../../componets/cards/product-request.js";
 
 const { width } = Dimensions.get("window");
 
@@ -37,6 +37,30 @@ export default function Home({ navigation }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
+
+  const productRequests = [
+    {
+      firstName: "Henry",
+      lastName: "Ford",
+      profilePicture: "",
+      content:
+        "Hello. Is there anyone selling Samsung Galaxy S22 that is slightly used? I need it at an affordable price",
+      county: "Nairobi",
+      subCounty: "Kasarani",
+      date: "17th Jan 2023",
+    },
+
+    {
+      firstName: "Natalie",
+      lastName: "Churning",
+      profilePicture: "",
+      content:
+        "Someone selling a brand new Ford GT 500 Mustang the 1969 model please reach out to me. I have a lot of money ",
+      county: "Siaya",
+      subCounty: "Bondo",
+      date: "11th Jan 2023",
+    },
+  ];
 
   useEffect(() => {
     getCategories();
@@ -76,6 +100,15 @@ export default function Home({ navigation }) {
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
+      </View>
+
+      <View style={styles.section}>
+        <View style={homeStyles.miniCatContainer}>
+          <FlatList
+            data={productRequests}
+            renderItem={({ item }) => <ProductRequest item={item} />}
+          />
+        </View>
       </View>
 
       <View style={homeStyles.carouselContainer}>
