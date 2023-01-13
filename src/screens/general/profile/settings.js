@@ -69,6 +69,8 @@ export default function Settings({ navigation }) {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (userID) {
@@ -86,6 +88,8 @@ export default function Settings({ navigation }) {
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
+          setPhoneNumber(response.data.data.phoneNumber);
+          setEmail(response.data.data.email);
         } else {
           setFirstName("");
           setLastName("");
@@ -99,7 +103,14 @@ export default function Settings({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate("Profile")}
+        onPress={() =>
+          navigation.navigate("Profile", {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+          })
+        }
         style={settingsListStyles.btn}
       >
         <View style={settingsListStyles.close}>
