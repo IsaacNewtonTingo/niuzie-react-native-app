@@ -29,6 +29,8 @@ export default function EditProfile({ route }) {
 
   const [submitting, setSubmitting] = useState(false);
 
+  //sat
+
   return (
     <ScrollView style={styles.container}>
       <View style={postStyles.holdingContainer}>
