@@ -145,7 +145,7 @@ export default function PostProduct({ navigation }) {
         subCategory: subCategoryID,
         condition,
         description,
-        price,
+        price: parseInt(price),
         image1,
         image2,
         image3,
@@ -367,9 +367,11 @@ export default function PostProduct({ navigation }) {
               />
               <TextInput
                 style={styles.textInput}
-                placeholder="e.g iPhone 14 pro max"
+                placeholder="e.g 1200"
                 placeholderTextColor="gray"
-                keyboardType="numeric"
+                  keyboardType="numeric"
+                  value={price}
+                  onChangeText={setPrice}
               />
             </View>
           </View>

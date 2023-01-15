@@ -31,8 +31,8 @@ import { AutoScrollFlatList } from "react-native-autoscroll-flatlist";
 
 const { width } = Dimensions.get("window");
 
-const topProductsData = require("../../../assets/data/top-products.json");
-const recentViewsData = require("../../../assets/data/top-products.json");
+const topProductsData = [];
+const recentViewsData = [];
 
 export default function Home({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);

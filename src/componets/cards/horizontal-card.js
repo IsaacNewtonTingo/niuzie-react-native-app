@@ -7,14 +7,19 @@ import {
   Dimensions,
 } from "react-native";
 import React from "react";
+
 import styles from "../styles/global-styles";
 import colors from "../colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
+import noImage from "../../assets/data/noImage";
 
 const { width } = Dimensions.get("window");
 export default function HorizontalCard(props) {
-  const productImage = props.image1;
+  const productImage1 = props.productImage1;
+  const productImage2 = props.productImage2;
+  const productImage3 = props.productImage3;
+  const productImage4 = props.productImage4;
   const productName = props.productName;
   const price = props.price;
   const condition = props.condition;
@@ -22,40 +27,53 @@ export default function HorizontalCard(props) {
   const county = props.county;
   const subCounty = props.subCounty;
   const rating = props.rating;
+  const onPress = props.onPress;
 
   return (
-    <TouchableOpacity style={verticalProductCardStyles.card}>
+    <TouchableOpacity onPress={onPress} style={verticalProductCardStyles.card}>
       <Image
         style={verticalProductCardStyles.productImage}
         source={{
-          uri: "https://www.digitaltrends.com/wp-content/uploads/2022/09/iPhone-14-Pro-Back-Purple-Hand.jpg?p=1",
+          uri: productImage1
+            ? productImage1
+            : productImage2
+            ? productImage2
+            : productImage3
+            ? productImage3
+            : productImage4
+            ? productImage4
+            : noImage.noProductImage,
         }}
       />
 
       <View style={verticalProductCardStyles.detailsContainer}>
-        <View style={verticalProductCardStyles.nameAndCondition}>
-          <Text style={verticalProductCardStyles.productNameText}>
-            {productName.length <= 13
-              ? productName
-              : productName.slice(1, 12) + "..."}
-          </Text>
-          <Text style={verticalProductCardStyles.conditionText}>
-            {condition}
-          </Text>
+        <View>
+          <View style={verticalProductCardStyles.nameAndCondition}>
+            <Text style={verticalProductCardStyles.productNameText}>
+              {productName.length <= 15
+                ? productName
+                : productName.slice(0, 14) + "..."}
+            </Text>
+            <Text style={verticalProductCardStyles.conditionText}>
+              {condition.length <= 8
+                ? condition
+                : condition.slice(0, 7) + "..."}
+            </Text>
+          </View>
+
+          <Text style={verticalProductCardStyles.priceText}>Ksh. {price}</Text>
         </View>
 
-        <Text style={verticalProductCardStyles.priceText}>Ksh. {price}</Text>
-
         <Text style={verticalProductCardStyles.descriptionText}>
-          {description.length <= 80
+          {description.length <= 60
             ? description
-            : description.slice(1, 79) + "..."}
+            : description.slice(1, 59) + "..."}
         </Text>
 
         <View style={verticalProductCardStyles.locationAndRating}>
-          {/* <Text style={verticalProductCardStyles.locationText}>
+          <Text style={verticalProductCardStyles.locationText}>
             {county},{subCounty}
-          </Text> */}
+          </Text>
 
           <View style={verticalProductCardStyles.ratingContainer}>
             <AntDesign name="star" size={14} color={colors.orange} />
@@ -69,18 +87,22 @@ export default function HorizontalCard(props) {
 
 const verticalProductCardStyles = StyleSheet.create({
   card: {
-    width: width / 2.1,
-    height: 330,
+    width: width,
+    minHeight: 160,
     backgroundColor: colors.cardColor,
     borderRadius: 10,
-    marginRight: 5,
+    marginBottom: 10,
+    flexDirection: "row",
   },
   productImage: {
-    width: "100%",
-    height: 120,
+    width: width / 2.5,
+    height: "100%",
+    borderRadius: 10,
   },
   detailsContainer: {
     padding: 10,
+    justifyContent: "space-between",
+    flex: 1,
   },
   ratingContainer: {
     flexDirection: "row",

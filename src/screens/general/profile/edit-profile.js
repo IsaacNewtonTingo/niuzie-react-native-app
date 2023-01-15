@@ -13,23 +13,29 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import colors from "../../../componets/colors/colors";
 import axios from "axios";
+
 import { postStyles } from "../../seller/post-product";
+import { BottomSheet } from "react-native-btr";
 
 export default function EditProfile({ route }) {
   const [firstName, setFirstName] = useState(route.params.firstName);
   const [lastName, setLastName] = useState(route.params.lastName);
   const [email, setEmail] = useState(route.params.email);
   const [phoneNumber, setPhoneNumber] = useState(route.params.phoneNumber);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [changePassModal, setChangePassModal] = useState(false);
 
-  //sat
+  async function changePassword() {}
 
   return (
     <ScrollView style={styles.container}>
@@ -117,7 +123,7 @@ export default function EditProfile({ route }) {
           }
         />
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setChangePassModal(true)}>
           <Text
             style={{
               color: colors.orange,
@@ -130,6 +136,78 @@ export default function EditProfile({ route }) {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <BottomSheet
+        visible={changePassModal}
+        onBackButtonPress={() => setChangePassModal(false)}
+        onBackdropPress={() => setChangePassModal(false)}
+      >
+        <LinearGradient
+          colors={[colors.cardColor, colors.dark]}
+          style={editProfileStyles.bottomNavigationView}
+        >
+          <Text style={styles.label}>Old password</Text>
+          <View style={styles.textInputContainer}>
+            <FontAwesome5
+              name="lock"
+              size={18}
+              color="black"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              value={oldPassword}
+              onChangeText={setOldPassword}
+              style={[styles.textInput, { color: colors.dark }]}
+              placeholder="*******"
+              placeholderTextColor="gray"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <Text style={styles.label}>New password</Text>
+          <View style={styles.textInputContainer}>
+            <FontAwesome5
+              name="lock"
+              size={18}
+              color="black"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              value={newPassword}
+              onChangeText={setNewPassword}
+              style={[styles.textInput, { color: colors.dark }]}
+              placeholder="********"
+              placeholderTextColor="gray"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <Text style={styles.label}>Confirm new password</Text>
+          <View style={styles.textInputContainer}>
+            <FontAwesome5
+              name="lock"
+              size={18}
+              color="black"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              value={confirmNewPassword}
+              onChangeText={setConfirmNewPassword}
+              style={[styles.textInput, { color: colors.dark }]}
+              placeholder="********"
+              placeholderTextColor="gray"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <PrimaryButton
+            disabled={submitting}
+            submitting={submitting}
+            onPress={changePassword}
+            buttonTitle="Submit"
+          />
+        </LinearGradient>
+      </BottomSheet>
     </ScrollView>
   );
 }
@@ -150,5 +228,12 @@ const editProfileStyles = StyleSheet.create({
     paddingTop: 80,
     top: 120,
     marginBottom: 200,
+  },
+  bottomNavigationView: {
+    backgroundColor: colors.cardColor,
+    width: "100%",
+    padding: 40,
+    borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
   },
 });

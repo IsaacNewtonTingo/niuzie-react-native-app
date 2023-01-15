@@ -19,7 +19,13 @@ export default function DiscoverNav() {
       }}
     >
       <Stack.Screen name="Discover" component={Discover} />
-      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetails}
+        options={({ route }) => ({
+          headerShown: false,
+        })}
+      />
       <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
   );
