@@ -10,6 +10,7 @@ import AuthNav from "./src/navigators/auth-nav";
 
 import { CredentialsContext } from "./src/componets/context/credentials-context";
 import * as SecureStore from "expo-secure-store";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 LogBox.ignoreAllLogs();
 
@@ -42,15 +43,17 @@ export default function App() {
   };
 
   return (
-    <CredentialsContext.Provider
-      value={{ storedCredentials, setStoredCredentials }}
-    >
-      <NativeBaseProvider theme={theme}>
-        <NavigationContainer>
-          <TabNavigator />
-          <StatusBar style="light" />
-        </NavigationContainer>
-      </NativeBaseProvider>
-    </CredentialsContext.Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <CredentialsContext.Provider
+        value={{ storedCredentials, setStoredCredentials }}
+      >
+        <NativeBaseProvider theme={theme}>
+          <NavigationContainer>
+            <TabNavigator />
+            <StatusBar style="light" />
+          </NavigationContainer>
+        </NativeBaseProvider>
+      </CredentialsContext.Provider>
+    </GestureHandlerRootView>
   );
 }

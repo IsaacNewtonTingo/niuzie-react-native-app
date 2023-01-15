@@ -31,39 +31,47 @@ export default function Settings({ navigation }) {
 
   const settingList = [
     {
+      title: "My products",
+      iconType: "FontAwesome5",
+      iconName: "luggage-cart",
+      navTo: "MyProducts",
+    },
+    {
       title: "Saved products",
       iconType: "FontAwesome5",
       iconName: "save",
+      navTo: "SavedProducts",
     },
-    {
-      title: "Recently viewed",
-      iconType: "FontAwesome",
-      iconName: "eye",
-    },
+
     {
       title: "Premium services",
       iconType: "FontAwesome5",
       iconName: "crown",
+      navTo: "PremiumServices",
     },
     {
       title: "Payments",
       iconType: "MaterialCommunityIcons",
       iconName: "hand-coin",
+      navTo: "Payments",
     },
     {
       title: "Support",
       iconType: "MaterialIcons",
       iconName: "support-agent",
+      navTo: "Support",
     },
     {
-      title: "Delete account",
+      title: "Notifications",
       iconType: "AntDesign",
       iconName: "delete",
+      navTo: "NotificationSettings",
     },
     {
       title: "Logout",
       iconType: "MaterialCommunityIcons",
       iconName: "logout",
+      navTo: "Logout",
     },
   ];
 
@@ -133,6 +141,7 @@ export default function Settings({ navigation }) {
 
       {settingList.map((item) => (
         <SettingsList
+          onPress={() => navigation.navigate(item.navTo)}
           key={item.title}
           iconName={item.iconName}
           iconType={item.iconType}

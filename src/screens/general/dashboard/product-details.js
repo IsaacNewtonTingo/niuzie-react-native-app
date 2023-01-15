@@ -12,7 +12,6 @@ import React, { useEffect, useState } from "react";
 import styles from "../../../componets/styles/global-styles";
 import { ENDPOINT } from "@env";
 
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 
 import Carousel from "react-native-reanimated-carousel";
@@ -152,38 +151,36 @@ export default function ProductDetails({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <GestureHandlerRootView>
-        <Carousel
-          loop
-          width={width}
-          height={width / 1.2}
-          autoPlay={true}
-          data={productImages}
-          scrollAnimationDuration={1000}
-          mode="parallax"
-          modeConfig={{
-            parallaxScrollingScale: 0.9,
-            parallaxScrollingOffset: 300,
-          }}
-          // onSnapToItem={
-          //   (index) => console.log("current index:", index)
-          // }
-          renderItem={({ item }) => (
-            <View
-              style={{
-                flex: 1,
-                borderWidth: 1,
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                style={{ height: "100%", width: "100%" }}
-                source={{ uri: item }}
-              />
-            </View>
-          )}
-        />
-      </GestureHandlerRootView>
+      <Carousel
+        loop
+        width={width}
+        height={width / 1.2}
+        autoPlay={true}
+        data={productImages}
+        scrollAnimationDuration={1000}
+        mode="parallax"
+        modeConfig={{
+          parallaxScrollingScale: 0.9,
+          parallaxScrollingOffset: 300,
+        }}
+        // onSnapToItem={
+        //   (index) => console.log("current index:", index)
+        // }
+        renderItem={({ item }) => (
+          <View
+            style={{
+              flex: 1,
+              borderWidth: 1,
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              style={{ height: "100%", width: "100%" }}
+              source={{ uri: item }}
+            />
+          </View>
+        )}
+      />
 
       <LinearGradient
         colors={[colors.dark, colors.almostDark, colors.dark]}
@@ -277,7 +274,7 @@ export default function ProductDetails({ route, navigation }) {
         <Text style={styles.subText}>Add review</Text>
 
         <LinearGradient
-          colors={[colors.cardColor, colors.dark]}
+          colors={[colors.almostDark, colors.dark]}
           style={[productDetailStyles.prodData, { marginTop: 20, padding: 20 }]}
         >
           <Text style={productDetailStyles.defaultRatingText}>

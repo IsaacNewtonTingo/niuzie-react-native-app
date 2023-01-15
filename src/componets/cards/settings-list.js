@@ -13,9 +13,10 @@ export default function SettingsList(props) {
   const title = props.title;
   const iconType = props.iconType;
   const iconName = props.iconName;
+  const onPress = props.onPress;
 
   return (
-    <TouchableOpacity style={settingsListStyles.btn}>
+    <TouchableOpacity onPress={onPress} style={settingsListStyles.btn}>
       <View style={settingsListStyles.close}>
         {iconType == "FontAwesome5" ? (
           <FontAwesome5 name={iconName} size={16} color={colors.gray} />
@@ -51,7 +52,7 @@ export const settingsListStyles = StyleSheet.create({
     backgroundColor: colors.dark,
     borderRadius: 10,
     paddingHorizontal: 40,
-    borderBottomColor: "#070b2c",
+    borderBottomColor: colors.almostDark,
     borderBottomWidth: 0.5,
   },
   text: {
