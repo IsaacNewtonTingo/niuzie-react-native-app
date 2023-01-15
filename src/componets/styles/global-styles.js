@@ -28,10 +28,9 @@ const styles = StyleSheet.create({
   },
 
   subText: {
-    color: colors.lightBlue,
+    color: colors.orange,
     fontWeight: "800",
     fontSize: 18,
-    marginBottom: 20,
   },
   section: {
     marginVertical: 20,
@@ -41,6 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 20,
   },
   viewAll: {
     color: colors.linkText,
@@ -89,6 +89,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+  },
+  spaceBetween: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 

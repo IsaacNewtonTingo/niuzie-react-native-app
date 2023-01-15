@@ -28,9 +28,13 @@ export default function HorizontalCard(props) {
   const subCounty = props.subCounty;
   const rating = props.rating;
   const onPress = props.onPress;
+  const style = props.style;
 
   return (
-    <TouchableOpacity onPress={onPress} style={verticalProductCardStyles.card}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[verticalProductCardStyles.card, style]}
+    >
       <Image
         style={verticalProductCardStyles.productImage}
         source={{
@@ -124,6 +128,7 @@ const verticalProductCardStyles = StyleSheet.create({
     backgroundColor: colors.dark,
     borderRadius: 10,
     padding: 5,
+    fontSize: 10,
   },
   priceText: {
     color: colors.orange,

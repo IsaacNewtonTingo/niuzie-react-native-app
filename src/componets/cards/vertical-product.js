@@ -68,7 +68,7 @@ export default function VerticalProductCard(props) {
   );
 }
 
-const verticalProductCardStyles = StyleSheet.create({
+export const verticalProductCardStyles = StyleSheet.create({
   card: {
     width: width / 2.1,
     height: 330,
@@ -103,6 +103,7 @@ const verticalProductCardStyles = StyleSheet.create({
     backgroundColor: colors.dark,
     borderRadius: 10,
     padding: 5,
+    fontSize: 10,
   },
   priceText: {
     color: colors.orange,
