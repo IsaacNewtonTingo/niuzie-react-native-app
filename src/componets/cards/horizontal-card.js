@@ -71,7 +71,7 @@ export default function HorizontalCard(props) {
         <Text style={verticalProductCardStyles.descriptionText}>
           {description.length <= 60
             ? description
-            : description.slice(1, 59) + "..."}
+            : description.slice(0, 59) + "..."}
         </Text>
 
         <View style={verticalProductCardStyles.locationAndRating}>

@@ -7,10 +7,11 @@ import HorizontalCard from "../../../componets/cards/horizontal-card";
 
 import { ENDPOINT } from "@env";
 import axios from "axios";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 export default function MyProducts({ navigation }) {
   const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const [products, setProducts] = useState([]);
 
   const { storedCredentials, setStoredCredentials } =
@@ -41,6 +42,10 @@ export default function MyProducts({ navigation }) {
 
   async function handleProductPressed(item) {
     navigation.push("ProductDetails", { item });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
   }
 
   return (
