@@ -369,9 +369,9 @@ export default function PostProduct({ navigation }) {
                 style={styles.textInput}
                 placeholder="e.g 1200"
                 placeholderTextColor="gray"
-                  keyboardType="numeric"
-                  value={price}
-                  onChangeText={setPrice}
+                keyboardType="numeric"
+                value={price}
+                onChangeText={setPrice}
               />
             </View>
           </View>

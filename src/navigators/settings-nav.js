@@ -9,6 +9,7 @@ import Profile from "../screens/general/profile/profile";
 import Settings from "../screens/general/profile/settings";
 import MyProducts from "../screens/general/profile/my-products";
 import ProductDetails from "../screens/general/dashboard/product-details";
+import ContactUs from "../screens/general/profile/contact-us";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +46,14 @@ export default function SettingsNav() {
         component={ProductDetails}
         options={{
           headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ContactUs"
+        component={ContactUs}
+        options={{
+          headerTitle: "Contact us",
         }}
       />
     </Stack.Navigator>

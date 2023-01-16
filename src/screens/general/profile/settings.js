@@ -59,7 +59,7 @@ export default function Settings({ navigation }) {
       title: "Support",
       iconType: "MaterialIcons",
       iconName: "support-agent",
-      navTo: "Support",
+      navTo: "ContactUs",
     },
     {
       title: "Notifications",
@@ -141,7 +141,10 @@ export default function Settings({ navigation }) {
 
       {settingList.map((item) => (
         <SettingsList
-          onPress={() => navigation.navigate(item.navTo)}
+          onPress={() => {
+            console.log(item.navTo);
+            navigation.navigate(item.navTo);
+          }}
           key={item.title}
           iconName={item.iconName}
           iconType={item.iconType}
