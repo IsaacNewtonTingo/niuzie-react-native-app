@@ -13,9 +13,14 @@ import colors from "../../../componets/colors/colors";
 import axios from "axios";
 import { Alert } from "react-native";
 
-export default function ContactUs() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+export default function ContactUs({ route }) {
+  const user = route.params.userID;
+  const firstName = route.params.firstName;
+  const lastName = route.params.lastName;
+  const email = route.params.email;
+  const phoneNumber = route.params.phoneNumber;
+
+  const fullName = firstName + " " + lastName;
   const [message, setMessage] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +29,9 @@ export default function ContactUs() {
     setSubmitting(true);
     await axios
       .post(`https://niuzie.herokuapp.com/api/user/contact-us`, {
+        user,
         fullName,
+        phoneNumber,
         email,
         message,
       })
@@ -44,40 +51,6 @@ export default function ContactUs() {
   return (
     <ScrollView style={styles.container}>
       <View style={postStyles.holdingContainer}>
-        <Text style={styles.label}>Full name</Text>
-        <View style={styles.textInputContainer}>
-          <FontAwesome5
-            name="user-tie"
-            size={18}
-            color="black"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            value={fullName}
-            onChangeText={setFullName}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g John"
-          />
-        </View>
-
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.textInputContainer}>
-          <Entypo
-            name="mail"
-            size={18}
-            color="black"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g johndoe@gmail.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
         <Text style={styles.label}>Message</Text>
         <View style={styles.textInputContainer}>
           <Entypo

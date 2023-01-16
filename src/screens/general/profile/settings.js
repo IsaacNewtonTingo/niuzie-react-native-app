@@ -142,8 +142,13 @@ export default function Settings({ navigation }) {
       {settingList.map((item) => (
         <SettingsList
           onPress={() => {
-            console.log(item.navTo);
-            navigation.navigate(item.navTo);
+            navigation.navigate(item.navTo, {
+              firstName,
+              lastName,
+              phoneNumber,
+              email,
+              userID,
+            });
           }}
           key={item.title}
           iconName={item.iconName}
