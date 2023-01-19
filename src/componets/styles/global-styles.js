@@ -95,6 +95,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  flatlist: {
+    marginTop: 20,
+  },
 });
 
 export default styles;

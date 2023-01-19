@@ -1,6 +1,6 @@
 export default {
   dark: "#02030C",
-  almostDark: "#12131C",
+  almostDark: "#040616",
   lightBlue: "#e6e6ff",
   cardColor: "#12163b",
   linkText: "#00F0FF",

@@ -93,7 +93,7 @@ const verticalProductCardStyles = StyleSheet.create({
   card: {
     width: width,
     minHeight: 160,
-    backgroundColor: colors.cardColor,
+    backgroundColor: colors.almostDark,
     borderRadius: 10,
     marginBottom: 10,
     flexDirection: "row",

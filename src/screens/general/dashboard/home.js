@@ -109,6 +109,7 @@ export default function Home({ navigation }) {
           <Text style={styles.subText}>Buyer requests</Text>
           <Text style={styles.viewAll}>View all</Text>
         </View>
+
         <View style={homeStyles.miniCatContainer}>
           <FlatList
             horizontal
