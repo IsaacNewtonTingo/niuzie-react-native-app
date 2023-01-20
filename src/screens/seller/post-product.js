@@ -95,7 +95,7 @@ export default function PostProduct({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getUserData() {
-    const url = `https://niuzie.herokuapp.com/api/user/get-user-data/${userID}`;
+    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
     await axios
       .get(url)
       .then((response) => {
@@ -119,7 +119,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function checkUserProducts() {
-    const url = `https://niuzie.herokuapp.com/api/product/get-number/${userID}`;
+    const url = `${process.env.ENDPOINT}/product/get-number/${userID}`;
     await axios
       .get(url)
       .then((response) => {
@@ -187,7 +187,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function getCategories() {
-    const url = `https://niuzie.herokuapp.com/api/admin/get-categories`;
+    const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
     await axios
       .get(url)
@@ -202,7 +202,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function getSubCategories() {
-    const url = `https://niuzie.herokuapp.com/api/admin/get-sub-categories/${categoryID}`;
+    const url = `${process.env.ENDPOINT}/admin/get-sub-categories/${categoryID}`;
 
     await axios
       .get(url)

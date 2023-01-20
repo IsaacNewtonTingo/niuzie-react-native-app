@@ -74,7 +74,7 @@ export default function SignUp({ navigation }) {
       setAlert(true);
       setAlertMessage("Passwords don't match");
     } else {
-      const url = `https://niuzie.herokuapp.com/api/user/signup`;
+      const url = `${process.env.ENDPOINT}/user/signup`;
       console.log(url);
       setSubmitting(true);
 

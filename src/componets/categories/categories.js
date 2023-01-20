@@ -30,7 +30,7 @@ export default function CategoriesComponent(props) {
   }, []);
 
   async function getCategories() {
-    const url = `https://niuzie.herokuapp.com/api/admin/get-categories`;
+    const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
     await axios
       .get(url)

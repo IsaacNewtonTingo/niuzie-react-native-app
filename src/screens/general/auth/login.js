@@ -58,7 +58,7 @@ export default function Login({ navigation, route }) {
       setAlert(true);
     } else {
       setSubmitting(true);
-      const url = `https://niuzie.herokuapp.com/api/user/login`;
+      const url = `${process.env.ENDPOINT}/user/login`;
       console.log(url);
       await axios
         .post(url, {

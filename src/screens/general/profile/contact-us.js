@@ -28,7 +28,7 @@ export default function ContactUs({ route }) {
   async function sendMessage() {
     setSubmitting(true);
     await axios
-      .post(`https://niuzie.herokuapp.com/api/user/contact-us`, {
+      .post(`${process.env.ENDPOINT}/user/contact-us`, {
         user,
         fullName,
         phoneNumber,
