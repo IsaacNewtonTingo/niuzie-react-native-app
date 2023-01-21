@@ -36,11 +36,12 @@ const { width } = Dimensions.get("window");
 import { homeStyles } from "../general/dashboard/home";
 import SubCategoryList from "../../componets/lists/sub-category-list";
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
+import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 
 export default function PostProduct({ navigation }) {
   const [maxPosts, setMaxPosts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
 
   const [productName, setProductName] = useState("");
@@ -123,12 +124,14 @@ export default function PostProduct({ navigation }) {
     await axios
       .get(url)
       .then((response) => {
+        setLoadingData(false);
         if (response.data.data >= 2) {
           setMaxPosts(true);
         }
       })
       .catch((err) => {
         console.log(err);
+        setLoadingData(false);
       });
   }
 
@@ -214,6 +217,10 @@ export default function PostProduct({ navigation }) {
         console.log(err);
         setLoadingData(false);
       });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
   }
 
   return (

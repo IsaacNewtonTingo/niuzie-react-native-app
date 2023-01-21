@@ -21,6 +21,7 @@ export default function TabNavigator() {
         tabBarInactiveTintColor: colors.lightBlue,
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           backgroundColor: colors.bar,
         },
