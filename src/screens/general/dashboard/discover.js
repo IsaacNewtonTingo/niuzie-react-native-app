@@ -1,4 +1,13 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Dimensions,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 
 import HorizontalCard from "../../../componets/cards/horizontal-card";
@@ -20,13 +29,19 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { BottomSheet } from "react-native-btr";
-import colors from "../../../componets/colors/colors";
 import { LinearGradient } from "expo-linear-gradient";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { RadioButton } from "react-native-paper";
+import { postStyles } from "../../seller/post-product";
+
+import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
+const { width } = Dimensions.get("window");
 
 export default function Discover({ navigation }) {
   let [allProducts, setAllProducts] = useState([]);
@@ -40,9 +55,13 @@ export default function Discover({ navigation }) {
   const [subCategory, setSubCatCategory] = useState("");
   const [condition, setCondition] = useState("");
 
+  const [price, setPrice] = useState("1");
+  const [rating, setRating] = useState("1");
+  const [date, setDate] = useState("1");
+
   const [filterModal, setFilterModal] = useState(true);
 
-  const [show, setShow] = React.useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     getAllProducts();
@@ -51,17 +70,21 @@ export default function Discover({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getAllProducts() {
-    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${category}&subCategory=${subCategory}&searchTerm=${searchTerm}&condition=${condition}`;
+    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${category}&subCategory=${subCategory}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
     setLoadingData(true);
+    setSubmitting(true);
 
     await axios
       .get(url)
       .then((response) => {
+        setSubmitting(false);
         setLoadingData(false);
+        // setFilterModal(false);
         setAllProducts(response.data.data);
       })
       .catch((err) => {
         console.log(err);
+        setSubmitting(false);
         setLoadingData(false);
       });
   }
@@ -70,41 +93,61 @@ export default function Discover({ navigation }) {
     navigation.navigate("ProductDetails", { item });
   }
 
-  if (loadingData) {
-    return <LoadingIndicator />;
-  }
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
-    <View style={styles.container}>
-      <Input
-        w={{
-          base: "100%",
-          md: "25%",
-        }}
-        type="text"
-        InputLeftElement={
-          <Icon
-            as={<MaterialIcons name="search" />}
-            size={5}
-            ml="2"
-            color="muted.400"
-          />
-        }
-        InputRightElement={
-          <TouchableOpacity onPress={() => getAllProducts()}>
+    <SafeAreaView
+      style={[styles.container, { paddingTop: StatusBar.currentHeight }]}
+    >
+      <View style={discoverStyles.searcContainer}>
+        <Input
+          w={{
+            base: width - 80,
+            // md: "25%",
+          }}
+          h={{
+            base: 50,
+          }}
+          borderRadius={10}
+          borderColor={colors.gray}
+          type="text"
+          InputLeftElement={
             <Icon
-              as={<AntDesign name="arrowright" />}
+              as={<MaterialIcons name="search" />}
               size={5}
-              mr="2"
+              ml="2"
               color="muted.400"
             />
-          </TouchableOpacity>
-        }
-        placeholder="Search product"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={{ color: colors.lightBlue }}
-      />
+          }
+          InputRightElement={
+            <TouchableOpacity onPress={() => getAllProducts()}>
+              <Icon
+                as={<AntDesign name="arrowright" />}
+                size={5}
+                mr="2"
+                color="muted.400"
+              />
+            </TouchableOpacity>
+          }
+          placeholder="Search product"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={{ color: colors.lightBlue, borderRadius: 10 }}
+        />
+
+        <TouchableOpacity
+          onPress={() => setFilterModal(!filterModal)}
+          style={discoverStyles.filterContainer}
+        >
+          <MaterialCommunityIcons
+            name="filter-menu-outline"
+            size={24}
+            color={colors.lightBlue}
+          />
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         style={styles.flatlist}
@@ -136,54 +179,36 @@ export default function Discover({ navigation }) {
         onBackdropPress={() => setFilterModal(false)}
       >
         <LinearGradient
-          colors={[colors.gray, colors.dark]}
+          colors={[colors.almostDark, colors.dark]}
           style={discoverStyles.bottomNavigationView}
           // start={[0.0, 0.5]}
           // end={[1.0, 0.5]}
           locations={[0.0, 1.0]}
         >
-          <Text style={styles.label}>Category</Text>
+          <View style={discoverStyles.topOpts}>
+            <Text style={{ color: colors.linkText, fontWeight: "800" }}>
+              Reset
+            </Text>
 
-          <TextInput
-            // value={firstName}
-            // onChangeText={setFirstName}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g John"
+            <Text style={{ color: colors.lightBlue, fontWeight: "800" }}>
+              Filter
+            </Text>
+
+            <AntDesign
+              onPress={() => setFilterModal(false)}
+              name="close"
+              size={18}
+              color={colors.lightBlue}
+            />
+          </View>
+
+          <PrimaryButton
+            buttonTitle="Filter"
+            style={{ position: "absolute", bottom: 20 }}
           />
-
-          <Text style={styles.label}>Sub category</Text>
-
-          <TextInput
-            // value={firstName}
-            // onChangeText={setFirstName}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g John"
-          />
-
-          <Text style={styles.label}>County</Text>
-
-          <TextInput
-            // value={firstName}
-            // onChangeText={setFirstName}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g John"
-          />
-
-          <Text style={styles.label}>Sub county</Text>
-
-          <TextInput
-            // value={firstName}
-            // onChangeText={setFirstName}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g John"
-          />
-
-          <PrimaryButton buttonTitle="Submit" />
-
-          <TertiaryButton buttonTitle="Cancel" />
         </LinearGradient>
       </BottomSheet>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -194,6 +219,44 @@ const discoverStyles = StyleSheet.create({
     width: "100%",
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
-    padding: 40,
+    padding: 20,
+    alignItems: "center",
+  },
+  searcContainer: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    padding: 10,
+    width: width,
+  },
+  filterContainer: {
+    backgroundColor: colors.cardColor,
+    padding: 10,
+    borderRadius: 10,
+    height: 50,
+    width: 50,
+  },
+  radios: {
+    width: "100%",
+    backgroundColor: colors.inputBG,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#0066FF",
+    padding: 10,
+  },
+
+  radioText: {
+    color: colors.dark,
+    fontWeight: "800",
+  },
+  label: {
+    color: colors.linkText,
+    fontWeight: "800",
+    marginVertical: 10,
+  },
+  topOpts: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
 });

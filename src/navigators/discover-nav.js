@@ -18,7 +18,14 @@ export default function DiscoverNav() {
         },
       }}
     >
-      <Stack.Screen name="Discover" component={Discover} />
+      <Stack.Screen
+        name="Discover"
+        component={Discover}
+        options={({ route }) => ({
+          headerShown: false,
+        })}
+      />
+
       <Stack.Screen
         name="ProductDetails"
         component={ProductDetails}
@@ -26,6 +33,7 @@ export default function DiscoverNav() {
           headerShown: false,
         })}
       />
+
       <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
   );
