@@ -1,5 +1,13 @@
  [
   {
+    "name": "All counties",
+    "capital": "",
+    "code": 0,
+    "sub_counties": [
+      
+    ]
+  },
+  {
     "name": "Baringo",
     "capital": "Kabarnet",
     "code": 30,

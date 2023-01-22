@@ -20,7 +20,7 @@ export default function PrimaryButton(props) {
           width: "100%",
           height: 50,
           borderRadius: 10,
-          backgroundColor: "#669999",
+          backgroundColor: "#336699",
           alignItems: "center",
           justifyContent: "center",
           marginTop: 20,

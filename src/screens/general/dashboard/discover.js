@@ -68,7 +68,7 @@ export default function Discover({ navigation }) {
   const [categoryID, setCategoryID] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
 
-  const [price, setPrice] = useState("1");
+  const [price, setPrice] = useState("-1");
   const [rating, setRating] = useState("1");
   const [date, setDate] = useState("1");
 
@@ -214,7 +214,7 @@ export default function Discover({ navigation }) {
     <SafeAreaView
       style={[styles.container, { paddingTop: StatusBar.currentHeight }]}
     >
-      <View style={discoverStyles.searcContainer}>
+      <View style={discoverStyles.searchContainer}>
         <Input
           w={{
             base: width - 80,
@@ -349,6 +349,17 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
+                  value=""
+                  status={condition === "" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCondition("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
                   value="New"
                   status={condition === "New" ? "checked" : "unchecked"}
                   onPress={() => {
@@ -468,7 +479,7 @@ export default function Discover({ navigation }) {
                     setDate("-1");
                   }}
                 />
-                <Text style={postStyles.radioText}>Low to high</Text>
+                <Text style={postStyles.radioText}>Oldest</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -479,7 +490,7 @@ export default function Discover({ navigation }) {
                     setDate("1");
                   }}
                 />
-                <Text style={postStyles.radioText}>High to low</Text>
+                <Text style={postStyles.radioText}>Newest</Text>
               </View>
             </View>
           </ScrollView>
@@ -488,7 +499,7 @@ export default function Discover({ navigation }) {
             disabled={submitting}
             submitting={submitting}
             onPress={getAllProducts}
-            buttonTitle="F ilter"
+            buttonTitle="Show results"
             style={{ position: "absolute", bottom: 20, alignSelf: "center" }}
           />
 
@@ -501,30 +512,24 @@ export default function Discover({ navigation }) {
                 <Text style={discoverStyles.close}>Cancel</Text>
               </TouchableOpacity>
 
-              <View style={discoverStyles.catModal}>
-                {categories.map((category) => (
-                  <TouchableOpacity
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={categories}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
                     onPress={() => {
                       setCategoriesModal(false);
-                      setCategory(category.categoryName);
-                      setCategoryID(category._id);
+                      setCategory(item.categoryName);
+                      setCategoryID(item._id);
 
                       setSubCategory("");
                       setSubCategoryID("");
                     }}
-                    style={homeStyles.miniCatItem}
-                    key={category._id}
-                  >
-                    <Image
-                      style={homeStyles.categoryImage}
-                      source={{ uri: category.categoryImage }}
-                    />
-                    <Text style={homeStyles.categoryText}>
-                      {category.categoryName}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                    key={item._id}
+                    subCategoryName={item.categoryName}
+                  />
+                )}
+              />
             </View>
           )}
 
@@ -538,18 +543,21 @@ export default function Discover({ navigation }) {
               </TouchableOpacity>
 
               <View style={discoverStyles.subCategoriesModal}>
-                {subCategories.map((item) => (
-                  <PostSubCategoryList
-                    itemKey={item._id}
-                    onPress={() => {
-                      setSubCategory(item.subCategoryName);
-                      setSubCategoryID(item._id);
-                      setSubCategoriesModal(false);
-                    }}
-                    subCategoryID={item._id}
-                    subCategoryName={item.subCategoryName}
-                  />
-                ))}
+                <FlatList
+                  data={subCategories}
+                  renderItem={({ item }) => (
+                    <PostSubCategoryList
+                      itemKey={item._id}
+                      onPress={() => {
+                        setSubCategory(item.subCategoryName);
+                        setSubCategoryID(item._id);
+                        setSubCategoriesModal(false);
+                      }}
+                      subCategoryID={item._id}
+                      subCategoryName={item.subCategoryName}
+                    />
+                  )}
+                />
               </View>
             </View>
           )}
@@ -571,6 +579,7 @@ export default function Discover({ navigation }) {
                     onPress={() => {
                       setCounty(item.name);
                       setSubCounties(item.sub_counties);
+                      setSubCounty("");
                       setCountiesModal(false);
                     }}
                     subCategoryName={item.name}
@@ -610,7 +619,7 @@ export default function Discover({ navigation }) {
   );
 }
 
-const discoverStyles = StyleSheet.create({
+export const discoverStyles = StyleSheet.create({
   bottomNavigationView: {
     height: "90%",
     backgroundColor: colors.cardColor,
@@ -619,7 +628,7 @@ const discoverStyles = StyleSheet.create({
     borderTopLeftRadius: 10,
     padding: 20,
   },
-  searcContainer: {
+  searchContainer: {
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
@@ -682,7 +691,6 @@ const discoverStyles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  subCategoriesModal: {},
   close: {
     color: colors.orange,
     fontWeight: "800",

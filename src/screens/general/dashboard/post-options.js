@@ -11,7 +11,7 @@ export default function PostOptions({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <LinearGradient
-        colors={[colors.gray, colors.dark]}
+        colors={[colors.almostDark, colors.dark]}
         style={{
           paddingVertical: 40,
           paddingHorizontal: 20,
@@ -44,7 +44,7 @@ export default function PostOptions({ navigation }) {
       </LinearGradient>
 
       <LinearGradient
-        colors={[colors.gray, colors.dark]}
+        colors={[colors.almostDark, colors.dark]}
         style={{
           paddingHorizontal: 20,
           paddingVertical: 40,
