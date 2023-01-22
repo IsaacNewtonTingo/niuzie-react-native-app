@@ -7,6 +7,8 @@ import {
   Dimensions,
   SafeAreaView,
   StatusBar,
+  Image,
+  Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -40,6 +42,11 @@ import { postStyles } from "../../seller/post-product";
 import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
+import SettingsList from "../../../componets/cards/settings-list";
+import FilterList from "../../../componets/lists/filter";
+import { homeStyles } from "./home";
+import NoData from "../../../componets/Text/no-data";
+import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
 
 const { width } = Dimensions.get("window");
 
@@ -52,14 +59,22 @@ export default function Discover({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
   const [category, setCategory] = useState("");
-  const [subCategory, setSubCatCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
   const [condition, setCondition] = useState("");
+
+  const [categoryID, setCategoryID] = useState("");
+  const [subCategoryID, setSubCategoryID] = useState("");
 
   const [price, setPrice] = useState("1");
   const [rating, setRating] = useState("1");
   const [date, setDate] = useState("1");
 
-  const [filterModal, setFilterModal] = useState(true);
+  const [filterModal, setFilterModal] = useState(false);
+  const [categoriesModal, setCategoriesModal] = useState(false);
+  const [subCategoriesModal, setSubCategoriesModal] = useState(false);
+
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -69,8 +84,35 @@ export default function Discover({ navigation }) {
 
   navigation.addListener("focus", () => setLoading(!loading));
 
+  const filters = [
+    {
+      title: "Category",
+      iconType: "Ionicons",
+      iconName: "md-shirt-sharp",
+      navTo: "category",
+    },
+    {
+      title: "Sub category",
+      iconType: "MaterialCommunityIcons",
+      iconName: "shoe-sneaker",
+      navTo: "subCategory",
+    },
+    {
+      title: "County",
+      iconType: "MaterialCommunityIcons",
+      iconName: "home-city",
+      navTo: "county",
+    },
+    {
+      title: "Sub county",
+      iconType: "MaterialCommunityIcons",
+      iconName: "city-variant",
+      navTo: "subCounty",
+    },
+  ];
+
   async function getAllProducts() {
-    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${category}&subCategory=${subCategory}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
+    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -79,7 +121,7 @@ export default function Discover({ navigation }) {
       .then((response) => {
         setSubmitting(false);
         setLoadingData(false);
-        // setFilterModal(false);
+        setFilterModal(false);
         setAllProducts(response.data.data);
       })
       .catch((err) => {
@@ -93,9 +135,49 @@ export default function Discover({ navigation }) {
     navigation.navigate("ProductDetails", { item });
   }
 
-  // if (loadingData) {
-  //   return <LoadingIndicator />;
-  // }
+  async function handleItemClicked(navTo) {
+    if (navTo == "category") {
+      setCategoriesModal(true);
+      getCategories();
+    } else if (navTo == "subCategory") {
+      setSubCategoriesModal(true);
+      getSubCategories();
+    }
+  }
+
+  async function getCategories() {
+    const url = `${process.env.ENDPOINT}/admin/get-categories`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setCategories(response.data.data);
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  async function getSubCategories() {
+    const url = `${process.env.ENDPOINT}/admin/get-sub-categories/${categoryID}`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setSubCategories(response.data.data);
+        setLoadingData(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <SafeAreaView
@@ -173,18 +255,14 @@ export default function Discover({ navigation }) {
         )}
       />
 
+      {allProducts.length < 1 && <NoData />}
+
       <BottomSheet
         visible={filterModal}
         onBackButtonPress={() => setFilterModal(false)}
         onBackdropPress={() => setFilterModal(false)}
       >
-        <LinearGradient
-          colors={[colors.almostDark, colors.dark]}
-          style={discoverStyles.bottomNavigationView}
-          // start={[0.0, 0.5]}
-          // end={[1.0, 0.5]}
-          locations={[0.0, 1.0]}
-        >
+        <View style={discoverStyles.bottomNavigationView}>
           <View style={discoverStyles.topOpts}>
             <Text style={{ color: colors.linkText, fontWeight: "800" }}>
               Reset
@@ -202,11 +280,223 @@ export default function Discover({ navigation }) {
             />
           </View>
 
+          <ScrollView style={discoverStyles.scrollFilt}>
+            {filters.map((item) => (
+              <FilterList
+                onPress={() => {
+                  handleItemClicked(item.navTo);
+                }}
+                key={item.title}
+                iconName={item.iconName}
+                iconType={item.iconType}
+                title={item.title}
+                filterDetail={
+                  item.title == "Category"
+                    ? category
+                    : item.title == "Sub category"
+                    ? subCategory
+                    : item.title == "County"
+                    ? county
+                    : item.title == "Sub county"
+                    ? subCounty
+                    : ""
+                }
+              />
+            ))}
+
+            <View style={[discoverStyles.radios, { marginTop: 20 }]}>
+              <Text
+                style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
+              >
+                Condition
+              </Text>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="New"
+                  status={condition === "New" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCondition("New");
+                  }}
+                />
+                <Text style={postStyles.radioText}>New</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="Used, in working conditions"
+                  status={
+                    condition === "Used, in working conditions"
+                      ? "checked"
+                      : "unchecked"
+                  }
+                  onPress={() => {
+                    setCondition("Used, in working conditions");
+                  }}
+                />
+                <Text style={postStyles.radioText}>
+                  Used, in working conditions
+                </Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="Used, with minor defects"
+                  status={
+                    condition === "Used, with minor defects"
+                      ? "checked"
+                      : "unchecked"
+                  }
+                  onPress={() => {
+                    setCondition("Used, with minor defects");
+                  }}
+                />
+                <Text style={postStyles.radioText}>
+                  Used, with minor defects
+                </Text>
+              </View>
+            </View>
+
+            <View style={discoverStyles.radios}>
+              <Text
+                style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
+              >
+                Price
+              </Text>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={price === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setPrice("-1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="1"
+                  status={price === "1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setPrice("1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>High to low</Text>
+              </View>
+            </View>
+
+            <View style={discoverStyles.radios}>
+              <Text
+                style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
+              >
+                Rating
+              </Text>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={rating === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setRating("-1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="1"
+                  status={rating === "1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setRating("1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>High to low</Text>
+              </View>
+            </View>
+
+            <View style={[discoverStyles.radios, { marginBottom: 100 }]}>
+              <Text
+                style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
+              >
+                Date
+              </Text>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={date === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setDate("-1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="1"
+                  status={date === "1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setDate("1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>High to low</Text>
+              </View>
+            </View>
+          </ScrollView>
+
           <PrimaryButton
+            disabled={submitting}
+            submitting={submitting}
+            onPress={getAllProducts}
             buttonTitle="Filter"
-            style={{ position: "absolute", bottom: 20 }}
+            style={{ position: "absolute", bottom: 20, alignSelf: "center" }}
           />
-        </LinearGradient>
+
+          {categoriesModal == true && (
+            <View style={discoverStyles.catModal}>
+              {categories.map((category) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setCategoriesModal(false);
+                    setCategory(category.categoryName);
+                    setCategoryID(category._id);
+                  }}
+                  style={homeStyles.miniCatItem}
+                  key={category._id}
+                >
+                  <Image
+                    style={homeStyles.categoryImage}
+                    source={{ uri: category.categoryImage }}
+                  />
+                  <Text style={homeStyles.categoryText}>
+                    {category.categoryName}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {subCategoriesModal == true && (
+            <View style={discoverStyles.subCategoriesModal}>
+              {subCategories.map((item) => (
+                <PostSubCategoryList
+                  itemKey={item._id}
+                  onPress={() => {
+                    setSubCategory(item.subCategoryName);
+                    setSubCategoryID(item._id);
+                    setSubCategoriesModal(false);
+                  }}
+                  subCategoryID={item._id}
+                  subCategoryName={item.subCategoryName}
+                />
+              ))}
+            </View>
+          )}
+        </View>
       </BottomSheet>
     </SafeAreaView>
   );
@@ -216,11 +506,10 @@ const discoverStyles = StyleSheet.create({
   bottomNavigationView: {
     height: "90%",
     backgroundColor: colors.cardColor,
-    width: "100%",
+    width: width,
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
     padding: 20,
-    alignItems: "center",
   },
   searcContainer: {
     alignItems: "center",
@@ -236,15 +525,24 @@ const discoverStyles = StyleSheet.create({
     height: 50,
     width: 50,
   },
-  radios: {
-    width: "100%",
-    backgroundColor: colors.inputBG,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#0066FF",
-    padding: 10,
+  scrollFilt: {
+    width: width,
+    padding: 20,
+    alignSelf: "center",
+    paddingBottom: 100,
   },
-
+  radios: {
+    backgroundColor: colors.cardColor,
+    borderRadius: 10,
+    borderWidth: 0.2,
+    borderColor: colors.gray,
+    padding: 10,
+    marginBottom: 20,
+  },
+  radioContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   radioText: {
     color: colors.dark,
     fontWeight: "800",
@@ -258,5 +556,28 @@ const discoverStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginBottom: 10,
+  },
+  catModal: {
+    backgroundColor: colors.lightBlue,
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    position: "absolute",
+    bottom: 0,
+  },
+  subCategoriesModal: {
+    backgroundColor: colors.lightBlue,
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    justifyContent: "space-between",
+    alignSelf: "center",
+    position: "absolute",
+    bottom: 0,
   },
 });

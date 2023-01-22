@@ -524,6 +524,7 @@ export default function PostProduct({ navigation }) {
                   data={subCategories}
                   renderItem={({ item }) => (
                     <PostSubCategoryList
+                      key={item._id}
                       onPress={() => {
                         setSubCatCategory(item.subCategoryName);
                         setSubCatCategoryID(item._id);

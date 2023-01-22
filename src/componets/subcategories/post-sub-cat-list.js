@@ -8,11 +8,13 @@ import colors from "../colors/colors";
 
 export default function PostSubCategoryList(props) {
   const subCategoryName = props.subCategoryName;
+  const itemKey = props.itemKey;
   const onPress = props.onPress;
 
   return (
     <TouchableOpacity
       onPress={onPress}
+      key={subCategoryName}
       style={{
         justifyContent: "space-between",
         flexDirection: "row",
