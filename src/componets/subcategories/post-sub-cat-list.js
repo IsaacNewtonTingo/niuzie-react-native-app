@@ -14,16 +14,16 @@ export default function PostSubCategoryList(props) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      key={subCategoryName}
+      key={itemKey}
       style={{
         justifyContent: "space-between",
         flexDirection: "row",
         padding: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: "#d3d6f8",
+        borderBottomWidth: 0.2,
+        borderBottomColor: "#538cc6",
       }}
     >
-      <Text style={{ color: colors.dark, fontWeight: "800" }}>
+      <Text style={{ color: colors.lightBlue, fontWeight: "800" }}>
         {subCategoryName}
       </Text>
       <AntDesign name="right" size={16} color={colors.gray} />

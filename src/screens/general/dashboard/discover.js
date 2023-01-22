@@ -49,6 +49,7 @@ import NoData from "../../../componets/Text/no-data";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
 
 const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default function Discover({ navigation }) {
   let [allProducts, setAllProducts] = useState([]);
@@ -111,6 +112,20 @@ export default function Discover({ navigation }) {
     },
   ];
 
+  async function resetFilters() {
+    setSearchTerm("");
+    setCounty("");
+    setSubCounty("");
+    setCategory("");
+    setSubCategory("");
+    setCondition("");
+    setCategoryID("");
+    setSubCategoryID("");
+    setPrice("");
+    setRating("");
+    setDate("");
+  }
+
   async function getAllProducts() {
     let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
     setLoadingData(true);
@@ -137,10 +152,12 @@ export default function Discover({ navigation }) {
 
   async function handleItemClicked(navTo) {
     if (navTo == "category") {
+      setSubCategoriesModal(false);
       setCategoriesModal(true);
       getCategories();
     } else if (navTo == "subCategory") {
       setSubCategoriesModal(true);
+      setCategoriesModal(false);
       getSubCategories();
     }
   }
@@ -220,7 +237,11 @@ export default function Discover({ navigation }) {
         />
 
         <TouchableOpacity
-          onPress={() => setFilterModal(!filterModal)}
+          onPress={() => {
+            setFilterModal(!filterModal);
+            setCategoriesModal(false);
+            setSubCategoriesModal(false);
+          }}
           style={discoverStyles.filterContainer}
         >
           <MaterialCommunityIcons
@@ -264,20 +285,19 @@ export default function Discover({ navigation }) {
       >
         <View style={discoverStyles.bottomNavigationView}>
           <View style={discoverStyles.topOpts}>
-            <Text style={{ color: colors.linkText, fontWeight: "800" }}>
-              Reset
-            </Text>
+            <TouchableOpacity onPress={resetFilters}>
+              <Text style={{ color: colors.linkText, fontWeight: "800" }}>
+                Reset
+              </Text>
+            </TouchableOpacity>
 
             <Text style={{ color: colors.lightBlue, fontWeight: "800" }}>
               Filter
             </Text>
 
-            <AntDesign
-              onPress={() => setFilterModal(false)}
-              name="close"
-              size={18}
-              color={colors.lightBlue}
-            />
+            <TouchableOpacity onPress={() => setFilterModal(false)}>
+              <Text style={discoverStyles.close}>Cancel</Text>
+            </TouchableOpacity>
           </View>
 
           <ScrollView style={discoverStyles.scrollFilt}>
@@ -457,43 +477,64 @@ export default function Discover({ navigation }) {
           />
 
           {categoriesModal == true && (
-            <View style={discoverStyles.catModal}>
-              {categories.map((category) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCategoriesModal(false);
-                    setCategory(category.categoryName);
-                    setCategoryID(category._id);
-                  }}
-                  style={homeStyles.miniCatItem}
-                  key={category._id}
-                >
-                  <Image
-                    style={homeStyles.categoryImage}
-                    source={{ uri: category.categoryImage }}
-                  />
-                  <Text style={homeStyles.categoryText}>
-                    {category.categoryName}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            <View style={discoverStyles.backdrop}>
+              <TouchableOpacity
+                style={discoverStyles.cancel}
+                onPress={() => setCategoriesModal(false)}
+              >
+                <Text style={discoverStyles.close}>Cancel</Text>
+              </TouchableOpacity>
+
+              <View style={discoverStyles.catModal}>
+                {categories.map((category) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCategoriesModal(false);
+                      setCategory(category.categoryName);
+                      setCategoryID(category._id);
+
+                      setSubCategory("");
+                      setSubCategoryID("");
+                    }}
+                    style={homeStyles.miniCatItem}
+                    key={category._id}
+                  >
+                    <Image
+                      style={homeStyles.categoryImage}
+                      source={{ uri: category.categoryImage }}
+                    />
+                    <Text style={homeStyles.categoryText}>
+                      {category.categoryName}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           )}
 
           {subCategoriesModal == true && (
-            <View style={discoverStyles.subCategoriesModal}>
-              {subCategories.map((item) => (
-                <PostSubCategoryList
-                  itemKey={item._id}
-                  onPress={() => {
-                    setSubCategory(item.subCategoryName);
-                    setSubCategoryID(item._id);
-                    setSubCategoriesModal(false);
-                  }}
-                  subCategoryID={item._id}
-                  subCategoryName={item.subCategoryName}
-                />
-              ))}
+            <View style={discoverStyles.backdrop}>
+              <TouchableOpacity
+                style={discoverStyles.cancel}
+                onPress={() => setSubCategoriesModal(false)}
+              >
+                <Text style={discoverStyles.close}>Cancel</Text>
+              </TouchableOpacity>
+
+              <View style={discoverStyles.subCategoriesModal}>
+                {subCategories.map((item) => (
+                  <PostSubCategoryList
+                    itemKey={item._id}
+                    onPress={() => {
+                      setSubCategory(item.subCategoryName);
+                      setSubCategoryID(item._id);
+                      setSubCategoriesModal(false);
+                    }}
+                    subCategoryID={item._id}
+                    subCategoryName={item.subCategoryName}
+                  />
+                ))}
+              </View>
             </View>
           )}
         </View>
@@ -558,26 +599,30 @@ const discoverStyles = StyleSheet.create({
     width: "100%",
     marginBottom: 10,
   },
-  catModal: {
-    backgroundColor: colors.lightBlue,
+  backdrop: {
+    backgroundColor: "#336699",
     width: width,
     borderRadius: 10,
     padding: 10,
+    bottom: 0,
+    height: height,
+    alignSelf: "center",
+    position: "absolute",
+    paddingTop: StatusBar.currentHeight + 40,
+  },
+  catModal: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    alignSelf: "center",
-    position: "absolute",
-    bottom: 0,
   },
-  subCategoriesModal: {
-    backgroundColor: colors.lightBlue,
-    width: width,
-    borderRadius: 10,
-    padding: 10,
-    justifyContent: "space-between",
-    alignSelf: "center",
-    position: "absolute",
-    bottom: 0,
+  subCategoriesModal: {},
+  close: {
+    color: colors.orange,
+    fontWeight: "800",
+  },
+  cancel: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    padding: 20,
   },
 });
