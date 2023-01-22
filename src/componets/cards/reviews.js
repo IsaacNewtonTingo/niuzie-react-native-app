@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import colors from "../colors/colors";
 
 import { verticalProductCardStyles } from "./vertical-product";
@@ -11,22 +11,33 @@ import styles from "../styles/global-styles";
 import noImage from "../../assets/data/noImage";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+import { CredentialsContext } from "../../componets/context/credentials-context";
+
 const { width } = Dimensions.get("window");
 
 export default function ReviewComponent(props) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials ? storedCredentials : "";
+  const userID = storedCredentials ? data.userID : "";
+
   const firstName = props.firstName;
   const lastName = props.lastName;
   const profilePicture = props.profilePicture;
   const date = props.date;
   const rating = props.rating;
   const reviewMessage = props.reviewMessage;
+  const key = props.myKey;
 
-  const userID = props.userID;
+  const productOwnerID = props.productOwnerID;
+
   return (
     <View
+      key={key}
       style={{
         borderBottomWidth: 1,
-        borderBottomColor: colors.almostDark,
+        borderBottomColor: "#1a1a1a",
         marginBottom: 20,
       }}
     >
@@ -69,9 +80,11 @@ export default function ReviewComponent(props) {
           {reviewMessage}
         </Text>
 
-        <TouchableOpacity>
-          <Entypo name="trash" size={18} color={colors.gray} />
-        </TouchableOpacity>
+        {userID == productOwnerID && (
+          <TouchableOpacity>
+            <Entypo name="trash" size={18} color={colors.gray} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

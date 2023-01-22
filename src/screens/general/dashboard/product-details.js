@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import styles from "../../../componets/styles/global-styles";
 import { ENDPOINT } from "@env";
 
@@ -27,11 +27,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
-import reviews from "../../../assets/data/reviews";
 import ReviewComponent from "../../../componets/cards/reviews";
 import axios from "axios";
 import { FlatList } from "react-native";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
+import { showMyToast } from "../../../functions/show-toast";
+
+import dateFormat from "dateformat";
+
+import { CredentialsContext } from "../../../componets/context/credentials-context";
 
 const width = Dimensions.get("window").width;
 
@@ -39,10 +43,19 @@ const B = (props) => (
   <Text style={{ color: colors.gray }}>{props.children}</Text>
 );
 export default function ProductDetails({ route, navigation }) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials ? storedCredentials : "";
+  const userID = storedCredentials ? data.userID : "";
+
   const [otherProducts, setOtherProducts] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+
+  const [reviewList, setReviewList] = useState([]);
 
   const productID = route.params.item._id;
   const productName = route.params.item.productName;
@@ -52,7 +65,7 @@ export default function ProductDetails({ route, navigation }) {
   const condition = route.params.item.condition;
   const rating = route.params.item.rating.$numberDecimal;
 
-  const userID = route.params.item.user._id;
+  const productOwnerID = route.params.item.user._id;
   const firstName = route.params.item.user.firstName;
   const lastName = route.params.item.user.lastName;
   const profilePicture = route.params.item.user.profilePicture;
@@ -68,6 +81,7 @@ export default function ProductDetails({ route, navigation }) {
   useEffect(() => {
     getOtherProducts();
     getSimilarProducts();
+    getReviews();
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
@@ -86,6 +100,27 @@ export default function ProductDetails({ route, navigation }) {
       ? route.params.item.image4
       : noImage.noProductImage,
   ];
+
+  async function getReviews() {
+    await axios
+      .get(
+        `https://f30e-105-163-156-62.eu.ngrok.io/api/product/get-product-reviews/${productID}`
+      )
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setReviewList(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: response.data.status,
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   async function handleSave() {
     setSaved(!saved);
@@ -118,7 +153,7 @@ export default function ProductDetails({ route, navigation }) {
   };
 
   async function getOtherProducts() {
-    const url = `${ENDPOINT}/product/get-user-products/${userID}?productID=${productID}`;
+    const url = `${ENDPOINT}/product/get-user-products/${productOwnerID}?productID=${productID}`;
     await axios
       .get(url)
       .then((response) => {
@@ -149,8 +184,59 @@ export default function ProductDetails({ route, navigation }) {
     navigation.push("ProductDetails", { item });
   }
 
+  function validate() {
+    if (!review) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description:
+          "Please right something in the review box before submitting",
+      });
+    } else if (defaultRating < 1) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Give star rating to this dealer",
+      });
+    } else {
+      reviewProduct();
+    }
+  }
+
+  async function reviewProduct() {
+    setSubmitting(true);
+    await axios
+      .post(`${process.env.ENDPOINT}/product/review-product/${productID}`, {
+        userID,
+        rating,
+        reviewMessage: review,
+      })
+      .then((response) => {
+        setSubmitting(false);
+        console.log(response.data);
+
+        if (response.data.status == "Failed") {
+          showMyToast({
+            status: "error",
+            title: response.data.status,
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "success",
+            title: response.data.status,
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
       <Carousel
         loop
         width={width}
@@ -183,7 +269,7 @@ export default function ProductDetails({ route, navigation }) {
       />
 
       <LinearGradient
-        colors={[colors.dark, colors.almostDark, colors.dark]}
+        colors={[colors.cardColor, colors.almostDark, colors.dark]}
         style={productDetailStyles.prodData}
       >
         <View style={styles.spaceBetween}>
@@ -223,7 +309,7 @@ export default function ProductDetails({ route, navigation }) {
       <Text style={productDetailStyles.descriptionText}>{description}</Text>
 
       <LinearGradient
-        colors={[colors.dark, colors.almostDark, colors.dark]}
+        colors={[colors.dark, colors.almostDark, colors.cardColor]}
         style={[productDetailStyles.prodData, { minHeight: 80 }]}
       >
         <View style={productDetailStyles.profileContainer}>
@@ -258,12 +344,14 @@ export default function ProductDetails({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        {reviews.map((review) => (
+        {reviewList.map((review) => (
           <ReviewComponent
-            firstName={review.firstName}
-            lastName={review.lastName}
-            profilePicture={review.profilePicture}
-            date={review.date}
+            myKey={review._id}
+            productOwnerID={productOwnerID}
+            firstName={review.user.firstName}
+            lastName={review.user.lastName}
+            profilePicture={review.user.profilePicture}
+            date={dateFormat(review.createdAt, "mediumDate")}
             rating={review.rating}
             reviewMessage={review.reviewMessage}
           />
@@ -298,11 +386,18 @@ export default function ProductDetails({ route, navigation }) {
             />
             <TextInput
               style={styles.textInput}
+              value={review}
+              onChangeText={setReview}
               placeholder="e.g The best seller you can get on this platform..."
             />
           </View>
 
-          <PrimaryButton buttonTitle="Add review" />
+          <PrimaryButton
+            submitting={submitting}
+            disabled={submitting}
+            onPress={validate}
+            buttonTitle="Add review"
+          />
         </LinearGradient>
       </View>
 
@@ -318,7 +413,7 @@ export default function ProductDetails({ route, navigation }) {
             <HorizontalCard
               onPress={() => handleProductPressed(item)}
               style={{ width: width - 40, marginRight: 10 }}
-              key={item._id}
+              myKey={item._id}
               productImage1={item.image1}
               productImage2={item.image2}
               productImage3={item.image3}
@@ -347,7 +442,7 @@ export default function ProductDetails({ route, navigation }) {
             <HorizontalCard
               onPress={() => handleProductPressed(item)}
               style={{ width: width - 40, marginRight: 10 }}
-              key={item._id}
+              myKey={item._id}
               productImage1={item.image1}
               productImage2={item.image2}
               productImage3={item.image3}
@@ -369,7 +464,6 @@ export default function ProductDetails({ route, navigation }) {
 
 const productDetailStyles = StyleSheet.create({
   prodData: {
-    minHeight: 150,
     padding: 10,
     borderRadius: 10,
   },
@@ -382,7 +476,7 @@ const productDetailStyles = StyleSheet.create({
     color: colors.orange,
     fontWeight: "800",
     marginVertical: 10,
-    fontSize: 14,
+    fontSize: 20,
   },
   descriptionText: {
     color: colors.lightBlue,

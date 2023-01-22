@@ -100,7 +100,7 @@ export const verticalProductCardStyles = StyleSheet.create({
   },
   conditionText: {
     color: colors.gray,
-    backgroundColor: colors.dark,
+    backgroundColor: colors.cardColor,
     borderRadius: 10,
     padding: 5,
     fontSize: 10,
