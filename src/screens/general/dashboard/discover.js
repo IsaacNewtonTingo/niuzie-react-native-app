@@ -51,6 +51,8 @@ import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-l
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");
 
+const countiesData = require("../../../assets/data/counties.json");
+
 export default function Discover({ navigation }) {
   let [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,9 +75,12 @@ export default function Discover({ navigation }) {
   const [filterModal, setFilterModal] = useState(false);
   const [categoriesModal, setCategoriesModal] = useState(false);
   const [subCategoriesModal, setSubCategoriesModal] = useState(false);
+  const [countiesModal, setCountiesModal] = useState(false);
+  const [subCountiesModal, setSubCountiesModal] = useState(false);
 
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [subCounties, setSubCounties] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -159,6 +164,15 @@ export default function Discover({ navigation }) {
       setSubCategoriesModal(true);
       setCategoriesModal(false);
       getSubCategories();
+    } else if (navTo == "county") {
+      setSubCategoriesModal(false);
+      setCategoriesModal(false);
+      setCountiesModal(true);
+    } else if (navTo == "subCounty") {
+      setSubCategoriesModal(false);
+      setCategoriesModal(false);
+      setCountiesModal(false);
+      setSubCountiesModal(true);
     }
   }
 
@@ -241,6 +255,8 @@ export default function Discover({ navigation }) {
             setFilterModal(!filterModal);
             setCategoriesModal(false);
             setSubCategoriesModal(false);
+            setCountiesModal(false);
+            setSubCountiesModal(false);
           }}
           style={discoverStyles.filterContainer}
         >
@@ -472,7 +488,7 @@ export default function Discover({ navigation }) {
             disabled={submitting}
             submitting={submitting}
             onPress={getAllProducts}
-            buttonTitle="Filter"
+            buttonTitle="F ilter"
             style={{ position: "absolute", bottom: 20, alignSelf: "center" }}
           />
 
@@ -535,6 +551,57 @@ export default function Discover({ navigation }) {
                   />
                 ))}
               </View>
+            </View>
+          )}
+
+          {countiesModal == true && (
+            <View style={discoverStyles.backdrop}>
+              <TouchableOpacity
+                style={discoverStyles.cancel}
+                onPress={() => setSubCategoriesModal(false)}
+              >
+                <Text style={discoverStyles.close}>Cancel</Text>
+              </TouchableOpacity>
+
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={countiesData}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
+                    onPress={() => {
+                      setCounty(item.name);
+                      setSubCounties(item.sub_counties);
+                      setCountiesModal(false);
+                    }}
+                    subCategoryName={item.name}
+                  />
+                )}
+              />
+            </View>
+          )}
+
+          {subCountiesModal == true && (
+            <View style={discoverStyles.backdrop}>
+              <TouchableOpacity
+                style={discoverStyles.cancel}
+                onPress={() => setSubCountiesModal(false)}
+              >
+                <Text style={discoverStyles.close}>Cancel</Text>
+              </TouchableOpacity>
+
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={subCounties}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
+                    onPress={() => {
+                      setSubCounty(item);
+                      setSubCountiesModal(false);
+                    }}
+                    subCategoryName={item}
+                  />
+                )}
+              />
             </View>
           )}
         </View>
