@@ -235,6 +235,8 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
+  //
+
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
       <Carousel
