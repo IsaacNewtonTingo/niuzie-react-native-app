@@ -254,6 +254,7 @@ export default function ProductDetails({ route, navigation }) {
         // }
         renderItem={({ item }) => (
           <View
+            key={item}
             style={{
               flex: 1,
               borderWidth: 1,

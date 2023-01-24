@@ -180,7 +180,15 @@ export default function PostProduct({ navigation }) {
 
   async function prePostProduct() {
     if (maxPosts == true) {
-      navigation.navigate("PayForProduct");
+      navigation.navigate("PayForProduct", {
+        image1,
+        productName,
+        condition,
+        description,
+        county,
+        subCounty,
+        price,
+      });
     } else {
       postProduct();
     }
