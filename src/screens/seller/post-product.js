@@ -7,11 +7,12 @@ import {
   Dimensions,
   FlatList,
   Image,
+  KeyboardAvoidingView,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { RadioButton } from "react-native-paper";
-import { useToast, Text } from "native-base";
+import { Text } from "native-base";
 
 import styles from "../../componets/styles/global-styles";
 import colors from "../../componets/colors/colors";
@@ -33,10 +34,12 @@ import { BottomSheet } from "react-native-btr";
 const { width } = Dimensions.get("window");
 
 import { homeStyles } from "../general/dashboard/home";
+import { showMyToast } from "../../functions/show-toast";
+
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
-import { showMyToast } from "../../functions/show-toast";
 import StaticAlert from "../../componets/alerts/static-alert";
+import { BarIndicator } from "react-native-indicators";
 
 export default function PostProduct({ navigation }) {
   const [maxPosts, setMaxPosts] = useState(false);
@@ -63,13 +66,6 @@ export default function PostProduct({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
-  const [alert, setAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertStatus, setAlertStatus] = useState("");
-
-  const [loginAlert, setLoginAlert] = useState(false);
-  const [showAuthComponent, setShowAuthComponent] = useState(false);
-
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [showCatSheet, setShowCatSheet] = useState(false);
   const [showSubCatSheet, setShowSubCatSheet] = useState(false);
@@ -89,7 +85,6 @@ export default function PostProduct({ navigation }) {
       getUserData();
       checkUserProducts();
     } else {
-      setLoginAlert(true);
     }
   }, [(loading, navigation)]);
 
@@ -179,6 +174,14 @@ export default function PostProduct({ navigation }) {
           "Condition is required. Please add a condition then submit your product for review",
       });
     } else {
+      prePostProduct();
+    }
+  }
+
+  async function prePostProduct() {
+    if (maxPosts == true) {
+      navigation.navigate("PayForProduct");
+    } else {
       postProduct();
     }
   }
@@ -206,15 +209,8 @@ export default function PostProduct({ navigation }) {
         console.log(response.data);
         setSubmitting(false);
         if (response.data.status == "Success") {
-          setAlert(true);
-          setAlertMessage(response.data.message);
-          setAlertStatus("success");
-
           checkUserProducts();
         } else {
-          setAlert(true);
-          setAlertMessage(response.data.message);
-          setAlertStatus("error");
         }
       })
       .catch((err) => {
@@ -238,6 +234,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function getCategories() {
+    setLoadingData(true);
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
     await axios
@@ -253,6 +250,8 @@ export default function PostProduct({ navigation }) {
   }
 
   async function getSubCategories() {
+    setLoadingData(true);
+
     const url = `${process.env.ENDPOINT}/admin/get-sub-categories/${categoryID}`;
 
     await axios
@@ -485,6 +484,7 @@ export default function PostProduct({ navigation }) {
         <View style={postStyles.sheetContainer}>
           {showCatSheet ? (
             <View style={homeStyles.miniCatContainer}>
+              {loadingData == true && <BarIndicator size={20} color="white" />}
               {categories.map((category) => (
                 <TouchableOpacity
                   onPress={() => {
@@ -509,21 +509,25 @@ export default function PostProduct({ navigation }) {
               ))}
             </View>
           ) : showSubCatSheet ? (
-            <FlatList
-              data={subCategories}
-              renderItem={({ item }) => (
-                <PostSubCategoryList
-                  key={item._id}
-                  onPress={() => {
-                    setSubCatCategory(item.subCategoryName);
-                    setSubCatCategoryID(item._id);
-                    setShowBottomSheet(false);
-                  }}
-                  subCategoryID={item._id}
-                  subCategoryName={item.subCategoryName}
-                />
-              )}
-            />
+            <>
+              {loadingData == true && <BarIndicator size={20} color="white" />}
+
+              <FlatList
+                data={subCategories}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
+                    key={item._id}
+                    onPress={() => {
+                      setSubCatCategory(item.subCategoryName);
+                      setSubCatCategoryID(item._id);
+                      setShowBottomSheet(false);
+                    }}
+                    subCategoryID={item._id}
+                    subCategoryName={item.subCategoryName}
+                  />
+                )}
+              />
+            </>
           ) : (
             <></>
           )}
@@ -584,11 +588,12 @@ export const postStyles = StyleSheet.create({
     justifyContent: "space-between",
   },
   sheetContainer: {
-    backgroundColor: colors.lightBlue,
+    backgroundColor: colors.cardColor,
     width: "100%",
+    height: "70%",
     paddingVertical: 40,
-    borderTopRightRadius: 40,
-    borderTopLeftRadius: 40,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
     paddingHorizontal: 10,
   },
 });
