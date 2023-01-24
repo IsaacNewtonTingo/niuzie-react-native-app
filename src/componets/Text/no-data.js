@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import colors from "../colors/colors";
 
-export default function NoData() {
+export default function NoData(props) {
+  const text = props.text;
   return (
     <Text
       style={{
@@ -14,7 +15,7 @@ export default function NoData() {
         alignSelf: "center",
       }}
     >
-      No data
+      {text}
     </Text>
   );
 }

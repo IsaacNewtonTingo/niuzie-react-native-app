@@ -177,6 +177,7 @@ export default function Discover({ navigation }) {
   }
 
   async function getCategories() {
+    setLoadingData(true);
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
     await axios
@@ -235,14 +236,16 @@ export default function Discover({ navigation }) {
             />
           }
           InputRightElement={
-            <TouchableOpacity onPress={() => getAllProducts()}>
-              <Icon
-                as={<AntDesign name="arrowright" />}
-                size={5}
-                mr="2"
-                color="muted.400"
-              />
-            </TouchableOpacity>
+            searchTerm.length > 0 && (
+              <TouchableOpacity onPress={() => getAllProducts()}>
+                <Icon
+                  as={<AntDesign name="arrowright" />}
+                  size={5}
+                  mr="2"
+                  color="muted.400"
+                />
+              </TouchableOpacity>
+            )
           }
           placeholder="Search product"
           value={searchTerm}
@@ -292,7 +295,7 @@ export default function Discover({ navigation }) {
         )}
       />
 
-      {allProducts.length < 1 && <NoData />}
+      {allProducts.length < 1 && <NoData text="No data" />}
 
       <BottomSheet
         visible={filterModal}
@@ -512,6 +515,7 @@ export default function Discover({ navigation }) {
                 <Text style={discoverStyles.close}>Cancel</Text>
               </TouchableOpacity>
 
+              {loadingData && <LoadingIndicator />}
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={categories}
@@ -530,6 +534,8 @@ export default function Discover({ navigation }) {
                   />
                 )}
               />
+
+              {categories.length < 1 && <NoData text="No data" />}
             </View>
           )}
 
@@ -542,23 +548,24 @@ export default function Discover({ navigation }) {
                 <Text style={discoverStyles.close}>Cancel</Text>
               </TouchableOpacity>
 
-              <View style={discoverStyles.subCategoriesModal}>
-                <FlatList
-                  data={subCategories}
-                  renderItem={({ item }) => (
-                    <PostSubCategoryList
-                      itemKey={item._id}
-                      onPress={() => {
-                        setSubCategory(item.subCategoryName);
-                        setSubCategoryID(item._id);
-                        setSubCategoriesModal(false);
-                      }}
-                      subCategoryID={item._id}
-                      subCategoryName={item.subCategoryName}
-                    />
-                  )}
-                />
-              </View>
+              <FlatList
+                data={subCategories}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
+                    itemKey={item._id}
+                    onPress={() => {
+                      setSubCategory(item.subCategoryName);
+                      setSubCategoryID(item._id);
+                      setSubCategoriesModal(false);
+                    }}
+                    subCategoryID={item._id}
+                    subCategoryName={item.subCategoryName}
+                  />
+                )}
+              />
+
+              {!category && <NoData text="Please select category first" />}
+              {categories.length.length < 1 && <NoData text="No data" />}
             </View>
           )}
 
@@ -566,7 +573,7 @@ export default function Discover({ navigation }) {
             <View style={discoverStyles.backdrop}>
               <TouchableOpacity
                 style={discoverStyles.cancel}
-                onPress={() => setSubCategoriesModal(false)}
+                onPress={() => setCountiesModal(false)}
               >
                 <Text style={discoverStyles.close}>Cancel</Text>
               </TouchableOpacity>
@@ -577,7 +584,7 @@ export default function Discover({ navigation }) {
                 renderItem={({ item }) => (
                   <PostSubCategoryList
                     onPress={() => {
-                      setCounty(item.name);
+                      setCounty(item.name == "All counties" ? "" : item.name);
                       setSubCounties(item.sub_counties);
                       setSubCounty("");
                       setCountiesModal(false);
@@ -586,6 +593,7 @@ export default function Discover({ navigation }) {
                   />
                 )}
               />
+              {countiesData.length < 1 && <NoData text="No data" />}
             </View>
           )}
 
@@ -611,6 +619,9 @@ export default function Discover({ navigation }) {
                   />
                 )}
               />
+
+              {!county && <NoData text="Please select county first" />}
+              {subCounties.length < 1 && <NoData text="No data" />}
             </View>
           )}
         </View>

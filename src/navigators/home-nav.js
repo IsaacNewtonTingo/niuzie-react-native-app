@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Image } from "react-native";
+import { Image } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -41,6 +41,7 @@ export default function HomeNav() {
       />
 
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
+
       <Stack.Screen
         options={({ route }) => ({
           title: route.params.categoryName,
@@ -48,13 +49,13 @@ export default function HomeNav() {
         name="Subcategories"
         component={Subcategories}
       />
+
       <Stack.Screen
         name="SubcategoryProducts"
         component={SubcategoryProducts}
       />
+
       <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({});

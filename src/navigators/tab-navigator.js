@@ -36,6 +36,7 @@ export default function TabNavigator() {
           },
         }}
       />
+
       <Tab.Screen
         name="DiscoverNav"
         component={DiscoverNav}
@@ -52,6 +53,7 @@ export default function TabNavigator() {
           },
         }}
       />
+
       <Tab.Screen
         name="PostProductNav"
         component={PostProductNav}
@@ -61,6 +63,7 @@ export default function TabNavigator() {
           },
         }}
       />
+
       <Tab.Screen
         name="NotificationsNav"
         component={NotificationsNav}
@@ -76,6 +79,7 @@ export default function TabNavigator() {
           },
         }}
       />
+
       <Tab.Screen
         name="SettingsNav"
         component={SettingsNav}

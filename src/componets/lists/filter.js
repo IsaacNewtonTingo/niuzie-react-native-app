@@ -42,7 +42,11 @@ export default function FilterList(props) {
       </View>
 
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={FilterListStyles.textTwo}>{filterDetail}</Text>
+        <Text style={FilterListStyles.textTwo}>
+          {title == "County" && filterDetail == ""
+            ? "All counties"
+            : filterDetail}
+        </Text>
         <AntDesign name="right" size={16} color={colors.gray} />
       </View>
     </TouchableOpacity>

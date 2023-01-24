@@ -1,10 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import PostProduct from "../screens/seller/post-product";
 import colors from "../componets/colors/colors";
-import AuthNav from "./auth-nav";
 import PostProductRequest from "../screens/buyer/post-product-request";
 import PostOptions from "../screens/general/dashboard/post-options";
 
@@ -44,16 +42,6 @@ export default function PostProductNav() {
           headerTitle: "Post product",
         }}
       />
-
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-        name="AuthNav"
-        component={AuthNav}
-      />
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({});

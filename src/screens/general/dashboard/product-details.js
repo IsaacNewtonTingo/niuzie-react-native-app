@@ -103,9 +103,7 @@ export default function ProductDetails({ route, navigation }) {
 
   async function getReviews() {
     await axios
-      .get(
-        `https://f30e-105-163-156-62.eu.ngrok.io/api/product/get-product-reviews/${productID}`
-      )
+      .get(`${process.env.ENDPOINT}/product/get-product-reviews/${productID}`)
       .then((response) => {
         if (response.data.status == "Success") {
           setReviewList(response.data.data);
