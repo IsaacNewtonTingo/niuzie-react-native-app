@@ -12,7 +12,7 @@ import {
 import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { RadioButton } from "react-native-paper";
-import { Text } from "native-base";
+import { Text, Button, Modal, FormControl, Input } from "native-base";
 
 import styles from "../../componets/styles/global-styles";
 import colors from "../../componets/colors/colors";
@@ -71,6 +71,8 @@ export default function PostProduct({ navigation }) {
   const [showSubCatSheet, setShowSubCatSheet] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+
+  const [paymentModal, setPaymentModal] = useState(false);
 
   const userName = firstName + " " + lastName;
 
@@ -180,15 +182,17 @@ export default function PostProduct({ navigation }) {
 
   async function prePostProduct() {
     if (maxPosts == true) {
-      navigation.navigate("PayForProduct", {
-        image1,
-        productName,
-        condition,
-        description,
-        county,
-        subCounty,
-        price,
-      });
+      // navigation.navigate("PayForProduct", {
+      //   image1,
+      //   productName,
+      //   condition,
+      //   description,
+      //   county,
+      //   subCounty,
+      //   price,
+      // });
+
+      setPaymentModal(true);
     } else {
       postProduct();
     }
@@ -286,6 +290,45 @@ export default function PostProduct({ navigation }) {
           title="Warning"
           description="You have exceeded the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
         />
+      )}
+
+      {paymentModal == true && (
+        <Modal isOpen={paymentModal} onClose={() => setPaymentModal(false)}>
+          <Modal.Content maxWidth="400px">
+            <Modal.CloseButton />
+            <Modal.Header>Contact Us</Modal.Header>
+            <Modal.Body>
+              <FormControl>
+                <FormControl.Label>Name</FormControl.Label>
+                <Input />
+              </FormControl>
+              <FormControl mt="3">
+                <FormControl.Label>Email</FormControl.Label>
+                <Input />
+              </FormControl>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onPress={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  Save
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal>
       )}
 
       <View style={postStyles.holdingContainer}>

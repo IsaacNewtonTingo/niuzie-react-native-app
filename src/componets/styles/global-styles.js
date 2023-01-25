@@ -8,8 +8,11 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    marginTop: 20,
-    marginHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    padding: 10,
+    width: "100%",
   },
 
   searchIcon: {

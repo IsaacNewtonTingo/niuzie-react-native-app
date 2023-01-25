@@ -10,8 +10,7 @@ import { NativeBaseProvider, extendTheme } from "native-base";
 import { CredentialsContext } from "./src/componets/context/credentials-context";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-LogBox.ignoreAllLogs();
+import AuthNav from "./src/navigators/auth-nav";
 
 const newColorTheme = {
   brand: {
@@ -29,8 +28,8 @@ export default function App() {
     checkLoginCredentials();
   }, []);
 
-  const checkLoginCredentials = () => {
-    SecureStore.getItemAsync("loginCredentials")
+  const checkLoginCredentials = async () => {
+    await SecureStore.getItemAsync("loginCredentials")
       .then((result) => {
         if (result !== null) {
           setStoredCredentials(JSON.parse(result));

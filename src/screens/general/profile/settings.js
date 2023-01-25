@@ -6,6 +6,8 @@ import {
   View,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
+import * as SecureStore from "expo-secure-store";
+
 import { Avatar } from "react-native-paper";
 
 import styles from "../../../componets/styles/global-styles";
@@ -93,6 +95,7 @@ export default function Settings({ navigation }) {
     await axios
       .get(url)
       .then((response) => {
+        console.log(response.data);
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
@@ -102,6 +105,30 @@ export default function Settings({ navigation }) {
           setFirstName("");
           setLastName("");
         }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function handleSettingPressed(navTo) {
+    if (navTo == "MyProducts") {
+      navigation.navigate(navTo, {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        userID,
+      });
+    } else if (navTo == "Logout") {
+      handleLogout();
+    }
+  }
+
+  async function handleLogout() {
+    await SecureStore.deleteItemAsync("loginCredentials")
+      .then(() => {
+        setStoredCredentials("");
       })
       .catch((err) => {
         console.log(err);
@@ -142,13 +169,7 @@ export default function Settings({ navigation }) {
       {settingList.map((item) => (
         <SettingsList
           onPress={() => {
-            navigation.navigate(item.navTo, {
-              firstName,
-              lastName,
-              phoneNumber,
-              email,
-              userID,
-            });
+            handleSettingPressed(item.navTo);
           }}
           key={item.title}
           iconName={item.iconName}

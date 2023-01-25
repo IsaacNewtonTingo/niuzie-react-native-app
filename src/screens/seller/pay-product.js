@@ -14,7 +14,7 @@ export default function PayForProduct({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <HorizontalCard
+      {/* <HorizontalCard
         productImage1={image1}
         productName={productName}
         price={price}
@@ -22,7 +22,7 @@ export default function PayForProduct({ route, navigation }) {
         description={description}
         county={county}
         subCounty={subCounty}
-      />
+      /> */}
     </ScrollView>
   );
 }

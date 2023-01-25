@@ -20,14 +20,7 @@ import axios from "axios";
 
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
-import {
-  Input,
-  Icon,
-  Stack,
-  Pressable,
-  Center,
-  NativeBaseProvider,
-} from "native-base";
+import { Input, Icon } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -44,7 +37,6 @@ import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 import SettingsList from "../../../componets/cards/settings-list";
 import FilterList from "../../../componets/lists/filter";
-import { homeStyles } from "./home";
 import NoData from "../../../componets/Text/no-data";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
 
@@ -142,7 +134,10 @@ export default function Discover({ navigation }) {
         setSubmitting(false);
         setLoadingData(false);
         setFilterModal(false);
-        setAllProducts(response.data.data);
+
+        if (response.data.message == "Success") {
+          setAllProducts(response.data.data);
+        }
       })
       .catch((err) => {
         console.log(err);

@@ -2,16 +2,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  Image,
-  TextInput,
   View,
   Dimensions,
   TouchableOpacity,
   FlatList,
-  Animated,
-  LayoutAnimation,
 } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import axios from "axios";
 
@@ -19,9 +15,7 @@ import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
 
 import VerticalProductCard from "../../../componets/cards/vertical-product";
-import HorizontalCard from "../../../componets/cards/horizontal-card";
 
-import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -30,12 +24,11 @@ import ProductRequest from "../../../componets/cards/product-request.js";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon, Input } from "native-base";
-import { discoverStyles } from "./discover";
+import { CredentialsContext } from "../../../componets/context/credentials-context";
 
 const { width } = Dimensions.get("window");
 
 const topProductsData = [];
-const recentViewsData = [];
 
 export default function Home({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
@@ -67,17 +60,27 @@ export default function Home({ navigation }) {
     },
   ];
 
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials ? storedCredentials : "";
+  const userID = storedCredentials ? data.userID : "";
+
   useEffect(() => {
     getCategories();
+    console.log(data);
   }, []);
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
+
     await axios
       .get(url)
       .then((response) => {
-        setCategories(response.data.data);
         setLoadingData(false);
+        if (response.data.status == "Success") {
+          setCategories(response.data.data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -91,7 +94,7 @@ export default function Home({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={discoverStyles.searchContainer}>
+      <View style={styles.searchContainer}>
         <Input
           w={{
             base: "100%",

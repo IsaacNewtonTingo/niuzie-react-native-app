@@ -59,7 +59,7 @@ export default function Login({ navigation, route }) {
     } else {
       setSubmitting(true);
       const url = `${process.env.ENDPOINT}/user/login`;
-      console.log(url);
+
       await axios
         .post(url, {
           phoneNumber: parseInt(phoneNumber),
