@@ -81,6 +81,13 @@ export default function PostProduct({ navigation }) {
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
+  const token = storedCredentials ? data.token : "";
+
+  const headers = {
+    "auth-token": token,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
 
   useEffect(() => {
     if (userID) {
@@ -95,7 +102,7 @@ export default function PostProduct({ navigation }) {
   async function getUserData() {
     const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
     await axios
-      .get(url)
+      .get(url, { headers: headers })
       .then((response) => {
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);

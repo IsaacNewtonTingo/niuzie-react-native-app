@@ -15,7 +15,6 @@ import SettingsList, {
   settingsListStyles,
 } from "../../../componets/cards/settings-list";
 
-import { postStyles } from "../../seller/post-product";
 import colors from "../../../componets/colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
@@ -28,6 +27,7 @@ export default function Settings({ navigation }) {
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
+  const token = storedCredentials ? data.token : "";
 
   const [loading, setLoading] = useState(false);
 
@@ -90,12 +90,17 @@ export default function Settings({ navigation }) {
 
   navigation.addListener("focus", () => setLoading(!loading));
 
+  const headers = {
+    "auth-token": token,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
   async function getUserData() {
     const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
     await axios
-      .get(url)
+      .get(url, { headers: headers })
       .then((response) => {
-        console.log(response.data);
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);

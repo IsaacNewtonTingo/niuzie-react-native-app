@@ -6,10 +6,9 @@ import {
   Dimensions,
   TouchableOpacity,
   FlatList,
+  Image,
 } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
-
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
@@ -24,8 +23,10 @@ import ProductRequest from "../../../componets/cards/product-request.js";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon, Input } from "native-base";
-import { CredentialsContext } from "../../../componets/context/credentials-context";
 
+import * as SecureStore from "expo-secure-store";
+
+import axios from "axios";
 const { width } = Dimensions.get("window");
 
 const topProductsData = [];
@@ -35,6 +36,8 @@ export default function Home({ navigation }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
+
+  const [token, setToken] = useState("");
 
   const productRequests = [
     {
@@ -60,22 +63,35 @@ export default function Home({ navigation }) {
     },
   ];
 
-  const { storedCredentials, setStoredCredentials } =
-    useContext(CredentialsContext);
-
-  const { data } = storedCredentials ? storedCredentials : "";
-  const userID = storedCredentials ? data.userID : "";
-
   useEffect(() => {
-    getCategories();
-    console.log(data);
+    getStoredData();
   }, []);
 
-  async function getCategories() {
+  const getStoredData = async () => {
+    await SecureStore.getItemAsync("loginCredentials")
+      .then((result) => {
+        if (result !== null) {
+          const jsonData = JSON.parse(result);
+          setToken(jsonData.data.token);
+          getCategories(jsonData.data.token);
+        } else {
+          setToken("");
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
+  async function getCategories(token) {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
     await axios
-      .get(url)
+      .get(url, { headers: headers })
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
