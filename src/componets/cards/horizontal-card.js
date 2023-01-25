@@ -29,9 +29,11 @@ export default function HorizontalCard(props) {
   const rating = props.rating;
   const onPress = props.onPress;
   const style = props.style;
+  const key = props.myKey;
 
   return (
     <TouchableOpacity
+      key={key}
       onPress={onPress}
       style={[verticalProductCardStyles.card, style]}
     >

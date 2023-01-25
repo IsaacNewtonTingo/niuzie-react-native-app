@@ -9,4 +9,4 @@ export default function PostProductRequest() {
   );
 }
 
-const productReqstyles = StyleSheet.create({});
+const styles = StyleSheet.create({});

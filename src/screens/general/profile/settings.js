@@ -89,7 +89,7 @@ export default function Settings({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getUserData() {
-    const url = `https://niuzie.herokuapp.com/api/user/get-user-data/${userID}`;
+    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
     await axios
       .get(url)
       .then((response) => {

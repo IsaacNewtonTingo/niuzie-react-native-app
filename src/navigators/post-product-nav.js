@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import PostProduct from "../screens/seller/post-product";
 import colors from "../componets/colors/colors";
-import AuthNav from "./auth-nav";
 import PostProductRequest from "../screens/buyer/post-product-request";
+import PostOptions from "../screens/general/dashboard/post-options";
+import PayForProduct from "../screens/seller/pay-product";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +20,14 @@ export default function PostProductNav() {
         },
       }}
     >
+      <Stack.Screen
+        name="PostOptions"
+        component={PostOptions}
+        options={{
+          headerTitle: "Post options",
+        }}
+      />
+
       <Stack.Screen
         name="PostProductRequest"
         component={PostProductRequest}
@@ -37,14 +45,12 @@ export default function PostProductNav() {
       />
 
       <Stack.Screen
+        name="PayForProduct"
+        component={PayForProduct}
         options={{
-          headerShown: false,
+          headerTitle: "Pay for product",
         }}
-        name="AuthNav"
-        component={AuthNav}
       />
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({});

@@ -6,7 +6,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import TabNavigator from "./src/navigators/tab-navigator";
 
 import { NativeBaseProvider, extendTheme } from "native-base";
-import AuthNav from "./src/navigators/auth-nav";
 
 import { CredentialsContext } from "./src/componets/context/credentials-context";
 import * as SecureStore from "expo-secure-store";

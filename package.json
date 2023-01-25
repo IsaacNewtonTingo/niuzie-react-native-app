@@ -13,6 +13,7 @@
     "@react-navigation/native": "^6.1.1",
     "@react-navigation/native-stack": "^6.9.7",
     "axios": "^1.2.2",
+    "dateformat": "^5.0.3",
     "expo": "~47.0.9",
     "expo-linear-gradient": "~12.0.1",
     "expo-notifications": "~0.17.0",

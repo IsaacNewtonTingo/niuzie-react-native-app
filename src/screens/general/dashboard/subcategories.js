@@ -20,7 +20,7 @@ export default function Subcategories({ route, navigation }) {
   }, []);
 
   async function getSubCategories() {
-    const url = `https://niuzie.herokuapp.com/api/admin/get-sub-categories/${categoryID}`;
+    const url = `${process.env.ENDPOINT}/admin/get-sub-categories/${categoryID}`;
 
     await axios
       .get(url)

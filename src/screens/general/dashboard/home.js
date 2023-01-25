@@ -22,12 +22,15 @@ import VerticalProductCard from "../../../componets/cards/vertical-product";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 
 import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
-import { ENDPOINT } from "@env";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import ProductRequest from "../../../componets/cards/product-request.js";
 
-import { AutoScrollFlatList } from "react-native-autoscroll-flatlist";
+import { LinearGradient } from "expo-linear-gradient";
+import { Icon, Input } from "native-base";
+import { discoverStyles } from "./discover";
 
 const { width } = Dimensions.get("window");
 
@@ -69,8 +72,7 @@ export default function Home({ navigation }) {
   }, []);
 
   async function getCategories() {
-    const url = `https://niuzie.herokuapp.com/api/admin/get-categories`;
-
+    const url = `${process.env.ENDPOINT}/admin/get-categories`;
     await axios
       .get(url)
       .then((response) => {
@@ -89,18 +91,40 @@ export default function Home({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.searchContainer}>
-        <FontAwesome5
-          style={styles.searchIcon}
-          name="search"
-          size={18}
-          color="black"
-        />
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search for a product"
+      <View style={discoverStyles.searchContainer}>
+        <Input
+          w={{
+            base: "100%",
+            // md: "25%",
+          }}
+          h={{
+            base: 50,
+          }}
+          borderRadius={10}
+          borderColor={colors.gray}
+          type="text"
+          InputLeftElement={
+            <Icon
+              as={<MaterialIcons name="search" />}
+              size={5}
+              ml="2"
+              color="muted.400"
+            />
+          }
+          InputRightElement={
+            <TouchableOpacity>
+              <Icon
+                as={<AntDesign name="arrowright" />}
+                size={5}
+                mr="2"
+                color="muted.400"
+              />
+            </TouchableOpacity>
+          }
+          placeholder="Search product"
           value={searchTerm}
           onChangeText={setSearchTerm}
+          style={{ color: colors.lightBlue, borderRadius: 10 }}
         />
       </View>
 
@@ -125,24 +149,31 @@ export default function Home({ navigation }) {
 
         <View style={homeStyles.miniCatContainer}>
           {categories.map((category) => (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Subcategories", {
-                  categoryID: category._id,
-                  categoryName: category.categoryName,
-                });
-              }}
-              style={homeStyles.miniCatItem}
+            <LinearGradient
               key={category._id}
+              start={[0.0, 0.5]}
+              end={[1.0, 0.5]}
+              locations={[0.0, 1.0]}
+              colors={[colors.almostDark, "#001949"]}
+              style={homeStyles.miniCatItem}
             >
-              <Image
-                style={homeStyles.categoryImage}
-                source={{ uri: category.categoryImage }}
-              />
-              <Text style={homeStyles.categoryText}>
-                {category.categoryName}
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Subcategories", {
+                    categoryID: category._id,
+                    categoryName: category.categoryName,
+                  });
+                }}
+              >
+                <Image
+                  style={homeStyles.categoryImage}
+                  source={{ uri: category.categoryImage }}
+                />
+                <Text style={homeStyles.categoryText}>
+                  {category.categoryName}
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
           ))}
         </View>
       </View>
@@ -169,31 +200,6 @@ export default function Home({ navigation }) {
           ))}
         </View>
       </View>
-
-      <View style={styles.section}>
-        <Text style={styles.subText}>Recently viewed</Text>
-        <View style={homeStyles.miniCatContainer}>
-          <FlatList
-            scrollEnabled
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={recentViewsData}
-            renderItem={({ item }) => (
-              <HorizontalCard
-                key={item.productName}
-                productImage={item.image1}
-                productName={item.productName}
-                price={item.price}
-                condition={item.condition}
-                description={item.description}
-                county={item.user.county}
-                subCounty={item.user.subCounty}
-                rating={item.rating}
-              />
-            )}
-          />
-        </View>
-      </View>
     </ScrollView>
   );
 }
@@ -212,7 +218,6 @@ export const homeStyles = StyleSheet.create({
   miniCatItem: {
     width: width / 4.5,
     height: width / 4.5,
-    backgroundColor: colors.cardColor,
     marginBottom: 10,
     borderRadius: 10,
     alignItems: "center",
@@ -225,8 +230,9 @@ export const homeStyles = StyleSheet.create({
     justifyContent: "space-between",
   },
   categoryImage: {
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
+    resizeMode: "contain",
   },
   categoryText: {
     color: colors.lightBlue,

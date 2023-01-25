@@ -1,5 +1,3 @@
-// In App.js in a new project
-
 import * as React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignUp from "../screens/general/auth/signup";
@@ -8,7 +6,6 @@ import PhoneOtp from "../screens/general/auth/phone-otp";
 import EmailOtp from "../screens/general/auth/email-otp";
 import ResetPassword from "../screens/general/auth/reset-password";
 import colors from "../componets/colors/colors";
-import TabNavigator from "./tab-navigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +27,7 @@ export default function AuthNav() {
           headerTitle: "Signup",
         }}
       />
+
       <Stack.Screen
         name="Login"
         component={Login}
@@ -37,6 +35,7 @@ export default function AuthNav() {
           headerTitle: "Login",
         }}
       />
+
       <Stack.Screen
         name="PhoneOtp"
         component={PhoneOtp}
@@ -44,7 +43,9 @@ export default function AuthNav() {
           headerTitle: "Verify phone number",
         }}
       />
+
       <Stack.Screen name="EmailOtp" component={EmailOtp} />
+
       <Stack.Screen name="ResetPassword" component={ResetPassword} />
     </Stack.Navigator>
   );

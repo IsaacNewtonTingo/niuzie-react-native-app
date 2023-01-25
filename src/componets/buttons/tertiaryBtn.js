@@ -21,7 +21,7 @@ export default function TertiaryButton(props) {
           height: 50,
           borderRadius: 10,
           borderWidth: 2,
-          borderColor: "#0066FF",
+          borderColor: "#336699",
           alignItems: "center",
           justifyContent: "center",
           marginTop: 20,
