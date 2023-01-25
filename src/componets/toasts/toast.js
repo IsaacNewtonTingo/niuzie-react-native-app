@@ -19,7 +19,8 @@ export default function MyToast(props) {
   const status = props.status;
   return (
     <Alert
-      maxWidth="90%"
+      maxWidth="100%"
+      minHeight={60}
       alignSelf="center"
       flexDirection="row"
       status={status}

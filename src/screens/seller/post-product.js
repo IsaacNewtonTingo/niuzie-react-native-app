@@ -229,6 +229,12 @@ export default function PostProduct({ navigation }) {
         setSubmitting(false);
         if (response.data.status == "Success") {
           checkUserProducts();
+          setPaymentModal(false);
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
         } else {
         }
       })
@@ -300,37 +306,76 @@ export default function PostProduct({ navigation }) {
       )}
 
       {paymentModal == true && (
-        <Modal isOpen={paymentModal} onClose={() => setPaymentModal(false)}>
-          <Modal.Content maxWidth="400px">
+        <Modal
+          backgroundColor={colors.dark}
+          isOpen={paymentModal}
+          onClose={() => setPaymentModal(false)}
+        >
+          <Modal.Content width={width - 40} maxWidth={width - 40}>
             <Modal.CloseButton />
-            <Modal.Header>Contact Us</Modal.Header>
+            <Modal.Header>Pay to submit product for review</Modal.Header>
+
             <Modal.Body>
-              <FormControl>
-                <FormControl.Label>Name</FormControl.Label>
-                <Input />
-              </FormControl>
-              <FormControl mt="3">
-                <FormControl.Label>Email</FormControl.Label>
-                <Input />
-              </FormControl>
+              <Text style={{ marginBottom: 20, color: colors.dark }}>
+                In order to post this product, you will have to pay KSH. 500.
+                Ensure the number provided below is your M-Pesa number and click
+                pay. You will recive an M-Pesa prompt to input your pin to
+                complete the payment process.
+              </Text>
+
+              <Text style={postStyles.label}>Phone number</Text>
+              <View style={styles.textInputContainer}>
+                <MaterialCommunityIcons
+                  style={styles.searchIcon}
+                  name="hand-coin-outline"
+                  size={18}
+                  color={colors.dark}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g 1200"
+                  keyboardType="numeric"
+                  value={phoneNumber.toString()}
+                  onChangeText={setPhoneNumber}
+                />
+              </View>
+
+              <Text style={postStyles.label}>Amount</Text>
+              <View style={styles.textInputContainer}>
+                <MaterialCommunityIcons
+                  style={styles.searchIcon}
+                  name="hand-coin-outline"
+                  size={18}
+                  color={colors.dark}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholderTextColor="gray"
+                  keyboardType="numeric"
+                  value="200"
+                  editable={false}
+                />
+              </View>
             </Modal.Body>
+
             <Modal.Footer>
               <Button.Group space={2}>
                 <Button
+                  width={100}
                   variant="ghost"
                   colorScheme="blueGray"
                   onPress={() => {
-                    setShowModal(false);
+                    setPaymentModal(false);
                   }}
                 >
                   Cancel
                 </Button>
-                <Button
-                  onPress={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Save
+                <Button width={100} disabled={submitting} onPress={postProduct}>
+                  {submitting == false ? (
+                    "Pay"
+                  ) : (
+                    <BarIndicator color="white" size={20} />
+                  )}
                 </Button>
               </Button.Group>
             </Modal.Footer>
@@ -607,6 +652,10 @@ export const postStyles = StyleSheet.create({
     borderColor: "#e60000",
     borderRadius: 10,
     padding: 10,
+  },
+  label: {
+    fontWeight: "800",
+    color: colors.dark,
   },
   warnText: {
     fontSize: 25,
