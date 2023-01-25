@@ -36,35 +36,13 @@ export default function Home({ navigation }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
+  const [productRequests, setProductRequests] = useState([]);
 
   const [token, setToken] = useState("");
 
-  const productRequests = [
-    {
-      firstName: "Henry",
-      lastName: "Ford",
-      profilePicture: "",
-      content:
-        "Hello. Is there anyone selling Samsung Galaxy S22 that is slightly used? I need it at an affordable price",
-      county: "Nairobi",
-      subCounty: "Kasarani",
-      date: "17th Jan 2023",
-    },
-
-    {
-      firstName: "Natalie",
-      lastName: "Churning",
-      profilePicture: "",
-      content:
-        "Someone selling a brand new Ford GT 500 Mustang the 1969 model please reach out to me. I have a lot of money ",
-      county: "Siaya",
-      subCounty: "Bondo",
-      date: "11th Jan 2023",
-    },
-  ];
-
   useEffect(() => {
     getStoredData();
+    getProductRequests();
   }, []);
 
   const getStoredData = async () => {
@@ -104,13 +82,28 @@ export default function Home({ navigation }) {
       });
   }
 
+  async function getProductRequests() {
+    const url = `${process.env.ENDPOINT}/buyer-needs/get-all-needs`;
+    await axios
+      .get(url)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.status == "Success") {
+          setProductRequests(response.data.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Input
           w={{
             base: "100%",
@@ -145,7 +138,7 @@ export default function Home({ navigation }) {
           onChangeText={setSearchTerm}
           style={{ color: colors.lightBlue, borderRadius: 10 }}
         />
-      </View>
+      </View> */}
 
       <View style={styles.section}>
         <View style={styles.textComb}>

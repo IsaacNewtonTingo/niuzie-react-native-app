@@ -18,11 +18,11 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "../colors/colors";
 
 export default function ProductRequest(props) {
-  const userName = props.item.firstName + " " + props.item.lastName;
-  const profilePicture = props.item.profilePicture;
+  const userName = props.item.user.firstName + " " + props.item.user.lastName;
+  const profilePicture = props.item.user.profilePicture;
   const content = props.item.content;
-  const location = props.item.county + ", " + props.item.subCounty;
-  const date = props.item.date;
+  const location = props.item.user.county + ", " + props.item.user.subCounty;
+  const date = props.item.createdAt;
 
   return (
     <TouchableOpacity>

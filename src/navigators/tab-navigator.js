@@ -10,6 +10,7 @@ import colors from "../componets/colors/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 
@@ -43,13 +44,7 @@ export default function TabNavigator() {
         options={{
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
-            return (
-              <MaterialIcons
-                name="local-fire-department"
-                size={27}
-                color={color}
-              />
-            );
+            return <FontAwesome name="search" size={27} color={color} />;
           },
         }}
       />
