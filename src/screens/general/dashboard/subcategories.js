@@ -44,7 +44,12 @@ export default function Subcategories({ route, navigation }) {
         data={subCategories}
         renderItem={({ item }) => (
           <SubCategoryList
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("SubcategoryProducts", {
+                item,
+                subCategoryName: item.subCategoryName,
+              });
+            }}
             subCategoryID={item._id}
             subCategoryName={item.subCategoryName}
           />

@@ -52,6 +52,9 @@ export default function HomeNav() {
       />
 
       <Stack.Screen
+        options={({ route }) => ({
+          title: route.params.subCategoryName,
+        })}
         name="SubcategoryProducts"
         component={SubcategoryProducts}
       />
