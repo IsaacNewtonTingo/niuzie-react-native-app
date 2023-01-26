@@ -9,7 +9,6 @@ import {
 import React, { useState } from "react";
 
 import styles from "../styles/global-styles";
-import { postStyles } from "../../screens/seller/post-product";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
@@ -20,11 +19,9 @@ import colors from "../colors/colors";
 import axios from "axios";
 
 import { BottomSheet } from "react-native-btr";
-import CenteredAlert from "../alerts/centered-alert";
+import { showMyToast } from "../../functions/show-toast";
 
-import { ENDPOINT } from "@env";
-
-export default function SignUpComponent({ navigation }) {
+export default function SignUpComponent(props) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -36,43 +33,71 @@ export default function SignUpComponent({ navigation }) {
 
   const [visible, setVisible] = useState(false);
 
-  const [alert, setAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-
   const [otp, setOtp] = useState("");
 
   async function signUp() {
     //validate
     if (!firstName) {
-      setAlert(true);
-      setAlertMessage("First name is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "First name is required. Please add a name then proceed",
+      });
     } else if (!lastName) {
-      setAlert(true);
-      setAlertMessage("Last name is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Last name is required. Please add a name then proceed",
+      });
     } else if (!/^[a-zA-Z ]*$/.test(firstName, lastName)) {
-      setAlert(true);
-      setAlertMessage("Invalid name format");
+      showMyToast({
+        status: "error",
+        title: "Inavlid format",
+        description: "Name shoult only contain characters",
+      });
     } else if (!email) {
-      setAlert(true);
-      setAlertMessage("Email is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Email is required. Please add an email then proceed",
+      });
     } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setAlert(true);
-      setAlertMessage("Invalid email address");
+      showMyToast({
+        status: "error",
+        title: "Invalid format",
+        description: "Email provided is invalid. Please check and change",
+      });
     } else if (!phoneNumber) {
-      setAlert(true);
-      setAlertMessage("Phone number is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description:
+          "Phone number is required. Please add a phone number then proceed",
+      });
     } else if (!phoneNumber.startsWith(254)) {
-      setAlert(true);
-      setAlertMessage("Invalid phone number");
+      showMyToast({
+        status: "error",
+        title: "Invalid format",
+        description: "Phone number must start with 254. No +",
+      });
     } else if (!password) {
-      setAlert(true);
-      setAlertMessage("Password is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
     } else if (password.length < 8) {
-      setAlert(true);
-      setAlertMessage("Password is too short. Use at least 8 characters");
+      showMyToast({
+        status: "error",
+        title: "Invalid field",
+        description: "Password should be at least 8 characters long",
+      });
     } else if (password != confirmPassword) {
-      setAlert(true);
-      setAlertMessage("Passwords don't match");
+      showMyToast({
+        status: "error",
+        title: "Non matching fields",
+        description: "Passwords don't match",
+      });
     } else {
       const url = `${process.env.ENDPOINT}/user/signup`;
       console.log(url);
@@ -118,10 +143,6 @@ export default function SignUpComponent({ navigation }) {
         console.log(response.data);
         setSubmitting(false);
         if (response.data.status == "Success") {
-          navigation.navigate("Login", {
-            alertMessage: "Code verified successfuly. Please login",
-            alertStatus: "success",
-          });
           setVisible(false);
         } else {
           setAlert(true);
@@ -135,15 +156,8 @@ export default function SignUpComponent({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {alert && (
-        <CenteredAlert
-          onPress={() => setAlert(false)}
-          alertMessage={alertMessage}
-          alertStatus="error"
-        />
-      )}
-      <View style={postStyles.holdingContainer}>
+    <>
+      <View style={signStyles.holdingContainer}>
         <Text style={styles.label}>First name</Text>
         <View style={styles.textInputContainer}>
           <FontAwesome5
@@ -254,14 +268,7 @@ export default function SignUpComponent({ navigation }) {
 
         <View style={styles.optTextSign}>
           <Text style={styles.firstText}>Already have an account ?</Text>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Login", {
-                alertMessage: "",
-                alertStatus: "",
-              })
-            }
-          >
+          <TouchableOpacity onPress={props.onLoginPress}>
             <Text style={styles.opt2Text}>Login</Text>
           </TouchableOpacity>
         </View>
@@ -310,7 +317,7 @@ export default function SignUpComponent({ navigation }) {
           </View>
         </View>
       </BottomSheet>
-    </ScrollView>
+    </>
   );
 }
 
@@ -320,5 +327,11 @@ const signStyles = StyleSheet.create({
     width: "100%",
     height: 300,
     padding: 20,
+  },
+  holdingContainer: {
+    backgroundColor: colors.cardColor,
+    padding: 40,
+    borderRadius: 10,
+    width: "90%",
   },
 });

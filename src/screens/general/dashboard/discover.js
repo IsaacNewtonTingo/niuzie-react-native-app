@@ -135,7 +135,7 @@ export default function Discover({ navigation }) {
         setLoadingData(false);
         setFilterModal(false);
 
-        if (response.data.message == "Success") {
+        if (response.data.status == "Success") {
           setAllProducts(response.data.data);
         }
       })

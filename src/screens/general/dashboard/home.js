@@ -38,42 +38,22 @@ export default function Home({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [productRequests, setProductRequests] = useState([]);
 
-  const [token, setToken] = useState("");
-
   useEffect(() => {
-    getStoredData();
+    getCategories();
     getProductRequests();
   }, []);
 
-  const getStoredData = async () => {
-    await SecureStore.getItemAsync("loginCredentials")
-      .then((result) => {
-        if (result !== null) {
-          const jsonData = JSON.parse(result);
-          setToken(jsonData.data.token);
-          getCategories(jsonData.data.token);
-        } else {
-          setToken("");
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  async function getCategories(token) {
+  async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
 
-    const headers = {
-      "auth-token": token,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
     await axios
-      .get(url, { headers: headers })
+      .get(url)
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setCategories(response.data.data);
+        } else {
+          console.log(response.data.message);
         }
       })
       .catch((err) => {
