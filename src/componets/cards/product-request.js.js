@@ -17,15 +17,20 @@ import { Ionicons } from "@expo/vector-icons";
 
 import colors from "../colors/colors";
 
+import dateFormat from "dateformat";
+
 export default function ProductRequest(props) {
   const userName = props.item.user.firstName + " " + props.item.user.lastName;
   const profilePicture = props.item.user.profilePicture;
+  const phoneNumber = props.item.user.phoneNumber;
+  const email = props.item.user.email;
   const content = props.item.content;
   const location = props.item.user.county + ", " + props.item.user.subCounty;
   const date = props.item.createdAt;
+  const onPress = props.onPress;
 
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onPress}>
       <LinearGradient
         start={[0.0, 0.5]}
         end={[1.0, 0.5]}
@@ -84,7 +89,7 @@ export default function ProductRequest(props) {
           </View>
 
           <Text style={{ fontWeight: "800", color: "#A8B8D8", fontSize: 10 }}>
-            {date}
+            {dateFormat(date, "mediumDate")}
           </Text>
         </View>
       </LinearGradient>
@@ -94,7 +99,7 @@ export default function ProductRequest(props) {
 
 const gradientStyles = StyleSheet.create({
   background: {
-    height: 140,
+    minHeight: 140,
     width: width / 1.5,
     marginRight: 10,
     padding: 20,

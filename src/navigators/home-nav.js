@@ -8,6 +8,7 @@ import Subcategories from "../screens/general/dashboard/subcategories";
 import SubcategoryProducts from "../screens/general/dashboard/subcategory-products";
 import UserProfile from "../screens/general/dashboard/user-profile";
 import colors from "../componets/colors/colors";
+import ProductRequestDetails from "../screens/general/dashboard/product-request-details";
 
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +57,11 @@ export default function HomeNav() {
       />
 
       <Stack.Screen name="UserProfile" component={UserProfile} />
+
+      <Stack.Screen
+        name="ProductRequestDetails"
+        component={ProductRequestDetails}
+      />
     </Stack.Navigator>
   );
 }

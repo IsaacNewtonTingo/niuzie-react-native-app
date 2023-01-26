@@ -87,7 +87,6 @@ export default function Home({ navigation }) {
     await axios
       .get(url)
       .then((response) => {
-        console.log(response.data);
         if (response.data.status == "Success") {
           setProductRequests(response.data.data);
         }
@@ -151,7 +150,14 @@ export default function Home({ navigation }) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={productRequests}
-            renderItem={({ item }) => <ProductRequest item={item} />}
+            renderItem={({ item }) => (
+              <ProductRequest
+                onPress={() =>
+                  navigation.navigate("ProductRequestDetails", { item })
+                }
+                item={item}
+              />
+            )}
           />
         </View>
       </View>
