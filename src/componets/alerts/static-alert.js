@@ -7,7 +7,7 @@ export default function StaticAlert(props) {
   const description = props.description;
   return (
     <Center>
-      <Alert alignSelf="center" w="90%" status={status}>
+      <Alert variant="left-accent" alignSelf="center" w="90%" status={status}>
         <VStack space={1} flexShrink={1} w="100%" alignItems="center">
           <Alert.Icon size="md" />
           <Text

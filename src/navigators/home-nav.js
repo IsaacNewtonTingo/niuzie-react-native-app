@@ -61,6 +61,9 @@ export default function HomeNav() {
       <Stack.Screen
         name="ProductRequestDetails"
         component={ProductRequestDetails}
+        options={{
+          headerTitle: "Product request",
+        }}
       />
     </Stack.Navigator>
   );
