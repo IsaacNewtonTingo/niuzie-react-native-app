@@ -27,21 +27,25 @@ import { Icon, Input } from "native-base";
 import * as SecureStore from "expo-secure-store";
 
 import axios from "axios";
+import HorizontalCard from "../../../componets/cards/horizontal-card";
 const { width } = Dimensions.get("window");
-
-const topProductsData = [];
 
 export default function Home({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [productRequests, setProductRequests] = useState([]);
 
+  const [premiumProducts, setPremiumProducts] = useState([]);
+
   useEffect(() => {
     getCategories();
+    getPremiumProducts();
     getProductRequests();
-  }, []);
+  }, [(navigation, loading)]);
+
+  navigation.addListener("focus", () => setLoading(!loading));
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
@@ -76,51 +80,37 @@ export default function Home({ navigation }) {
       });
   }
 
+  async function getPremiumProducts() {
+    const url = `${process.env.ENDPOINT}/product/get-premium-user-products`;
+
+    await axios
+      .get(url)
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setPremiumProducts(response.data.data);
+        } else {
+          console.log(response.data.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  async function handleProductPressed(item) {
+    navigation.navigate("ProductDetails", { item });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
 
   return (
     <ScrollView style={styles.container}>
-      {/* <View style={styles.searchContainer}>
-        <Input
-          w={{
-            base: "100%",
-            // md: "25%",
-          }}
-          h={{
-            base: 50,
-          }}
-          borderRadius={10}
-          borderColor={colors.gray}
-          type="text"
-          InputLeftElement={
-            <Icon
-              as={<MaterialIcons name="search" />}
-              size={5}
-              ml="2"
-              color="muted.400"
-            />
-          }
-          InputRightElement={
-            <TouchableOpacity>
-              <Icon
-                as={<AntDesign name="arrowright" />}
-                size={5}
-                mr="2"
-                color="muted.400"
-              />
-            </TouchableOpacity>
-          }
-          placeholder="Search product"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          style={{ color: colors.lightBlue, borderRadius: 10 }}
-        />
-      </View> */}
-
       <View style={styles.section}>
-        <View style={styles.textComb}>
+        <View style={[styles.textComb, { marginBottom: 20 }]}>
           <Text style={styles.subText}>Buyer requests</Text>
           <Text style={styles.viewAll}>View all</Text>
         </View>
@@ -143,7 +133,7 @@ export default function Home({ navigation }) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.subText}>Categories</Text>
+        <Text style={[styles.subText, { marginBottom: 20 }]}>Categories</Text>
 
         <View style={homeStyles.miniCatContainer}>
           {categories.map((category) => (
@@ -183,17 +173,22 @@ export default function Home({ navigation }) {
         </View>
 
         <View style={homeStyles.miniCatContainer}>
-          {topProductsData.map((product) => (
-            <VerticalProductCard
-              key={product.productName}
-              productImage={product.image1}
-              productName={product.productName}
-              price={product.price}
-              condition={product.condition}
-              description={product.description}
-              county={product.user.county}
-              subCounty={product.user.subCounty}
-              rating={product.rating}
+          {premiumProducts.map((item) => (
+            <HorizontalCard
+              onPress={() => handleProductPressed(item)}
+              style={{ marginBottom: 10 }}
+              key={item._id}
+              productImage1={item.image1}
+              productImage2={item.image2}
+              productImage3={item.image3}
+              productImage4={item.image4}
+              productName={item.productName}
+              price={item.price}
+              condition={item.condition}
+              description={item.description}
+              county={item.user.county}
+              subCounty={item.user.subCounty}
+              rating={item.rating.$numberDecimal}
             />
           ))}
         </View>

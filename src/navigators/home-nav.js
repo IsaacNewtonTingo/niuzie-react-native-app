@@ -41,7 +41,13 @@ export default function HomeNav() {
         component={Home}
       />
 
-      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetails}
+        options={({ route }) => ({
+          headerShown: false,
+        })}
+      />
 
       <Stack.Screen
         options={({ route }) => ({

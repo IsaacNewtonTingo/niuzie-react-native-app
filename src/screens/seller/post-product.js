@@ -123,7 +123,7 @@ export default function PostProduct({ navigation }) {
           setCounty(response.data.data.county);
           setSubCounty(response.data.data.subCounty);
 
-          checkUserProducts(userID);
+          checkUserProducts(userID, token);
         } else {
           setFirstName("");
           setLastName("");
@@ -137,10 +137,17 @@ export default function PostProduct({ navigation }) {
       });
   }
 
-  async function checkUserProducts(userID) {
+  async function checkUserProducts(userID, token) {
     const url = `${process.env.ENDPOINT}/product/get-number/${userID}`;
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
     await axios
-      .get(url)
+      .get(url, {
+        headers,
+      })
       .then((response) => {
         setLoadingData(false);
         if (response.data.data >= 2) {
