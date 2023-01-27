@@ -18,12 +18,15 @@ import styles from "../styles/global-styles";
 export default function FullProductRequest(props) {
   const userName = props.data.buyerName;
   const profilePicture = props.data.buyerProfilePicture;
-  const phoneNumber = props.data.buyerPhoneNumber;
+  let phoneNumber = props.data.buyerPhoneNumber;
   const email = props.data.buyerEmail;
   const location = props.data.location;
   const date = props.data.date;
+  const premium = props.data.premium;
 
   const content = props.data.content;
+
+  phoneNumber = phoneNumber.toString();
 
   async function sendSMS() {
     await Linking.openURL(`sms:+${phoneNumber}`);
@@ -70,13 +73,16 @@ export default function FullProductRequest(props) {
                 fontSize: 16,
               }}
             >
-              {phoneNumber}
+              {premium
+                ? phoneNumber
+                : phoneNumber.slice(0, 6) + "XXXXX" + phoneNumber.slice(-1)}
             </Text>
           </View>
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
+            disabled={!premium}
             onPress={() => {
               Linking.openURL(`tel:+${phoneNumber}`);
             }}
@@ -84,7 +90,11 @@ export default function FullProductRequest(props) {
             <Feather name="phone-call" size={20} color={colors.linkText} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginLeft: 20 }} onPress={sendSMS}>
+          <TouchableOpacity
+            style={{ marginLeft: 20 }}
+            disabled={!premium}
+            onPress={sendSMS}
+          >
             <FontAwesome5 name="sms" size={20} color={colors.lightBlue} />
           </TouchableOpacity>
         </View>

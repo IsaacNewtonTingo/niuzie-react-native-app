@@ -168,7 +168,7 @@ export default function Home({ navigation }) {
 
       <View style={styles.section}>
         <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>Top products</Text>
+          <Text style={styles.subText}>Featured products</Text>
           <Text style={styles.viewAll}>View all</Text>
         </View>
 
@@ -189,6 +189,7 @@ export default function Home({ navigation }) {
               county={item.user.county}
               subCounty={item.user.subCounty}
               rating={item.rating.$numberDecimal}
+              premium={item.user.premium}
             />
           ))}
         </View>

@@ -13,6 +13,7 @@ import colors from "../colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
 import noImage from "../../assets/data/noImage";
+import PromotedCard from "./promoted";
 
 const { width } = Dimensions.get("window");
 export default function HorizontalCard(props) {
@@ -29,12 +30,15 @@ export default function HorizontalCard(props) {
   const rating = props.rating;
   const onPress = props.onPress;
   const style = props.style;
+  const premium = props.premium;
 
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[verticalProductCardStyles.card, style]}
     >
+      {premium && <PromotedCard />}
+
       <Image
         style={verticalProductCardStyles.productImage}
         source={{

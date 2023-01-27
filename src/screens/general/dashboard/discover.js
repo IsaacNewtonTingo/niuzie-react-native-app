@@ -60,7 +60,7 @@ export default function Discover({ navigation }) {
   const [categoryID, setCategoryID] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
 
-  const [price, setPrice] = useState("-1");
+  const [price, setPrice] = useState("1");
   const [rating, setRating] = useState("1");
   const [date, setDate] = useState("1");
 
@@ -411,10 +411,10 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={price === "-1" ? "checked" : "unchecked"}
+                  value="1"
+                  status={price === "1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setPrice("-1");
+                    setPrice("1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Low to high</Text>
@@ -422,10 +422,10 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="1"
-                  status={price === "1" ? "checked" : "unchecked"}
+                  value="-1"
+                  status={price === "-1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setPrice("1");
+                    setPrice("-1");
                   }}
                 />
                 <Text style={postStyles.radioText}>High to low</Text>
