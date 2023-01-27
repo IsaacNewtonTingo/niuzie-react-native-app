@@ -36,6 +36,8 @@ import { showMyToast } from "../../../functions/show-toast";
 import dateFormat from "dateformat";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
+import NoData from "../../../componets/Text/no-data";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 const width = Dimensions.get("window").width;
 
@@ -48,6 +50,7 @@ export default function ProductDetails({ route, navigation }) {
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
+  const token = storedCredentials ? data.token : "";
 
   const [otherProducts, setOtherProducts] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
@@ -60,7 +63,7 @@ export default function ProductDetails({ route, navigation }) {
   const productID = route.params.item._id;
   const productName = route.params.item.productName;
   const description = route.params.item.description;
-  const categoryID = route.params.item.category;
+  const categoryID = route.params.item.category._id;
   const price = route.params.item.price;
   const condition = route.params.item.condition;
   const rating = route.params.item.rating.$numberDecimal;
@@ -85,6 +88,12 @@ export default function ProductDetails({ route, navigation }) {
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  const headers = {
+    "auth-token": token,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
 
   const productImages = [
     route.params.item.image1
@@ -150,8 +159,12 @@ export default function ProductDetails({ route, navigation }) {
     );
   };
 
+  async function handleProductPressed(item) {
+    navigation.push("ProductDetails", { item });
+  }
+
   async function getOtherProducts() {
-    const url = `${ENDPOINT}/product/get-user-products/${productOwnerID}?productID=${productID}`;
+    let url = `${ENDPOINT}/product/get-user-products/${productOwnerID}?productID=${productID}`;
     await axios
       .get(url)
       .then((response) => {
@@ -165,21 +178,19 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function getSimilarProducts() {
-    const url = `${ENDPOINT}/admin/get-category-products/${categoryID}`;
+    let url = `${ENDPOINT}/admin/get-category-products/${categoryID}`;
     await axios
       .get(url)
       .then((response) => {
-        setSimilarProducts(response.data.data);
         setLoadingData(false);
+        if (response.data.status == "Success") {
+          setSimilarProducts(response.data.data);
+        }
       })
       .catch((err) => {
         console.log(err);
         setLoadingData(false);
       });
-  }
-
-  async function handleProductPressed(item) {
-    navigation.push("ProductDetails", { item });
   }
 
   function validate() {
@@ -203,12 +214,17 @@ export default function ProductDetails({ route, navigation }) {
 
   async function reviewProduct() {
     setSubmitting(true);
+
     await axios
-      .post(`${process.env.ENDPOINT}/product/review-product/${productID}`, {
-        userID,
-        rating,
-        reviewMessage: review,
-      })
+      .post(
+        `${process.env.ENDPOINT}/product/review-product/${productID}`,
+        {
+          userID,
+          rating,
+          reviewMessage: review,
+        },
+        { headers }
+      )
       .then((response) => {
         setSubmitting(false);
         console.log(response.data);
@@ -233,7 +249,35 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
-  //
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
+  async function deleteReview(reviewID) {
+    const url = `https://3058-197-176-255-142.in.ngrok.io/api/product/delete-product-review/${reviewID}?userID=${userID}&&productID=${productID}`;
+    await axios
+      .delete(url, { headers: headers })
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.status == "Success") {
+          getReviews();
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Something went wrong",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
@@ -311,7 +355,7 @@ export default function ProductDetails({ route, navigation }) {
 
       <LinearGradient
         colors={[colors.dark, colors.almostDark, colors.cardColor]}
-        style={[productDetailStyles.prodData, { minHeight: 80 }]}
+        style={[productDetailStyles.prodData, { minHeight: 180 }]}
       >
         <View style={productDetailStyles.profileContainer}>
           <Image
@@ -336,8 +380,8 @@ export default function ProductDetails({ route, navigation }) {
         </View>
       </LinearGradient>
 
-      <View style={[styles.section, { marginTop: 40 }]}>
-        <View style={styles.textComb}>
+      <View style={[styles.section, { marginTop: 40, minHeight: 200 }]}>
+        <View style={[styles.textComb, { marginBottom: 20 }]}>
           <Text style={styles.subText}>Reviews</Text>
 
           <TouchableOpacity>
@@ -345,9 +389,13 @@ export default function ProductDetails({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
+        {reviewList.length < 1 && (
+          <NoData text="No reviews found for this product" />
+        )}
+
         {reviewList.map((review) => (
           <ReviewComponent
-            myKey={review._id}
+            key={review._id}
             productOwnerID={productOwnerID}
             firstName={review.user.firstName}
             lastName={review.user.lastName}
@@ -355,6 +403,7 @@ export default function ProductDetails({ route, navigation }) {
             date={dateFormat(review.createdAt, "mediumDate")}
             rating={review.rating}
             reviewMessage={review.reviewMessage}
+            onPress={() => deleteReview(review._id)}
           />
         ))}
       </View>
@@ -443,7 +492,7 @@ export default function ProductDetails({ route, navigation }) {
             <HorizontalCard
               onPress={() => handleProductPressed(item)}
               style={{ width: width - 40, marginRight: 10 }}
-              myKey={item._id}
+              key={item._id}
               productImage1={item.image1}
               productImage2={item.image2}
               productImage3={item.image3}

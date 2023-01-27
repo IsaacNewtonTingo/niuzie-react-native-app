@@ -28,17 +28,18 @@ export default function ReviewComponent(props) {
   const date = props.date;
   const rating = props.rating;
   const reviewMessage = props.reviewMessage;
-  const key = props.myKey;
+  const onPress = props.onPress;
 
   const productOwnerID = props.productOwnerID;
 
   return (
     <View
-      key={key}
       style={{
         borderBottomWidth: 1,
         borderBottomColor: "#1a1a1a",
         marginBottom: 20,
+        minHeight: 80,
+        justifyContent: "space-between",
       }}
     >
       <View style={styles.spaceBetween}>
@@ -68,21 +69,22 @@ export default function ReviewComponent(props) {
           alignItems: "flex-end",
           maxWidth: width,
           marginBottom: 10,
+          justifyContent: "space-between",
         }}
       >
         <Text
           style={{
             color: colors.lightBlue,
             marginTop: 10,
-            width: width - 40,
+            width: width - 60,
           }}
         >
           {reviewMessage}
         </Text>
 
         {userID == productOwnerID && (
-          <TouchableOpacity>
-            <Entypo name="trash" size={18} color={colors.gray} />
+          <TouchableOpacity onPress={onPress}>
+            <Entypo name="trash" size={25} color={colors.gray} />
           </TouchableOpacity>
         )}
       </View>
