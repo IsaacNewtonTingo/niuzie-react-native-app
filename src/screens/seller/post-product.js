@@ -87,6 +87,7 @@ export default function PostProduct({ navigation }, props) {
 
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
+  const [premiumUser, setPremiumUser] = useState(false);
 
   const onSignupPress = props.onSignupPress;
 
@@ -161,6 +162,7 @@ export default function PostProduct({ navigation }, props) {
     if (data) {
       setUserID(data.userID);
       setToken(data.token);
+      setPremiumUser(data.premiumUser);
 
       getUserData(data.userID, data.token);
     } else {
@@ -275,17 +277,7 @@ export default function PostProduct({ navigation }, props) {
   }
 
   async function prePostProduct() {
-    if (maxPosts == true) {
-      // navigation.navigate("PayForProduct", {
-      //   image1,
-      //   productName,
-      //   condition,
-      //   description,
-      //   county,
-      //   subCounty,
-      //   price,
-      // });
-
+    if (maxPosts == true && premiumUser == false) {
       setPaymentModal(true);
     } else {
       postProduct();
@@ -406,7 +398,7 @@ export default function PostProduct({ navigation }, props) {
           </Modal>
         )}
 
-        {maxPosts == true && (
+        {maxPosts == true && premiumUser == false && (
           <StaticAlert
             status="warning"
             title="Warning"

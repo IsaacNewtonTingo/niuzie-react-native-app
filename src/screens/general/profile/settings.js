@@ -190,8 +190,6 @@ export default function Settings({ navigation }) {
           setLastName(response.data.data.lastName);
           setPhoneNumber(response.data.data.phoneNumber);
           setEmail(response.data.data.email);
-
-          checkUserProducts(userID, token);
         } else {
           setFirstName("");
           setLastName("");
