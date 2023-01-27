@@ -6,7 +6,9 @@ import {
   View,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
+
 import * as SecureStore from "expo-secure-store";
+import * as Updates from "expo-updates";
 
 import { Avatar } from "react-native-paper";
 
@@ -20,16 +22,18 @@ import colors from "../../../componets/colors/colors";
 import { AntDesign } from "@expo/vector-icons";
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 import axios from "axios";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import { Modal } from "native-base";
+import LoginComponent from "../../../componets/auth/login";
+import { showMyToast } from "../../../functions/show-toast";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
-  const { data } = storedCredentials ? storedCredentials : "";
-  const userID = storedCredentials ? data.userID : "";
-  const token = storedCredentials ? data.token : "";
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
   const settingList = [
     {
@@ -77,41 +81,126 @@ export default function Settings({ navigation }) {
     },
   ];
 
+  const [userID, setUserID] = useState("");
+  const [token, setToken] = useState("");
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
 
+  const [password, setPassword] = useState("");
+
   useEffect(() => {
-    if (userID) {
-      getUserData();
-    }
+    checkStoreCredentials();
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
-  const headers = {
-    "auth-token": token,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
+  async function login() {
+    if (!phoneNumber) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "First name is required. Please add a name then proceed",
+      });
+    } else if (!password) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
+    } else {
+      setSubmitting(true);
+      const url = `${process.env.ENDPOINT}/user/login`;
+      await axios
+        .post(url, {
+          phoneNumber: parseInt(phoneNumber),
+          password,
+        })
+        .then((response) => {
+          setSubmitting(false);
+          if (response.data.status == "Success") {
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
 
-  async function getUserData() {
+            const { data } = response.data;
+            storeCredentials({ data });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
+  }
+
+  async function storeCredentials(values) {
+    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
+      .then(() => {
+        setPassword("");
+        setStoredCredentials(values);
+        getUserData(values.data.userID, values.data.token);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function checkStoreCredentials() {
+    const { data } = storedCredentials ? storedCredentials : "";
+
+    if (data) {
+      setUserID(data.userID);
+      setToken(data.token);
+
+      getUserData(data.userID, data.token);
+    } else {
+      setUserID("");
+      setToken("");
+      setLoadingData(false);
+    }
+  }
+
+  async function getUserData(userID, token) {
+    setLoadingData(true);
     const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
     await axios
       .get(url, { headers: headers })
       .then((response) => {
+        setLoadingData(false);
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
           setPhoneNumber(response.data.data.phoneNumber);
           setEmail(response.data.data.email);
+
+          checkUserProducts(userID, token);
         } else {
           setFirstName("");
           setLastName("");
+          setPhoneNumber("");
+          setEmail("");
         }
       })
       .catch((err) => {
+        setLoadingData(false);
         console.log(err);
       });
   }
@@ -131,17 +220,45 @@ export default function Settings({ navigation }) {
   }
 
   async function handleLogout() {
+    setLoadingData(true);
     await SecureStore.deleteItemAsync("loginCredentials")
-      .then(() => {
+      .then(async () => {
+        setLoadingData(false);
         setStoredCredentials("");
       })
       .catch((err) => {
         console.log(err);
+        setLoadingData(false);
       });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
   }
 
   return (
     <ScrollView style={styles.container}>
+      {!storedCredentials && (
+        <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
+          <TouchableOpacity
+            onPress={async () => await Updates.reloadAsync()}
+            style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
+          >
+            <Text style={{ color: colors.orange, fontWeight: "800" }}>
+              Close
+            </Text>
+          </TouchableOpacity>
+          <LoginComponent
+            submitting={submitting}
+            loginPress={login}
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            password={password}
+            setPassword={setPassword}
+          />
+        </Modal>
+      )}
+
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("Profile", {

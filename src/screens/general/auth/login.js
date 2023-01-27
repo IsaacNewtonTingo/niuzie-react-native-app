@@ -22,7 +22,7 @@ import TopAlert from "../../../componets/alerts/top-alert";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 
-export default function Login({ navigation, route }) {
+export default function Login({ navigation, route }, props) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
@@ -67,7 +67,6 @@ export default function Login({ navigation, route }) {
         })
         .then((response) => {
           setSubmitting(false);
-          console.log(response.data);
           if (response.data.status == "Success") {
             setAlertMessage(response.data.message);
             setAlertStatus("success");
@@ -93,7 +92,7 @@ export default function Login({ navigation, route }) {
     await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
       .then(() => {
         setStoredCredentials(values);
-        console.log(values);
+        props.getStoredCredentialsAfterLogin();
       })
       .catch((err) => {
         console.log(err);

@@ -167,7 +167,7 @@ export default function Home({ navigation }) {
       </View>
 
       <View style={styles.section}>
-        <View style={styles.textComb}>
+        <View style={[styles.textComb, { marginBottom: 20 }]}>
           <Text style={styles.subText}>Top products</Text>
           <Text style={styles.viewAll}>View all</Text>
         </View>

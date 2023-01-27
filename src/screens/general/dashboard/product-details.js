@@ -254,7 +254,8 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function deleteReview(reviewID) {
-    const url = `https://3058-197-176-255-142.in.ngrok.io/api/product/delete-product-review/${reviewID}?userID=${userID}&&productID=${productID}`;
+    const url = `${process.env.ENDPOINT}/product/delete-product-review/${reviewID}?userID=${userID}&&productID=${productID}`;
+    ``;
     await axios
       .delete(url, { headers: headers })
       .then((response) => {

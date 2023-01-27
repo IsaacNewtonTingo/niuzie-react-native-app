@@ -29,11 +29,9 @@ export default function HorizontalCard(props) {
   const rating = props.rating;
   const onPress = props.onPress;
   const style = props.style;
-  const key = props.myKey;
 
   return (
     <TouchableOpacity
-      key={key}
       onPress={onPress}
       style={[verticalProductCardStyles.card, style]}
     >
@@ -101,8 +99,8 @@ const verticalProductCardStyles = StyleSheet.create({
     flexDirection: "row",
   },
   productImage: {
-    width: width / 2.5,
-    height: "100%",
+    width: 160,
+    height: 160,
     borderRadius: 10,
   },
   detailsContainer: {
@@ -154,5 +152,6 @@ const verticalProductCardStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginRight: 10,
   },
 });

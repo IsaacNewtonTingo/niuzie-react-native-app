@@ -7,7 +7,7 @@ import colors from "../colors/colors";
 import { useState } from "react";
 import SignUpComponent from "../auth/signup";
 
-export default function AuthModal() {
+export default function AuthModal(props) {
   const [loginComp, setLoginComp] = useState(true);
   const [signupComp, setSignupComp] = useState(false);
 

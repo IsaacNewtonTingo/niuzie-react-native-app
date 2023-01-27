@@ -1,14 +1,11 @@
 import {
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   Text,
   View,
 } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
-import * as SecureStore from "expo-secure-store";
-import axios from "axios";
+import React from "react";
 
 import styles from "../styles/global-styles";
 
@@ -18,80 +15,14 @@ import { Entypo } from "@expo/vector-icons";
 import PrimaryButton from "../buttons/primary-button";
 import colors from "../colors/colors";
 
-import { CredentialsContext } from "../context/credentials-context";
-import { showMyToast } from "../../functions/show-toast";
-
 export default function LoginComponent(props) {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const phoneNumber = props.phoneNumber;
+  const setPhoneNumber = props.setPhoneNumber;
+  const password = props.password;
+  const setPassword = props.setPassword;
 
-  const [submitting, setSubmitting] = useState(false);
-
+  const submitting = props.submitting;
   const onSignupPress = props.onSignupPress;
-
-  const { storedCredentials, setStoredCredentials } =
-    useContext(CredentialsContext);
-
-  const { data } = storedCredentials ? storedCredentials : "";
-
-  async function login() {
-    if (!phoneNumber) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "First name is required. Please add a name then proceed",
-      });
-    } else if (!password) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "Password is required. Please add a password then proceed",
-      });
-    } else {
-      setSubmitting(true);
-      const url = `${process.env.ENDPOINT}/user/login`;
-      await axios
-        .post(url, {
-          phoneNumber: parseInt(phoneNumber),
-          password,
-        })
-        .then((response) => {
-          setSubmitting(false);
-          console.log(response.data);
-          if (response.data.status == "Success") {
-            showMyToast({
-              status: "success",
-              title: "Success",
-              description: response.data.message,
-            });
-
-            const { data } = response.data;
-            storeCredentials({ data });
-          } else {
-            showMyToast({
-              status: "error",
-              title: "Failed",
-              description: response.data.message,
-            });
-          }
-        })
-        .catch((err) => {
-          setSubmitting(false);
-          console.log(err);
-        });
-    }
-  }
-
-  async function storeCredentials(values) {
-    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
-      .then(() => {
-        setStoredCredentials(values);
-        props.getStoredCredentialsAfterLogin();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   return (
     <View style={loginStyles.holdingContainer}>
@@ -132,7 +63,7 @@ export default function LoginComponent(props) {
       <PrimaryButton
         submitting={submitting}
         disabled={submitting}
-        onPress={login}
+        onPress={props.loginPress}
         buttonTitle="Login"
       />
 

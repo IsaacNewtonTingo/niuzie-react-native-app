@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
 
+import * as SecureStore from "expo-secure-store";
+
 import { RadioButton } from "react-native-paper";
 import { Text, Button, Modal } from "native-base";
 
@@ -41,8 +43,9 @@ import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
 import { BarIndicator } from "react-native-indicators";
 import AuthModal from "../../componets/modal/auth-modal";
+import LoginComponent from "../../componets/auth/login";
 
-export default function PostProduct({ navigation }) {
+export default function PostProduct({ navigation }, props) {
   const [maxPosts, setMaxPosts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -67,6 +70,8 @@ export default function PostProduct({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
+  const [password, setPassword] = useState("");
+
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [showCatSheet, setShowCatSheet] = useState(false);
   const [showSubCatSheet, setShowSubCatSheet] = useState(false);
@@ -83,11 +88,72 @@ export default function PostProduct({ navigation }) {
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
 
+  const onSignupPress = props.onSignupPress;
+
   useEffect(() => {
     checkStoreCredentials();
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  async function login() {
+    if (!phoneNumber) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "First name is required. Please add a name then proceed",
+      });
+    } else if (!password) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
+    } else {
+      setSubmitting(true);
+      const url = `${process.env.ENDPOINT}/user/login`;
+      await axios
+        .post(url, {
+          phoneNumber: parseInt(phoneNumber),
+          password,
+        })
+        .then((response) => {
+          setSubmitting(false);
+          if (response.data.status == "Success") {
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+
+            const { data } = response.data;
+            storeCredentials({ data });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
+  }
+
+  async function storeCredentials(values) {
+    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
+      .then(() => {
+        setStoredCredentials(values);
+        getUserData(values.data.userID, values.data.token);
+        setPassword("");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   async function checkStoreCredentials() {
     const { data } = storedCredentials ? storedCredentials : "";
@@ -320,7 +386,24 @@ export default function PostProduct({ navigation }) {
     <>
       <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
         {!storedCredentials && (
-          <AuthModal getStoredCredentialsAfterLogin={checkStoreCredentials} />
+          <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
+            >
+              <Text style={{ color: colors.orange, fontWeight: "800" }}>
+                Close
+              </Text>
+            </TouchableOpacity>
+            <LoginComponent
+              submitting={submitting}
+              loginPress={login}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+              password={password}
+              setPassword={setPassword}
+            />
+          </Modal>
         )}
 
         {maxPosts == true && (

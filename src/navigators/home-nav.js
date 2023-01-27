@@ -15,7 +15,7 @@ const Stack = createNativeStackNavigator();
 function Logo() {
   return (
     <Image
-      style={{ width: 25, height: 25 }}
+      style={{ width: 100, height: 25, resizeMode: "contain" }}
       source={require("../assets/images/niuzie-logo.png")}
     />
   );
