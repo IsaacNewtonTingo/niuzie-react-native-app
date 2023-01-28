@@ -68,12 +68,6 @@ export default function Settings({ navigation }) {
       navTo: "ContactUs",
     },
     {
-      title: "Notifications",
-      iconType: "AntDesign",
-      iconName: "delete",
-      navTo: "NotificationSettings",
-    },
-    {
       title: "Logout",
       iconType: "MaterialCommunityIcons",
       iconName: "logout",
@@ -212,6 +206,14 @@ export default function Settings({ navigation }) {
         email,
         userID,
       });
+    } else if (navTo == "SavedProducts") {
+      navigation.navigate("SavedProducts");
+    } else if (navTo == "PremiumServices") {
+      navigation.navigate("PremiumServices");
+    } else if (navTo == "Payments") {
+      navigation.navigate("Payments");
+    } else if (navTo == "ContactUs") {
+      navigation.navigate("Support");
     } else if (navTo == "Logout") {
       handleLogout();
     }

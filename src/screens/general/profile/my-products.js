@@ -43,7 +43,7 @@ export default function MyProducts({ navigation }) {
       .get(url)
       .then((response) => {
         setLoadingData(false);
-        if (response.data.stutus == "Success") {
+        if (response.data.status == "Success") {
           setProducts(response.data.data);
 
           const products = response.data.data;

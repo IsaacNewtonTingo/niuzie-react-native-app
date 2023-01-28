@@ -10,6 +10,10 @@ import Settings from "../screens/general/profile/settings";
 import MyProducts from "../screens/general/profile/my-products";
 import ProductDetails from "../screens/general/dashboard/product-details";
 import ContactUs from "../screens/general/profile/contact-us";
+import SavedProducts from "../screens/general/profile/saved-products";
+import PremiumServices from "../screens/general/profile/premium-services";
+import Payments from "../screens/general/profile/payments";
+import Support from "../screens/general/profile/support";
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +58,38 @@ export default function SettingsNav() {
         component={ContactUs}
         options={{
           headerTitle: "Contact us",
+        }}
+      />
+
+      <Stack.Screen
+        name="SavedProducts"
+        component={SavedProducts}
+        options={{
+          headerTitle: "Saved items",
+        }}
+      />
+
+      <Stack.Screen
+        name="PremiumServices"
+        component={PremiumServices}
+        options={{
+          headerTitle: "Premium services",
+        }}
+      />
+
+      <Stack.Screen
+        name="Payments"
+        component={Payments}
+        options={{
+          headerTitle: "Payments",
+        }}
+      />
+
+      <Stack.Screen
+        name="Support"
+        component={Support}
+        options={{
+          headerTitle: "Support",
         }}
       />
     </Stack.Navigator>
