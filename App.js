@@ -10,7 +10,8 @@ import { NativeBaseProvider, extendTheme } from "native-base";
 import { CredentialsContext } from "./src/componets/context/credentials-context";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import AuthNav from "./src/navigators/auth-nav";
+
+LogBox.ignoreAllLogs();
 
 const newColorTheme = {
   brand: {

@@ -9,8 +9,9 @@ import {
   StatusBar,
   Image,
   Modal,
+  RefreshControl,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import styles from "../../../componets/styles/global-styles";
@@ -76,11 +77,21 @@ export default function Discover({ navigation }) {
 
   const [submitting, setSubmitting] = useState(false);
 
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     getAllProducts();
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getAllProducts();
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const filters = [
     {
@@ -267,6 +278,14 @@ export default function Discover({ navigation }) {
       </View>
 
       <FlatList
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.lightBlue}
+            colors={[colors.lightBlue]}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
         style={styles.flatlist}
         // numColumns={2}
         data={allProducts}

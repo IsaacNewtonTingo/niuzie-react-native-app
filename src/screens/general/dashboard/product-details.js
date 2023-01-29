@@ -63,7 +63,11 @@ export default function ProductDetails({ route, navigation }) {
   const productID = route.params.item._id;
   const productName = route.params.item.productName;
   const description = route.params.item.description;
+  const category = route.params.item.category.categoryName;
   const categoryID = route.params.item.category._id;
+  const subCategory = route.params.item.subCategory.subCategoryName;
+  const subCategoryName = route.params.item.subCategory.subCategoryName;
+  const subCategoryID = route.params.item.subCategory._id;
   const price = route.params.item.price;
   const condition = route.params.item.condition;
   const rating = route.params.item.rating.$numberDecimal;
@@ -71,6 +75,7 @@ export default function ProductDetails({ route, navigation }) {
   const productOwnerID = route.params.item.user._id;
   const firstName = route.params.item.user.firstName;
   const lastName = route.params.item.user.lastName;
+  const phoneNumber = route.params.item.user.phoneNumber;
   const profilePicture = route.params.item.user.profilePicture;
   const county = route.params.item.user.county;
   const subCounty = route.params.item.user.subCounty;
@@ -134,7 +139,7 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function getSavedProducts() {
-    const url = `https://d6af-105-161-159-117.eu.ngrok.io/api/product/get-one-saved-product/${userID}?productID=${productID}`;
+    const url = `${process.env.ENDPOINT}/product/get-one-saved-product/${userID}?productID=${productID}`;
 
     await axios
       .get(url, { headers })
@@ -548,6 +553,32 @@ export default function ProductDetails({ route, navigation }) {
           )}
         />
       </View>
+
+      {userID == productOwnerID && (
+        <View style={[styles.section, {}]}>
+          <PrimaryButton
+            onPress={() =>
+              navigation.navigate("EditProduct", {
+                productID,
+                productName,
+                category,
+                categoryID,
+                subCategory,
+                subCategoryID,
+                description,
+                price,
+                condition,
+                firstName,
+                lastName,
+                phoneNumber,
+                county,
+                subCounty,
+              })
+            }
+            buttonTitle="Edit product"
+          />
+        </View>
+      )}
     </ScrollView>
   );
 }

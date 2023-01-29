@@ -288,21 +288,31 @@ export default function PostProduct({ navigation }, props) {
     const url = `${process.env.ENDPOINT}/product/post-product`;
     setSubmitting(true);
 
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
     await axios
-      .post(url, {
-        userID,
-        phoneNumber,
-        productName,
-        category: categoryID,
-        subCategory: subCategoryID,
-        condition,
-        description,
-        price: parseInt(price),
-        image1,
-        image2,
-        image3,
-        image4,
-      })
+      .post(
+        url,
+        {
+          userID,
+          phoneNumber,
+          productName,
+          category: categoryID,
+          subCategory: subCategoryID,
+          condition,
+          description,
+          price: parseInt(price),
+          image1,
+          image2,
+          image3,
+          image4,
+        },
+        { headers }
+      )
       .then((response) => {
         console.log(response.data);
         setSubmitting(false);

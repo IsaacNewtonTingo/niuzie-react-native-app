@@ -9,6 +9,7 @@ import SubcategoryProducts from "../screens/general/dashboard/subcategory-produc
 import UserProfile from "../screens/general/dashboard/user-profile";
 import colors from "../componets/colors/colors";
 import ProductRequestDetails from "../screens/general/dashboard/product-request-details";
+import EditProduct from "../screens/seller/edit-product";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,14 @@ export default function HomeNav() {
         component={ProductDetails}
         options={({ route }) => ({
           headerShown: false,
+        })}
+      />
+
+      <Stack.Screen
+        name="EditProduct"
+        component={EditProduct}
+        options={({ route }) => ({
+          title: route.params.productName,
         })}
       />
 

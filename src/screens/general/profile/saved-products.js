@@ -7,6 +7,7 @@ import HorizontalCard from "../../../componets/cards/horizontal-card";
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import axios from "axios";
+import NoData from "../../../componets/Text/no-data";
 
 export default function SavedProducts({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -57,6 +58,7 @@ export default function SavedProducts({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {savedItems.length < 1 && <NoData text="No saved items" />}
       <FlatList
         data={savedItems}
         renderItem={({ item }) => (
