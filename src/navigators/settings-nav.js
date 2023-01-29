@@ -82,7 +82,7 @@ export default function SettingsNav() {
         name="Payments"
         component={Payments}
         options={{
-          headerTitle: "Payments",
+          headerTitle: "Transactions",
         }}
       />
 

@@ -51,6 +51,8 @@ export default function PremiumServices({ navigation }) {
     getAmount();
   }, [(loading, navigation)]);
 
+  navigation.addListener("focus", () => setLoading(!loading));
+
   async function getAmount() {
     const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.premiumSubscriptionID}`;
     const headers = {
@@ -63,9 +65,8 @@ export default function PremiumServices({ navigation }) {
       .get(url, { headers: headers })
       .then((response) => {
         setLoadingData(false);
-        console.log(response.data.data[0]);
         if (response.data.status == "Success") {
-          setAmount(response.data.data[0].amount);
+          setAmount(response.data.data.amount);
         }
       })
       .catch((err) => {

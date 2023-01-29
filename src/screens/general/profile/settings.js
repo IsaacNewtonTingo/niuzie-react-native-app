@@ -56,7 +56,7 @@ export default function Settings({ navigation }) {
       navTo: "PremiumServices",
     },
     {
-      title: "Payments",
+      title: "Transaction",
       iconType: "MaterialCommunityIcons",
       iconName: "hand-coin",
       navTo: "Payments",
