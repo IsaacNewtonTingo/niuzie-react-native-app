@@ -28,7 +28,7 @@ export default function Payments({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getPayments() {
-    const url = `https://d6af-105-161-159-117.eu.ngrok.io/api/payments/get-payments/${userID}`;
+    const url = `${process.env.ENDPOINT}/payments/get-payments/${userID}`;
 
     const headers = {
       "auth-token": token,

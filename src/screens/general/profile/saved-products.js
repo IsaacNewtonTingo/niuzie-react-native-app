@@ -41,7 +41,6 @@ export default function SavedProducts({ navigation }) {
       .get(url, { headers })
       .then((response) => {
         setLoadingData(false);
-        console.log(response.data);
         if (response.data.status == "Success") {
           setSavedItems(response.data.data);
         }
