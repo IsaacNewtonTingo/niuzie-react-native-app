@@ -26,6 +26,7 @@ import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import { Modal } from "native-base";
 import LoginComponent from "../../../componets/auth/login";
 import { showMyToast } from "../../../functions/show-toast";
+import SignUpComponent from "../../../componets/auth/signup";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -34,6 +35,9 @@ export default function Settings({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
+
+  const [loginItem, setLoginItem] = useState(true);
+  const [signupItem, setSignupItem] = useState(false);
 
   const settingList = [
     {
@@ -82,8 +86,10 @@ export default function Settings({ navigation }) {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [confirmCodeModal, setConfirmCodeModal] = useState(false);
 
   useEffect(() => {
     checkStoreCredentials();
@@ -147,6 +153,133 @@ export default function Settings({ navigation }) {
       })
       .catch((err) => {
         console.log(err);
+      });
+  }
+
+  async function signUp() {
+    //validate
+    if (!firstName) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "First name is required. Please add a name then proceed",
+      });
+    } else if (!lastName) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Last name is required. Please add a name then proceed",
+      });
+    } else if (!/^[a-zA-Z ]*$/.test(firstName, lastName)) {
+      showMyToast({
+        status: "error",
+        title: "Inavlid format",
+        description: "Name shoult only contain characters",
+      });
+    } else if (!email) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Email is required. Please add an email then proceed",
+      });
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid format",
+        description: "Email provided is invalid. Please check and change",
+      });
+    } else if (!phoneNumber) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description:
+          "Phone number is required. Please add a phone number then proceed",
+      });
+    } else if (!phoneNumber.startsWith(254)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid format",
+        description: "Phone number must start with 254. No +",
+      });
+    } else if (!password) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
+    } else if (password.length < 8) {
+      showMyToast({
+        status: "error",
+        title: "Invalid field",
+        description: "Password should be at least 8 characters long",
+      });
+    } else if (password != confirmPassword) {
+      showMyToast({
+        status: "error",
+        title: "Non matching fields",
+        description: "Passwords don't match",
+      });
+    } else {
+      const url = `${process.env.ENDPOINT}/user/signup`;
+      setSubmitting(true);
+
+      await axios
+        .post(url, {
+          email,
+          phoneNumber,
+        })
+        .then((response) => {
+          console.log(response.data);
+          setSubmitting(false);
+
+          if (response.data.status == "Success") {
+            setConfirmCodeModal(true);
+            showMyToast({
+              status: "succes",
+              title: "Success",
+              description: response.data.messsage,
+            });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.messsage,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setSubmitting(false);
+        });
+    }
+  }
+
+  async function verifyCode() {
+    setSubmitting(true);
+    const url = `${process.env.ENDPOINT}/user/verify-code`;
+
+    await axios
+      .post(url, {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        password,
+        verificationCode: otp,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setSubmitting(false);
+        if (response.data.status == "Success") {
+          setVisible(false);
+        } else {
+          setAlert(true);
+          setAlertMessage(response.data.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitting(false);
       });
   }
 
@@ -232,6 +365,16 @@ export default function Settings({ navigation }) {
       });
   }
 
+  function onSignupPress() {
+    setLoginItem(false);
+    setSignupItem(true);
+  }
+
+  function onLoginPress() {
+    setLoginItem(true);
+    setSignupItem(false);
+  }
+
   // if (loadingData) {
   //   return <LoadingIndicator />;
   // }
@@ -248,14 +391,41 @@ export default function Settings({ navigation }) {
               Close
             </Text>
           </TouchableOpacity>
-          <LoginComponent
-            submitting={submitting}
-            loginPress={login}
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            password={password}
-            setPassword={setPassword}
-          />
+
+          {loginItem == true ? (
+            <LoginComponent
+              submitting={submitting}
+              loginPress={login}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+              password={password}
+              setPassword={setPassword}
+              onSignupPress={onSignupPress}
+            />
+          ) : signupItem == true ? (
+            <SignUpComponent
+              submitting={submitting}
+              onLoginPress={onLoginPress}
+              signupPress={signUp}
+              firstName={firstName}
+              setFirstName={setFirstName}
+              email={email}
+              setEmail={setEmail}
+              lastName={lastName}
+              setLastName={setLastName}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+              password={password}
+              setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
+              confirmCodeModal={confirmCodeModal}
+              setConfirmCodeModal={setConfirmCodeModal}
+              verifyCode={verifyCode}
+            />
+          ) : (
+            <></>
+          )}
         </Modal>
       )}
 
