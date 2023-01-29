@@ -12,6 +12,7 @@ import styles from "../styles/global-styles";
 import colors from "../colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
+
 import noImage from "../../assets/data/noImage";
 import PromotedCard from "./promoted";
 

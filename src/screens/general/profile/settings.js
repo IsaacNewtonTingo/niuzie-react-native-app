@@ -232,12 +232,12 @@ export default function Settings({ navigation }) {
       });
   }
 
-  if (loadingData) {
-    return <LoadingIndicator />;
-  }
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { padding: 20 }]}>
       {!storedCredentials && (
         <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
           <TouchableOpacity
@@ -268,7 +268,14 @@ export default function Settings({ navigation }) {
             phoneNumber,
           })
         }
-        style={settingsListStyles.btn}
+        style={[
+          settingsListStyles.btn,
+          {
+            minHeight: 80,
+            marginBottom: 20,
+            backgroundColor: colors.almostDark,
+          },
+        ]}
       >
         <View style={settingsListStyles.close}>
           <Avatar.Image
@@ -308,6 +315,8 @@ const settingsStyls = StyleSheet.create({
     fontWeight: "800",
   },
   prof: {
-    color: "gray",
+    color: colors.gray,
+    fontWeight: "800",
+    marginTop: 5,
   },
 });

@@ -2,14 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import colors from "../colors/colors";
 
+import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 export default function PromotedCard() {
   return (
     <View
       style={{
-        width: 60,
-        height: 25,
         borderRadius: 10,
-        backgroundColor: "rgba(18, 22, 59,0.3)",
         position: "absolute",
         zIndex: 1,
         top: 10,
@@ -18,11 +18,11 @@ export default function PromotedCard() {
         justifyContent: "center",
       }}
     >
-      <Text
-        style={{ color: colors.lightBlue, fontSize: 10, fontWeight: "600" }}
-      >
-        Promoted
-      </Text>
+      <MaterialCommunityIcons
+        name="diamond-stone"
+        size={16}
+        color={colors.orange}
+      />
     </View>
   );
 }

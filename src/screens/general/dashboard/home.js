@@ -109,91 +109,97 @@ export default function Home({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>Buyer requests</Text>
-          <Text style={styles.viewAll}>View all</Text>
-        </View>
+      {productRequests.length > 0 && (
+        <View style={styles.section}>
+          <View style={[styles.textComb, { marginBottom: 20 }]}>
+            <Text style={styles.subText}>Buyer requests</Text>
+            <Text style={styles.viewAll}>View all</Text>
+          </View>
 
-        <View style={homeStyles.miniCatContainer}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={productRequests}
-            renderItem={({ item }) => (
-              <ProductRequest
-                onPress={() =>
-                  navigation.navigate("ProductRequestDetails", { item })
-                }
-                item={item}
-              />
-            )}
-          />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={[styles.subText, { marginBottom: 20 }]}>Categories</Text>
-
-        <View style={homeStyles.miniCatContainer}>
-          {categories.map((category) => (
-            <LinearGradient
-              key={category._id}
-              start={[0.0, 0.5]}
-              end={[1.0, 0.5]}
-              locations={[0.0, 1.0]}
-              colors={[colors.almostDark, "#001949"]}
-              style={homeStyles.miniCatItem}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Subcategories", {
-                    categoryID: category._id,
-                    categoryName: category.categoryName,
-                  });
-                }}
-              >
-                <Image
-                  style={homeStyles.categoryImage}
-                  source={{ uri: category.categoryImage }}
+          <View style={homeStyles.miniCatContainer}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={productRequests}
+              renderItem={({ item }) => (
+                <ProductRequest
+                  onPress={() =>
+                    navigation.navigate("ProductRequestDetails", { item })
+                  }
+                  item={item}
                 />
-                <Text style={homeStyles.categoryText}>
-                  {category.categoryName}
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>Featured products</Text>
-          <Text style={styles.viewAll}>View all</Text>
-        </View>
-
-        <View style={homeStyles.miniCatContainer}>
-          {premiumProducts.map((item) => (
-            <HorizontalCard
-              onPress={() => handleProductPressed(item)}
-              style={{ marginBottom: 10 }}
-              key={item._id}
-              productImage1={item.image1}
-              productImage2={item.image2}
-              productImage3={item.image3}
-              productImage4={item.image4}
-              productName={item.productName}
-              price={item.price}
-              condition={item.condition}
-              description={item.description}
-              county={item.user.county}
-              subCounty={item.user.subCounty}
-              rating={item.rating.$numberDecimal}
-              premium={item.user.premium}
+              )}
             />
-          ))}
+          </View>
         </View>
-      </View>
+      )}
+
+      {categories.length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.subText, { marginBottom: 20 }]}>Categories</Text>
+
+          <View style={homeStyles.miniCatContainer}>
+            {categories.map((category) => (
+              <LinearGradient
+                key={category._id}
+                start={[0.0, 0.5]}
+                end={[1.0, 0.5]}
+                locations={[0.0, 1.0]}
+                colors={[colors.almostDark, "#001949"]}
+                style={homeStyles.miniCatItem}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Subcategories", {
+                      categoryID: category._id,
+                      categoryName: category.categoryName,
+                    });
+                  }}
+                >
+                  <Image
+                    style={homeStyles.categoryImage}
+                    source={{ uri: category.categoryImage }}
+                  />
+                  <Text style={homeStyles.categoryText}>
+                    {category.categoryName}
+                  </Text>
+                </TouchableOpacity>
+              </LinearGradient>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {premiumProducts.length > 0 && (
+        <View style={styles.section}>
+          <View style={[styles.textComb, { marginBottom: 20 }]}>
+            <Text style={styles.subText}>Featured products</Text>
+            <Text style={styles.viewAll}>View all</Text>
+          </View>
+
+          <View style={homeStyles.miniCatContainer}>
+            {premiumProducts.map((item) => (
+              <HorizontalCard
+                onPress={() => handleProductPressed(item)}
+                style={{ marginBottom: 10 }}
+                key={item._id}
+                productImage1={item.image1}
+                productImage2={item.image2}
+                productImage3={item.image3}
+                productImage4={item.image4}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                rating={item.rating.$numberDecimal}
+                premium={item.user.premium}
+              />
+            ))}
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }

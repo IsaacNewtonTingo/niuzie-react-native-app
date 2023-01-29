@@ -28,7 +28,15 @@ export default function SettingsNav() {
         },
       }}
     >
-      <Stack.Screen options={{}} name="Settings" component={Settings} />
+      <Stack.Screen
+        options={
+          {
+            // headerShown: false,
+          }
+        }
+        name="Settings"
+        component={Settings}
+      />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen
         name="EditProfile"

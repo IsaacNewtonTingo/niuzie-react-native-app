@@ -25,6 +25,7 @@ import { showMyToast } from "../../../functions/show-toast";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import axios from "axios";
+import { BarIndicator } from "react-native-indicators";
 const { width } = Dimensions.get("window");
 
 export default function PremiumServices({ navigation }) {
@@ -144,6 +145,7 @@ export default function PremiumServices({ navigation }) {
             description: response.data.message,
           });
           setPremium(true);
+          setPaymentModal(false);
         } else {
           showMyToast({
             status: "error",

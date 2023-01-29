@@ -417,9 +417,11 @@ export default function ProductDetails({ route, navigation }) {
         <View style={[styles.textComb, { marginBottom: 20 }]}>
           <Text style={styles.subText}>Reviews</Text>
 
-          <TouchableOpacity>
-            <Text style={styles.viewAll}>View all</Text>
-          </TouchableOpacity>
+          {reviewList.leng > 0 && (
+            <TouchableOpacity>
+              <Text style={styles.viewAll}>View all</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {reviewList.length < 1 && (
@@ -441,48 +443,53 @@ export default function ProductDetails({ route, navigation }) {
         ))}
       </View>
 
-      <View style={[styles.section, {}]}>
-        <Text style={styles.subText}>Add review</Text>
+      {userID !== productOwnerID && (
+        <View style={[styles.section, {}]}>
+          <Text style={styles.subText}>Add review</Text>
 
-        <LinearGradient
-          colors={[colors.almostDark, colors.dark]}
-          style={[productDetailStyles.prodData, { marginTop: 20, padding: 20 }]}
-        >
-          <Text style={productDetailStyles.defaultRatingText}>
-            {defaultRating.toFixed(1)}
-          </Text>
-          <CustomRatingBar />
-
-          <View style={styles.textComb}>
-            <Text style={styles.label}>Review message</Text>
-            <Text style={[styles.label, { color: "gray" }]}>
-              {review.length}/200
+          <LinearGradient
+            colors={[colors.almostDark, colors.dark]}
+            style={[
+              productDetailStyles.prodData,
+              { marginTop: 20, padding: 20 },
+            ]}
+          >
+            <Text style={productDetailStyles.defaultRatingText}>
+              {defaultRating.toFixed(1)}
             </Text>
-          </View>
+            <CustomRatingBar />
 
-          <View style={styles.textInputContainer}>
-            <MaterialIcons
-              name="rate-review"
-              size={20}
-              color={colors.gray}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              style={styles.textInput}
-              value={review}
-              onChangeText={setReview}
-              placeholder="e.g The best seller you can get on this platform..."
-            />
-          </View>
+            <View style={styles.textComb}>
+              <Text style={styles.label}>Review message</Text>
+              <Text style={[styles.label, { color: "gray" }]}>
+                {review.length}/200
+              </Text>
+            </View>
 
-          <PrimaryButton
-            submitting={submitting}
-            disabled={submitting}
-            onPress={validate}
-            buttonTitle="Add review"
-          />
-        </LinearGradient>
-      </View>
+            <View style={styles.textInputContainer}>
+              <MaterialIcons
+                name="rate-review"
+                size={20}
+                color={colors.gray}
+                style={styles.searchIcon}
+              />
+              <TextInput
+                style={styles.textInput}
+                value={review}
+                onChangeText={setReview}
+                placeholder="e.g The best seller you can get on this platform..."
+              />
+            </View>
+
+            <PrimaryButton
+              submitting={submitting}
+              disabled={submitting}
+              onPress={validate}
+              buttonTitle="Add review"
+            />
+          </LinearGradient>
+        </View>
+      )}
 
       <View style={[styles.section, {}]}>
         <Text style={[styles.subText, { marginBottom: 20 }]}>
