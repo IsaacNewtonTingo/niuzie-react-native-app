@@ -20,8 +20,6 @@ export default function Transaction(props) {
   const productPromotion = props.item.productPromotion;
   const premium = props.item.premium;
 
-  console.log(props.item);
-
   return (
     <LinearGradient
       start={[0.0, 0.5]}

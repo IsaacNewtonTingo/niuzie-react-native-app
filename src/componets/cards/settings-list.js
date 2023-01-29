@@ -30,8 +30,8 @@ export default function SettingsList(props) {
         style={settingsListStyles.btn}
         start={[0.0, 0.5]}
         end={[1.0, 0.5]}
-        locations={[0.0, 1.0]}
-        colors={[colors.dark, colors.cardColor]}
+        // locations={[0.0, 0.5, 1.0]}
+        colors={[colors.dark, colors.cardColor, colors.dark]}
       >
         <View style={settingsListStyles.close}>
           {iconType == "FontAwesome5" ? (
