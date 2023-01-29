@@ -162,7 +162,6 @@ export default function PostProduct({ navigation }, props) {
     if (data) {
       setUserID(data.userID);
       setToken(data.token);
-      setPremiumUser(data.premiumUser);
 
       getUserData(data.userID, data.token);
     } else {
@@ -190,6 +189,7 @@ export default function PostProduct({ navigation }, props) {
           setPhoneNumber(response.data.data.phoneNumber);
           setCounty(response.data.data.county);
           setSubCounty(response.data.data.subCounty);
+          setPremiumUser(response.data.data.premium);
 
           checkUserProducts(userID, token);
         } else {

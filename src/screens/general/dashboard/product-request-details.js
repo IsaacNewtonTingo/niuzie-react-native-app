@@ -42,14 +42,41 @@ export default function ProductRequestDetails({ route, navigation }) {
   async function checkStoreCredentials() {
     const { data } = storedCredentials ? storedCredentials : "";
     if (data) {
+      getUserData(data.userID, data.token);
+
       setUserID(data.userID);
       setToken(data.token);
-      setPremium(data.premium);
     } else {
       setUserID("");
       setToken("");
       setLoadingData(false);
     }
+  }
+
+  async function getUserData(userID, token) {
+    setLoadingData(true);
+    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    await axios
+      .get(url, { headers: headers })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setPremium(response.data.data.premium);
+        } else {
+          setPremium(false);
+        }
+      })
+      .catch((err) => {
+        setLoadingData(false);
+        console.log(err);
+      });
   }
 
   const buyerName =

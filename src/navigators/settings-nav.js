@@ -74,6 +74,7 @@ export default function SettingsNav() {
         component={PremiumServices}
         options={{
           headerTitle: "Premium services",
+          headerShown: false,
         }}
       />
 
