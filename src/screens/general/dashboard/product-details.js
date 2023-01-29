@@ -85,6 +85,10 @@ export default function ProductDetails({ route, navigation }) {
     getOtherProducts();
     getSimilarProducts();
     getReviews();
+
+    if (userID) {
+      getSavedProducts();
+    }
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
@@ -129,8 +133,34 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
+  async function getSavedProducts() {
+    const url = `https://d6af-105-161-159-117.eu.ngrok.io/api/product/get-one-saved-product/${userID}?productID=${productID}`;
+
+    await axios
+      .get(url, { headers })
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setSaved(response.data.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   async function handleSave() {
     setSaved(!saved);
+
+    const url = `${process.env.ENDPOINT}/product/save-product/${productID}`;
+
+    await axios
+      .post(url, { userID }, { headers })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   const starImgFilled = () => {
@@ -321,21 +351,23 @@ export default function ProductDetails({ route, navigation }) {
         <View style={styles.spaceBetween}>
           <Text style={productDetailStyles.prodNameText}>{productName}</Text>
 
-          <TouchableOpacity onPress={handleSave}>
-            {saved ? (
-              <MaterialCommunityIcons
-                name="heart-multiple"
-                size={24}
-                color={colors.linkText}
-              />
-            ) : (
-              <MaterialCommunityIcons
-                name="heart-multiple-outline"
-                size={24}
-                color={colors.linkText}
-              />
-            )}
-          </TouchableOpacity>
+          {userID && (
+            <TouchableOpacity onPress={handleSave}>
+              {saved ? (
+                <MaterialCommunityIcons
+                  name="heart-multiple"
+                  size={24}
+                  color={colors.linkText}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name="heart-multiple-outline"
+                  size={24}
+                  color={colors.linkText}
+                />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text style={productDetailStyles.priceText}>KSH. {price}</Text>
