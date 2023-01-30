@@ -2,6 +2,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -21,12 +22,18 @@ import colors from "../../../componets/colors/colors";
 
 import { AntDesign } from "@expo/vector-icons";
 import { CredentialsContext } from "../../../componets/context/credentials-context";
+
 import axios from "axios";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
-import { Modal } from "native-base";
 import LoginComponent from "../../../componets/auth/login";
+
 import { showMyToast } from "../../../functions/show-toast";
+import { BottomSheet } from "react-native-btr";
+
 import SignUpComponent from "../../../componets/auth/signup";
+
+import { FontAwesome } from "@expo/vector-icons";
+import PrimaryButton from "../../../componets/buttons/primary-button";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -90,6 +97,8 @@ export default function Settings({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [confirmCodeModal, setConfirmCodeModal] = useState(false);
+
+  const [otp, setOtp] = useState("");
 
   useEffect(() => {
     checkStoreCredentials();
@@ -256,7 +265,7 @@ export default function Settings({ navigation }) {
 
   async function verifyCode() {
     setSubmitting(true);
-    const url = `${process.env.ENDPOINT}/user/verify-code`;
+    const url = `https://a54a-105-163-2-113.eu.ngrok.io/api/user/verify-code`;
 
     await axios
       .post(url, {
@@ -270,11 +279,23 @@ export default function Settings({ navigation }) {
       .then((response) => {
         console.log(response.data);
         setSubmitting(false);
+
         if (response.data.status == "Success") {
-          setVisible(false);
+          setConfirmCodeModal(false);
+          setLoginItem(true);
+          setSignupItem(false);
+
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: "Phone number verified successfully. Please login",
+          });
         } else {
-          setAlert(true);
-          setAlertMessage(response.data.message);
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {
@@ -375,107 +396,165 @@ export default function Settings({ navigation }) {
     setSignupItem(false);
   }
 
-  // if (loadingData) {
-  //   return <LoadingIndicator />;
-  // }
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
 
   return (
-    <ScrollView style={[styles.container, { padding: 20 }]}>
-      {!storedCredentials && (
-        <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
-          <TouchableOpacity
-            onPress={async () => await Updates.reloadAsync()}
-            style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
+    <ScrollView
+      keyboardShouldPersistTaps="always"
+      style={[styles.container, { padding: 20 }]}
+    >
+      {!storedCredentials ? (
+        <>
+          <View style={{ backgroundColor: colors.almostDark, width: "100%" }}>
+            <TouchableOpacity
+              onPress={async () => await Updates.reloadAsync()}
+              style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
+            >
+              <Text style={{ color: colors.orange, fontWeight: "800" }}>
+                Close
+              </Text>
+            </TouchableOpacity>
+
+            {loginItem == true ? (
+              <LoginComponent
+                submitting={submitting}
+                loginPress={login}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+                password={password}
+                setPassword={setPassword}
+                onSignupPress={onSignupPress}
+              />
+            ) : signupItem == true ? (
+              <SignUpComponent
+                submitting={submitting}
+                onLoginPress={onLoginPress}
+                signupPress={signUp}
+                firstName={firstName}
+                setFirstName={setFirstName}
+                email={email}
+                setEmail={setEmail}
+                lastName={lastName}
+                setLastName={setLastName}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+                password={password}
+                setPassword={setPassword}
+                confirmPassword={confirmPassword}
+                setConfirmPassword={setConfirmPassword}
+                confirmCodeModal={confirmCodeModal}
+                setConfirmCodeModal={setConfirmCodeModal}
+                verifyCode={verifyCode}
+              />
+            ) : (
+              <></>
+            )}
+          </View>
+
+          <BottomSheet
+            visible={confirmCodeModal}
+            onBackButtonPress={() => setConfirmCodeModal(false)}
+            onBackdropPress={() => setConfirmCodeModal(false)}
           >
-            <Text style={{ color: colors.orange, fontWeight: "800" }}>
-              Close
-            </Text>
+            <View style={settingsStyls.bottomNavigationView}>
+              <Text
+                style={[
+                  styles.label,
+                  { textAlign: "center", marginVertical: 20 },
+                ]}
+              >
+                Enter verification code sent to your phone number to finish
+                setting up your account
+              </Text>
+
+              <View style={styles.textInputContainer}>
+                <FontAwesome
+                  name="qrcode"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={otp}
+                  onChangeText={setOtp}
+                  style={[
+                    styles.textInput,
+                    { color: colors.dark, width: "100%" },
+                  ]}
+                  placeholder="e.g 2763"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <PrimaryButton
+                disabled={submitting}
+                submitting={submitting}
+                onPress={verifyCode}
+                buttonTitle="Submit"
+              />
+
+              <View style={styles.optTextSign}>
+                <Text style={styles.firstText}>Didn't recieve code ?</Text>
+                <TouchableOpacity>
+                  <Text style={styles.opt2Text}>Resend</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BottomSheet>
+        </>
+      ) : (
+        <>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Profile", {
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+              })
+            }
+            style={[
+              settingsListStyles.btn,
+              {
+                minHeight: 80,
+                marginBottom: 20,
+                backgroundColor: colors.almostDark,
+              },
+            ]}
+          >
+            <View style={settingsListStyles.close}>
+              <Avatar.Image
+                style={{ marginRight: 20 }}
+                size={50}
+                source={require("../../../assets/images/tabs.jpg")}
+              />
+
+              <View>
+                <Text style={settingsStyls.name}>
+                  {firstName} {lastName}
+                </Text>
+                <Text style={settingsStyls.prof}>View profile</Text>
+              </View>
+            </View>
+
+            <AntDesign name="right" size={16} color={colors.gray} />
           </TouchableOpacity>
 
-          {loginItem == true ? (
-            <LoginComponent
-              submitting={submitting}
-              loginPress={login}
-              phoneNumber={phoneNumber}
-              setPhoneNumber={setPhoneNumber}
-              password={password}
-              setPassword={setPassword}
-              onSignupPress={onSignupPress}
+          {settingList.map((item) => (
+            <SettingsList
+              onPress={() => {
+                handleSettingPressed(item.navTo);
+              }}
+              key={item.title}
+              iconName={item.iconName}
+              iconType={item.iconType}
+              title={item.title}
             />
-          ) : signupItem == true ? (
-            <SignUpComponent
-              submitting={submitting}
-              onLoginPress={onLoginPress}
-              signupPress={signUp}
-              firstName={firstName}
-              setFirstName={setFirstName}
-              email={email}
-              setEmail={setEmail}
-              lastName={lastName}
-              setLastName={setLastName}
-              phoneNumber={phoneNumber}
-              setPhoneNumber={setPhoneNumber}
-              password={password}
-              setPassword={setPassword}
-              confirmPassword={confirmPassword}
-              setConfirmPassword={setConfirmPassword}
-              confirmCodeModal={confirmCodeModal}
-              setConfirmCodeModal={setConfirmCodeModal}
-              verifyCode={verifyCode}
-            />
-          ) : (
-            <></>
-          )}
-        </Modal>
+          ))}
+        </>
       )}
-
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("Profile", {
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-          })
-        }
-        style={[
-          settingsListStyles.btn,
-          {
-            minHeight: 80,
-            marginBottom: 20,
-            backgroundColor: colors.almostDark,
-          },
-        ]}
-      >
-        <View style={settingsListStyles.close}>
-          <Avatar.Image
-            style={{ marginRight: 20 }}
-            size={50}
-            source={require("../../../assets/images/tabs.jpg")}
-          />
-
-          <View>
-            <Text style={settingsStyls.name}>
-              {firstName} {lastName}
-            </Text>
-            <Text style={settingsStyls.prof}>View profile</Text>
-          </View>
-        </View>
-
-        <AntDesign name="right" size={16} color={colors.gray} />
-      </TouchableOpacity>
-
-      {settingList.map((item) => (
-        <SettingsList
-          onPress={() => {
-            handleSettingPressed(item.navTo);
-          }}
-          key={item.title}
-          iconName={item.iconName}
-          iconType={item.iconType}
-          title={item.title}
-        />
-      ))}
     </ScrollView>
   );
 }
@@ -488,5 +567,12 @@ const settingsStyls = StyleSheet.create({
     color: colors.gray,
     fontWeight: "800",
     marginTop: 5,
+  },
+  bottomNavigationView: {
+    backgroundColor: colors.cardColor,
+    width: "100%",
+    padding: 20,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
   },
 });

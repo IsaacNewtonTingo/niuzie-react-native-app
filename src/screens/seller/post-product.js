@@ -423,38 +423,150 @@ export default function PostProduct({ navigation }, props) {
       quality: 0.6,
     });
 
-    try {
-      if (!pickerResult.canceled) {
-        // const uploadURL = await uploadImageAsync(pickerResult.assets[0].uri);
-        setImage1(pickerResult.assets[0].uri);
-        uploadImage1(pickerResult.assets[0].uri);
-      }
-    } catch (error) {
-      console.log(error);
-      showMyToast({
-        status: "error",
-        title: "Failed",
-        description: "Upload failed, sorry :(",
-      });
+    if (!pickerResult.canceled) {
+      setImage1(pickerResult.assets[0].uri);
     }
   }
 
-  const uploadImage1 = async (uri) => {
-    const data = new FormData();
-    data.append("file", uri);
-    data.append("upload_preset", "niuzie_upload_presets");
-    data.append("cloud_name", "ape30technologies");
+  async function openImage2Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
 
-    try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/ape30technologies/image/upload",
-        data
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
+    if (!pickerResult.canceled) {
+      setImage2(pickerResult.assets[0].uri);
     }
-  };
+  }
+
+  async function openImage3Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage3(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function openImage4Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage4(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function uploadImage1() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image1, true);
+      xhr.send(null);
+    });
+
+    let filename = image1.substring(image1.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage2() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image2, true);
+      xhr.send(null);
+    });
+
+    let filename = image2.substring(image1.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage3() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image3, true);
+      xhr.send(null);
+    });
+
+    let filename = image3.substring(image3.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage4() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image4, true);
+      xhr.send(null);
+    });
+
+    let filename = image4.substring(image4.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
 
   if (loadingData) {
     return <LoadingIndicator />;
@@ -740,7 +852,7 @@ export default function PostProduct({ navigation }, props) {
               </TouchableOpacity>
             </ImageBackground>
 
-            {/* <ImageBackground
+            <ImageBackground
               style={postStyles.imageContainer}
               source={{ uri: image2 }}
             >
@@ -765,7 +877,7 @@ export default function PostProduct({ navigation }, props) {
               <TouchableOpacity onPress={openImage4Picker}>
                 <FontAwesome5 name="camera" size={24} color="black" />
               </TouchableOpacity>
-            </ImageBackground> */}
+            </ImageBackground>
           </ScrollView>
         </View>
 

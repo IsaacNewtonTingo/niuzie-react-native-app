@@ -82,6 +82,7 @@ const loginStyles = StyleSheet.create({
     backgroundColor: colors.cardColor,
     padding: 40,
     borderRadius: 10,
-    width: "90%",
+    width: "100%",
+    alignSelf: "center",
   },
 });

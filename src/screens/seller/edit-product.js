@@ -140,7 +140,7 @@ export default function EditProduct({ navigation, route }, props) {
   }
 
   async function editProduct() {
-    const url = `https://7130-41-81-151-50.in.ngrok.io/api/product/update-product/${productID}`;
+    const url = `${process.env.ENDPOINT}/product/update-product/${productID}`;
     setSubmitting(true);
 
     const headers = {
@@ -187,7 +187,7 @@ export default function EditProduct({ navigation, route }, props) {
   }
 
   async function deleteProduct() {
-    const url = `https://3057-41-81-151-50.in.ngrok.io/api/product/delete-product/${productID}?userID=${userID}`;
+    const url = `${process.env.ENDPOINT}/product/delete-product/${productID}?userID=${userID}`;
     setSubmitting(true);
 
     const headers = {
