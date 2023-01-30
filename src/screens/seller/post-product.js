@@ -8,8 +8,19 @@ import {
   FlatList,
   Image,
   KeyboardAvoidingView,
+  ActivityIndicator,
+  Share,
+  ImageBackground,
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
+
+import { getApps, initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import * as ImagePicker from "expo-image-picker";
+import * as Clipboard from "expo-clipboard";
+
+import { v4 as uuidv4 } from "uuid";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -42,14 +53,28 @@ import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
 import { BarIndicator } from "react-native-indicators";
-import AuthModal from "../../componets/modal/auth-modal";
 import LoginComponent from "../../componets/auth/login";
+
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 export default function PostProduct({ navigation }, props) {
   const [maxPosts, setMaxPosts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
+
+  const [uploading, setUploading] = useState(false);
 
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
@@ -59,10 +84,10 @@ export default function PostProduct({ navigation }, props) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState();
   const [condition, setCondition] = useState("");
-  const [image1, setImage1] = useState("");
-  const [image2, setImage2] = useState("");
-  const [image3, setImage3] = useState("");
-  const [image4, setImage4] = useState("");
+  const [image1, setImage1] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [image3, setImage3] = useState(null);
+  const [image4, setImage4] = useState(null);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -164,6 +189,7 @@ export default function PostProduct({ navigation }, props) {
       setToken(data.token);
 
       getUserData(data.userID, data.token);
+      requestStoragePermission();
     } else {
       setUserID("");
       setToken("");
@@ -306,10 +332,10 @@ export default function PostProduct({ navigation }, props) {
           condition,
           description,
           price: parseInt(price),
-          image1,
-          image2,
-          image3,
-          image4,
+          image1: image1 !== null ? await uploadImage1() : null,
+          image2: image2 !== null ? await uploadImage2() : null,
+          image3: image3 !== null ? await uploadImage3() : null,
+          image4: image4 !== null ? await uploadImage4() : null,
         },
         { headers }
       )
@@ -378,6 +404,232 @@ export default function PostProduct({ navigation }, props) {
         console.log(err);
         setLoadingData(false);
       });
+  }
+
+  async function requestStoragePermission() {
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+      }
+    }
+  }
+
+  async function openImage1Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    handleImage1Picked(pickerResult);
+  }
+
+  async function handleImage1Picked(pickerResult) {
+    try {
+      if (!pickerResult.canceled) {
+        // const uploadURL = await uploadImageAsync(pickerResult.assets[0].uri);
+        setImage1(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Upload failed, sorry :(",
+      });
+    }
+  }
+
+  async function openImage2Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    handleImage2Picked(pickerResult);
+  }
+
+  async function handleImage2Picked(pickerResult) {
+    try {
+      setUploading(true);
+
+      if (!pickerResult.canceled) {
+        // const uploadURL = await uploadImageAsync(pickerResult.assets[0].uri);
+        setImage2(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Upload failed, sorry :(",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function openImage3Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    handleImage3Picked(pickerResult);
+  }
+
+  async function handleImage3Picked(pickerResult) {
+    try {
+      setUploading(true);
+
+      if (!pickerResult.canceled) {
+        // const uploadURL = await uploadImageAsync(pickerResult.assets[0].uri);
+        setImage3(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Upload failed, sorry :(",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function openImage4Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    handleImage4Picked(pickerResult);
+  }
+
+  async function handleImage4Picked(pickerResult) {
+    try {
+      if (!pickerResult.canceled) {
+        // const uploadURL = await uploadImageAsync(pickerResult.assets[0].uri);
+        setImage4(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Upload failed, sorry :(",
+      });
+    }
+  }
+
+  async function uploadImage1() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image1, true);
+      xhr.send(null);
+    });
+
+    let filename = image1.substring(image1.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage2() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image2, true);
+      xhr.send(null);
+    });
+
+    let filename = image2.substring(image2.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage3() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image3, true);
+      xhr.send(null);
+    });
+
+    let filename = image3.substring(image3.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage4() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image4, true);
+      xhr.send(null);
+    });
+
+    let filename = image4.substring(image4.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
   }
 
   if (loadingData) {
@@ -655,21 +907,41 @@ export default function PostProduct({ navigation }, props) {
             horizontal
             style={postStyles.horImaCont}
           >
-            <TouchableOpacity style={postStyles.imageContainer}>
-              <FontAwesome5 name="camera" size={24} color="black" />
-            </TouchableOpacity>
+            <ImageBackground
+              style={postStyles.imageContainer}
+              source={{ uri: image1 }}
+            >
+              <TouchableOpacity onPress={openImage1Picker}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
+            </ImageBackground>
 
-            <TouchableOpacity style={postStyles.imageContainer}>
-              <FontAwesome5 name="camera" size={24} color="black" />
-            </TouchableOpacity>
+            <ImageBackground
+              style={postStyles.imageContainer}
+              source={{ uri: image2 }}
+            >
+              <TouchableOpacity onPress={openImage2Picker}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
+            </ImageBackground>
 
-            <TouchableOpacity style={postStyles.imageContainer}>
-              <FontAwesome5 name="camera" size={24} color="black" />
-            </TouchableOpacity>
+            <ImageBackground
+              style={postStyles.imageContainer}
+              source={{ uri: image3 }}
+            >
+              <TouchableOpacity onPress={openImage3Picker}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
+            </ImageBackground>
 
-            <TouchableOpacity style={postStyles.imageContainer}>
-              <FontAwesome5 name="camera" size={24} color="black" />
-            </TouchableOpacity>
+            <ImageBackground
+              style={postStyles.imageContainer}
+              source={{ uri: image4 }}
+            >
+              <TouchableOpacity onPress={openImage4Picker}>
+                <FontAwesome5 name="camera" size={24} color="black" />
+              </TouchableOpacity>
+            </ImageBackground>
           </ScrollView>
         </View>
 
