@@ -138,6 +138,10 @@ export default function Settings({ navigation }) {
 
             const { data } = response.data;
             storeCredentials({ data });
+
+            if (response.data.data.admin == true) {
+              navigation.navigate("AdminDashboard");
+            }
           } else {
             showMyToast({
               status: "error",
