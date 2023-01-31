@@ -15,6 +15,7 @@ import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
 import Support from "../screens/general/profile/support";
 import AdminDashboard from "../screens/admin/dashboard/admin-dashboard";
+import Products from "../screens/admin/dashboard/products";
 
 const Stack = createNativeStackNavigator();
 
@@ -108,6 +109,14 @@ export default function SettingsNav() {
         component={AdminDashboard}
         options={{
           headerTitle: "Admin dashboard",
+        }}
+      />
+
+      <Stack.Screen
+        name="Products"
+        component={Products}
+        options={{
+          headerTitle: "Products",
         }}
       />
     </Stack.Navigator>
