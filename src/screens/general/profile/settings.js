@@ -34,6 +34,7 @@ import SignUpComponent from "../../../componets/auth/signup";
 
 import { FontAwesome } from "@expo/vector-icons";
 import PrimaryButton from "../../../componets/buttons/primary-button";
+import noImage from "../../../assets/data/noImage";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -46,7 +47,53 @@ export default function Settings({ navigation }) {
   const [loginItem, setLoginItem] = useState(true);
   const [signupItem, setSignupItem] = useState(false);
 
-  const settingList = [
+  const adminSettingList = [
+    {
+      title: "My products",
+      iconType: "FontAwesome5",
+      iconName: "luggage-cart",
+      navTo: "MyProducts",
+    },
+    {
+      title: "Saved products",
+      iconType: "FontAwesome5",
+      iconName: "save",
+      navTo: "SavedProducts",
+    },
+
+    {
+      title: "Premium services",
+      iconType: "FontAwesome5",
+      iconName: "crown",
+      navTo: "PremiumServices",
+    },
+    {
+      title: "Transaction",
+      iconType: "MaterialCommunityIcons",
+      iconName: "hand-coin",
+      navTo: "Payments",
+    },
+    {
+      title: "Support",
+      iconType: "MaterialIcons",
+      iconName: "support-agent",
+      navTo: "ContactUs",
+    },
+    {
+      title: "Admin panel",
+      iconType: "MaterialIcons",
+      iconName: "admin-panel-settings",
+      navTo: "Admin",
+    },
+    {
+      title: "Logout",
+      iconType: "MaterialCommunityIcons",
+      iconName: "logout",
+      navTo: "Logout",
+    },
+  ];
+
+  const regularSettingList = [
     {
       title: "My products",
       iconType: "FontAwesome5",
@@ -88,10 +135,12 @@ export default function Settings({ navigation }) {
 
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
+  const [admin, setAdmin] = useState(false);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -135,6 +184,8 @@ export default function Settings({ navigation }) {
               title: "Success",
               description: response.data.message,
             });
+
+            setAdmin(response.data.data.admin);
 
             const { data } = response.data;
             storeCredentials({ data });
@@ -342,6 +393,9 @@ export default function Settings({ navigation }) {
           setLastName(response.data.data.lastName);
           setPhoneNumber(response.data.data.phoneNumber);
           setEmail(response.data.data.email);
+          setProfilePicture(response.data.data.profilePicture);
+
+          setAdmin(response.data.data.admin);
         } else {
           setFirstName("");
           setLastName("");
@@ -372,6 +426,8 @@ export default function Settings({ navigation }) {
       navigation.navigate("Payments");
     } else if (navTo == "ContactUs") {
       navigation.navigate("Support");
+    } else if (navTo == "Admin") {
+      navigation.navigate("Products");
     } else if (navTo == "Logout") {
       handleLogout();
     }
@@ -532,7 +588,9 @@ export default function Settings({ navigation }) {
               <Avatar.Image
                 style={{ marginRight: 20 }}
                 size={50}
-                source={require("../../../assets/images/tabs.jpg")}
+                source={{
+                  uri: profilePicture ? profilePicture : noImage.noProfilePic,
+                }}
               />
 
               <View>
@@ -546,17 +604,35 @@ export default function Settings({ navigation }) {
             <AntDesign name="right" size={16} color={colors.gray} />
           </TouchableOpacity>
 
-          {settingList.map((item) => (
-            <SettingsList
-              onPress={() => {
-                handleSettingPressed(item.navTo);
-              }}
-              key={item.title}
-              iconName={item.iconName}
-              iconType={item.iconType}
-              title={item.title}
-            />
-          ))}
+          {admin == true ? (
+            <>
+              {adminSettingList.map((item) => (
+                <SettingsList
+                  onPress={() => {
+                    handleSettingPressed(item.navTo);
+                  }}
+                  key={item.title}
+                  iconName={item.iconName}
+                  iconType={item.iconType}
+                  title={item.title}
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              {regularSettingList.map((item) => (
+                <SettingsList
+                  onPress={() => {
+                    handleSettingPressed(item.navTo);
+                  }}
+                  key={item.title}
+                  iconName={item.iconName}
+                  iconType={item.iconType}
+                  title={item.title}
+                />
+              ))}
+            </>
+          )}
         </>
       )}
     </ScrollView>
