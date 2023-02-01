@@ -57,7 +57,5 @@ const adminActionStyles = StyleSheet.create({
     height: width / 2.5,
     borderRadius: 10,
     marginBottom: 20,
-    borderWidth: 0.2,
-    borderColor: colors.gray,
   },
 });

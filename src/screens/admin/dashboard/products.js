@@ -85,7 +85,7 @@ export default function Products({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    // navigation.push("ProductDetails", { item });
+    navigation.push("AdminProductDetails", { item });
   }
 
   const newlyAddedProducts = () => (

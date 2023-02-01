@@ -19,6 +19,7 @@ import Products from "../screens/admin/dashboard/products";
 import Users from "../screens/admin/dashboard/users";
 import AdminProfile from "../screens/admin/dashboard/admin-profile";
 import Messages from "../screens/admin/dashboard/messages";
+import AdminProductDetails from "../screens/admin/dashboard/product-details";
 
 const Stack = createNativeStackNavigator();
 
@@ -144,6 +145,14 @@ export default function SettingsNav() {
         component={AdminProfile}
         options={{
           headerTitle: "Profile",
+        }}
+      />
+
+      <Stack.Screen
+        name="AdminProductDetails"
+        component={AdminProductDetails}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
