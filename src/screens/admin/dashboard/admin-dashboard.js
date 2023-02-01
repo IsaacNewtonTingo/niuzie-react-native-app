@@ -13,10 +13,49 @@ import colors from "../../../componets/colors/colors";
 import MoneyCard from "../../../componets/cards/money-card";
 
 import { Divider, Flex } from "native-base";
+import AdminAction from "../../../componets/cards/admin-actions";
 
 const { width } = Dimensions.get("window");
 
 export default function AdminDashboard({ navigation }) {
+  const adminItems = [
+    {
+      title: "Products",
+      navTo: "Products",
+      iconType: "FontAwesome",
+      iconName: "shirtsinbulk",
+    },
+    {
+      title: "Users",
+      navTo: "Users",
+      iconType: "FontAwesome",
+      iconName: "users",
+    },
+    {
+      title: "Messages",
+      navTo: "Messages",
+      iconType: "MaterialCommunityIcons",
+      iconName: "message-reply-text-outline",
+    },
+    {
+      title: "Profile",
+      navTo: "AdminProfile",
+      iconType: "FontAwesome",
+      iconName: "user-circle",
+    },
+  ];
+
+  async function handlePressed({ navTo }) {
+    if (navTo == "Products") {
+      navigation.navigate("Products");
+    } else if (navTo == "Users") {
+      navigation.navigate("Users");
+    } else if (navTo == "Messages") {
+      navigation.navigate("Messages");
+    } else if (navTo == "AdminProfile") {
+      navigation.navigate("AdminProfile");
+    }
+  }
   return (
     <ScrollView style={styles.container}>
       <MoneyCard>
@@ -37,6 +76,24 @@ export default function AdminDashboard({ navigation }) {
           </Flex>
         </View>
       </MoneyCard>
+
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          marginTop: 20,
+          justifyContent: "space-between",
+          padding: 20,
+        }}
+      >
+        {adminItems.map((item) => (
+          <AdminAction
+            key={item.title}
+            item={item}
+            onPress={() => handlePressed(item)}
+          />
+        ))}
+      </View>
     </ScrollView>
   );
 }

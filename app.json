@@ -9,7 +9,9 @@
     "splash": {
       "image": "./src/assets/images/niuzie-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#02030C"
+      "backgroundColor": "#02030C",
+      "width": 400,
+      "height": 400
     },
     "updates": {
       "fallbackToCacheTimeout": 0
