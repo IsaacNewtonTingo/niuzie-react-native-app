@@ -35,6 +35,12 @@ import SignUpComponent from "../../../componets/auth/signup";
 import { FontAwesome } from "@expo/vector-icons";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import noImage from "../../../assets/data/noImage";
+import { discoverStyles } from "../dashboard/discover";
+import { FlatList } from "react-native";
+import NoData from "../../../componets/Text/no-data";
+import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
+import { TouchableWithoutFeedback } from "react-native";
+import { Keyboard } from "react-native";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -141,11 +147,18 @@ export default function Settings({ navigation }) {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
+
   const [confirmCodeModal, setConfirmCodeModal] = useState(false);
+  const [countiesModal, setCountiesModal] = useState(false);
+  const [subCountiesModal, setSubCategoriesModal] = useState(false);
+  const [subCounties, setSubCounties] = useState([]);
+
+  const countiesData = require("../../../assets/data/counties.json");
 
   const [otp, setOtp] = useState("");
 
@@ -240,17 +253,18 @@ export default function Settings({ navigation }) {
         title: "Inavlid format",
         description: "Name shoult only contain characters",
       });
-    } else if (!email) {
+    } else if (!county) {
       showMyToast({
         status: "error",
         title: "Required field",
-        description: "Email is required. Please add an email then proceed",
+        description: "County is required. Please add your county then proceed",
       });
-    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+    } else if (!subCounty) {
       showMyToast({
         status: "error",
-        title: "Invalid format",
-        description: "Email provided is invalid. Please check and change",
+        title: "Required field",
+        description:
+          "Sub county is required. Please add your subcounty then proceed.",
       });
     } else if (!phoneNumber) {
       showMyToast({
@@ -289,7 +303,6 @@ export default function Settings({ navigation }) {
 
       await axios
         .post(url, {
-          email,
           phoneNumber,
         })
         .then((response) => {
@@ -320,13 +333,12 @@ export default function Settings({ navigation }) {
 
   async function verifyCode() {
     setSubmitting(true);
-    const url = `https://a54a-105-163-2-113.eu.ngrok.io/api/user/verify-code`;
+    const url = `${process.env.ENDPOINT}/user/verify-code`;
 
     await axios
       .post(url, {
         firstName,
         lastName,
-        email,
         phoneNumber,
         password,
         verificationCode: otp,
@@ -392,7 +404,6 @@ export default function Settings({ navigation }) {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
           setPhoneNumber(response.data.data.phoneNumber);
-          setEmail(response.data.data.email);
           setProfilePicture(response.data.data.profilePicture);
 
           setAdmin(response.data.data.admin);
@@ -400,7 +411,6 @@ export default function Settings({ navigation }) {
           setFirstName("");
           setLastName("");
           setPhoneNumber("");
-          setEmail("");
         }
       })
       .catch((err) => {
@@ -415,7 +425,6 @@ export default function Settings({ navigation }) {
         firstName,
         lastName,
         phoneNumber,
-        email,
         userID,
       });
     } else if (navTo == "SavedProducts") {
@@ -461,181 +470,188 @@ export default function Settings({ navigation }) {
   }
 
   return (
-    <ScrollView
-      keyboardShouldPersistTaps="always"
-      style={[styles.container, { padding: 20 }]}
-    >
-      {!storedCredentials ? (
-        <>
-          <View style={{ backgroundColor: colors.almostDark, width: "100%" }}>
-            <TouchableOpacity
-              onPress={async () => await Updates.reloadAsync()}
-              style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ScrollView
+        keyboardShouldPersistTaps="always"
+        style={[styles.container, { padding: 20 }]}
+      >
+        {!storedCredentials ? (
+          <>
+            <View style={{ backgroundColor: colors.almostDark, width: "100%" }}>
+              <TouchableOpacity
+                onPress={async () => await Updates.reloadAsync()}
+                style={{
+                  alignSelf: "flex-end",
+                  top: 20,
+                  right: 20,
+                }}
+              >
+                <Text style={{ color: colors.orange, fontWeight: "800" }}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+
+              {loginItem == true ? (
+                <LoginComponent
+                  submitting={submitting}
+                  loginPress={login}
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
+                  password={password}
+                  setPassword={setPassword}
+                  onSignupPress={onSignupPress}
+                />
+              ) : signupItem == true ? (
+                <SignUpComponent
+                  submitting={submitting}
+                  onLoginPress={onLoginPress}
+                  signupPress={signUp}
+                  firstName={firstName}
+                  setFirstName={setFirstName}
+                  lastName={lastName}
+                  setLastName={setLastName}
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
+                  password={password}
+                  setPassword={setPassword}
+                  confirmPassword={confirmPassword}
+                  setConfirmPassword={setConfirmPassword}
+                  confirmCodeModal={confirmCodeModal}
+                  setConfirmCodeModal={setConfirmCodeModal}
+                  verifyCode={verifyCode}
+                  county={county}
+                  setCounty={setCounty}
+                  subCounty={subCounty}
+                  setSubCounty={setSubCounty}
+                />
+              ) : (
+                <></>
+              )}
+            </View>
+
+            <BottomSheet
+              visible={confirmCodeModal}
+              // onBackButtonPress={() => setConfirmCodeModal(false)}
+              // onBackdropPress={() => setConfirmCodeModal(false)}
             >
-              <Text style={{ color: colors.orange, fontWeight: "800" }}>
-                Close
-              </Text>
+              <View style={settingsStyls.bottomNavigationView}>
+                <Text
+                  style={[
+                    styles.label,
+                    { textAlign: "center", marginVertical: 20 },
+                  ]}
+                >
+                  Enter verification code sent to your phone number to finish
+                  setting up your account
+                </Text>
+
+                <View style={styles.textInputContainer}>
+                  <FontAwesome
+                    name="qrcode"
+                    size={18}
+                    color="black"
+                    style={styles.searchIcon}
+                  />
+                  <TextInput
+                    value={otp}
+                    onChangeText={setOtp}
+                    style={[
+                      styles.textInput,
+                      { color: colors.dark, width: "100%" },
+                    ]}
+                    placeholder="e.g 2763"
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                <PrimaryButton
+                  disabled={submitting}
+                  submitting={submitting}
+                  onPress={verifyCode}
+                  buttonTitle="Submit"
+                />
+
+                <View style={styles.optTextSign}>
+                  <Text style={styles.firstText}>Didn't recieve code ?</Text>
+                  <TouchableOpacity>
+                    <Text style={styles.opt2Text}>Resend</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </BottomSheet>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Profile", {
+                  firstName,
+                  lastName,
+                  phoneNumber,
+                })
+              }
+              style={[
+                settingsListStyles.btn,
+                {
+                  minHeight: 80,
+                  marginBottom: 20,
+                  backgroundColor: colors.almostDark,
+                },
+              ]}
+            >
+              <View style={settingsListStyles.close}>
+                <Avatar.Image
+                  style={{ marginRight: 20 }}
+                  size={50}
+                  source={{
+                    uri: profilePicture ? profilePicture : noImage.noProfilePic,
+                  }}
+                />
+
+                <View>
+                  <Text style={settingsStyls.name}>
+                    {firstName} {lastName}
+                  </Text>
+                  <Text style={settingsStyls.prof}>View profile</Text>
+                </View>
+              </View>
+
+              <AntDesign name="right" size={16} color={colors.gray} />
             </TouchableOpacity>
 
-            {loginItem == true ? (
-              <LoginComponent
-                submitting={submitting}
-                loginPress={login}
-                phoneNumber={phoneNumber}
-                setPhoneNumber={setPhoneNumber}
-                password={password}
-                setPassword={setPassword}
-                onSignupPress={onSignupPress}
-              />
-            ) : signupItem == true ? (
-              <SignUpComponent
-                submitting={submitting}
-                onLoginPress={onLoginPress}
-                signupPress={signUp}
-                firstName={firstName}
-                setFirstName={setFirstName}
-                email={email}
-                setEmail={setEmail}
-                lastName={lastName}
-                setLastName={setLastName}
-                phoneNumber={phoneNumber}
-                setPhoneNumber={setPhoneNumber}
-                password={password}
-                setPassword={setPassword}
-                confirmPassword={confirmPassword}
-                setConfirmPassword={setConfirmPassword}
-                confirmCodeModal={confirmCodeModal}
-                setConfirmCodeModal={setConfirmCodeModal}
-                verifyCode={verifyCode}
-              />
+            {admin == true ? (
+              <>
+                {adminSettingList.map((item) => (
+                  <SettingsList
+                    onPress={() => {
+                      handleSettingPressed(item.navTo);
+                    }}
+                    key={item.title}
+                    iconName={item.iconName}
+                    iconType={item.iconType}
+                    title={item.title}
+                  />
+                ))}
+              </>
             ) : (
-              <></>
+              <>
+                {regularSettingList.map((item) => (
+                  <SettingsList
+                    onPress={() => {
+                      handleSettingPressed(item.navTo);
+                    }}
+                    key={item.title}
+                    iconName={item.iconName}
+                    iconType={item.iconType}
+                    title={item.title}
+                  />
+                ))}
+              </>
             )}
-          </View>
-
-          <BottomSheet
-            visible={confirmCodeModal}
-            onBackButtonPress={() => setConfirmCodeModal(false)}
-            onBackdropPress={() => setConfirmCodeModal(false)}
-          >
-            <View style={settingsStyls.bottomNavigationView}>
-              <Text
-                style={[
-                  styles.label,
-                  { textAlign: "center", marginVertical: 20 },
-                ]}
-              >
-                Enter verification code sent to your phone number to finish
-                setting up your account
-              </Text>
-
-              <View style={styles.textInputContainer}>
-                <FontAwesome
-                  name="qrcode"
-                  size={18}
-                  color="black"
-                  style={styles.searchIcon}
-                />
-                <TextInput
-                  value={otp}
-                  onChangeText={setOtp}
-                  style={[
-                    styles.textInput,
-                    { color: colors.dark, width: "100%" },
-                  ]}
-                  placeholder="e.g 2763"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <PrimaryButton
-                disabled={submitting}
-                submitting={submitting}
-                onPress={verifyCode}
-                buttonTitle="Submit"
-              />
-
-              <View style={styles.optTextSign}>
-                <Text style={styles.firstText}>Didn't recieve code ?</Text>
-                <TouchableOpacity>
-                  <Text style={styles.opt2Text}>Resend</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </BottomSheet>
-        </>
-      ) : (
-        <>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Profile", {
-                firstName,
-                lastName,
-                email,
-                phoneNumber,
-              })
-            }
-            style={[
-              settingsListStyles.btn,
-              {
-                minHeight: 80,
-                marginBottom: 20,
-                backgroundColor: colors.almostDark,
-              },
-            ]}
-          >
-            <View style={settingsListStyles.close}>
-              <Avatar.Image
-                style={{ marginRight: 20 }}
-                size={50}
-                source={{
-                  uri: profilePicture ? profilePicture : noImage.noProfilePic,
-                }}
-              />
-
-              <View>
-                <Text style={settingsStyls.name}>
-                  {firstName} {lastName}
-                </Text>
-                <Text style={settingsStyls.prof}>View profile</Text>
-              </View>
-            </View>
-
-            <AntDesign name="right" size={16} color={colors.gray} />
-          </TouchableOpacity>
-
-          {admin == true ? (
-            <>
-              {adminSettingList.map((item) => (
-                <SettingsList
-                  onPress={() => {
-                    handleSettingPressed(item.navTo);
-                  }}
-                  key={item.title}
-                  iconName={item.iconName}
-                  iconType={item.iconType}
-                  title={item.title}
-                />
-              ))}
-            </>
-          ) : (
-            <>
-              {regularSettingList.map((item) => (
-                <SettingsList
-                  onPress={() => {
-                    handleSettingPressed(item.navTo);
-                  }}
-                  key={item.title}
-                  iconName={item.iconName}
-                  iconType={item.iconType}
-                  title={item.title}
-                />
-              ))}
-            </>
-          )}
-        </>
-      )}
-    </ScrollView>
+          </>
+        )}
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 const settingsStyls = StyleSheet.create({

@@ -5,23 +5,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 
 import styles from "../styles/global-styles";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import PrimaryButton from "../buttons/primary-button";
 import colors from "../colors/colors";
+import { discoverStyles } from "../../screens/general/dashboard/discover";
+import PostSubCategoryList from "../subcategories/post-sub-cat-list";
+import NoData from "../Text/no-data";
+
+const countiesData = require("../../assets/data/counties.json");
 
 export default function SignUpComponent(props) {
   const firstName = props.firstName;
   const setFirstName = props.setFirstName;
   const lastName = props.lastName;
   const setLastName = props.setLastName;
-  const email = props.email;
-  const setEmail = props.setEmail;
   const confirmPassword = props.confirmPassword;
   const setConfirmPassword = props.setConfirmPassword;
 
@@ -32,6 +36,10 @@ export default function SignUpComponent(props) {
 
   const submitting = props.submitting;
   const onLoginPress = props.onLoginPress;
+
+  const [countiesModal, setCountiesModal] = useState(false);
+  const [subCountiesModal, setSubCountiesModal] = useState(false);
+  const [subCounties, setSubCounties] = useState([]);
 
   return (
     <View style={signStyles.holdingContainer}>
@@ -67,6 +75,44 @@ export default function SignUpComponent(props) {
         />
       </View>
 
+      <Text style={styles.label}>County</Text>
+      <View style={styles.textInputContainer}>
+        <MaterialCommunityIcons
+          name="city"
+          size={18}
+          color="black"
+          style={styles.searchIcon}
+        />
+        <TouchableOpacity
+          style={[
+            styles.textInput,
+            { color: colors.dark, justifyContent: "center" },
+          ]}
+          onPress={() => setCountiesModal(true)}
+        >
+          <Text>{props.county}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.label}>Sub county</Text>
+      <View style={styles.textInputContainer}>
+        <MaterialCommunityIcons
+          name="city-variant"
+          size={18}
+          color="black"
+          style={styles.searchIcon}
+        />
+        <TouchableOpacity
+          style={[
+            styles.textInput,
+            { color: colors.dark, justifyContent: "center" },
+          ]}
+          onPress={() => setSubCountiesModal(true)}
+        >
+          <Text>{props.subCounty}</Text>
+        </TouchableOpacity>
+      </View>
+
       <Text style={styles.label}>Phone number</Text>
       <View style={styles.textInputContainer}>
         <Entypo
@@ -81,19 +127,6 @@ export default function SignUpComponent(props) {
           style={[styles.textInput, { color: colors.dark }]}
           placeholder="e.g +254724753175"
           keyboardType="phone-pad"
-        />
-      </View>
-
-      <Text style={styles.label}>Email</Text>
-      <View style={styles.textInputContainer}>
-        <Entypo name="mail" size={18} color="black" style={styles.searchIcon} />
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          style={[styles.textInput, { color: colors.dark }]}
-          placeholder="e.g johndoe@gmail.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
         />
       </View>
 
@@ -144,6 +177,60 @@ export default function SignUpComponent(props) {
           <Text style={styles.opt2Text}>Login</Text>
         </TouchableOpacity>
       </View>
+
+      {countiesModal == true && (
+        <View
+          setCountiesModal={setCountiesModal}
+          style={discoverStyles.backdrop}
+        >
+          <TouchableOpacity
+            style={discoverStyles.cancel}
+            onPress={() => setCountiesModal(false)}
+          >
+            <Text style={discoverStyles.close}>Cancel</Text>
+          </TouchableOpacity>
+
+          {countiesData.map((item) => (
+            <PostSubCategoryList
+              key={item.code}
+              onPress={() => {
+                props.setCounty(item.name);
+                setSubCounties(item.sub_counties);
+                props.setSubCounty("");
+                setCountiesModal(false);
+              }}
+              subCategoryName={item.name}
+            />
+          ))}
+
+          {countiesData.length < 1 && <NoData text="No data" />}
+        </View>
+      )}
+
+      {subCountiesModal == true && (
+        <View style={discoverStyles.backdrop}>
+          <TouchableOpacity
+            style={discoverStyles.cancel}
+            onPress={() => setSubCountiesModal(false)}
+          >
+            <Text style={discoverStyles.close}>Cancel</Text>
+          </TouchableOpacity>
+
+          {subCounties.map((item, i) => (
+            <PostSubCategoryList
+              key={i}
+              onPress={() => {
+                props.setSubCounty(item);
+                setSubCountiesModal(false);
+              }}
+              subCategoryName={item}
+            />
+          ))}
+
+          {!props.county && <NoData text="Please select county first" />}
+          {subCounties.length < 1 && <NoData text="No data" />}
+        </View>
+      )}
     </View>
   );
 }
