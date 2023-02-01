@@ -427,7 +427,7 @@ export default function Settings({ navigation }) {
     } else if (navTo == "ContactUs") {
       navigation.navigate("Support");
     } else if (navTo == "Admin") {
-      navigation.navigate("Products");
+      navigation.navigate("AdminDashboard");
     } else if (navTo == "Logout") {
       handleLogout();
     }

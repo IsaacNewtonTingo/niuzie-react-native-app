@@ -49,7 +49,7 @@ export default function Products({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getProducts() {
-    const url = `https://12c5-105-163-158-113.in.ngrok.io/api/admin/get-products`;
+    const url = `${process.env.ENDPOINT}/admin/get-products`;
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {

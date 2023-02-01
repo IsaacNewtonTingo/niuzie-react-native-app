@@ -2,25 +2,28 @@ import { ImageBackground, Dimensions, StyleSheet } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import colors from "../colors/colors";
+import { TouchableOpacity } from "react-native";
 
 const { width } = Dimensions.get("window");
 
 export default function MoneyCard({ children }) {
   return (
-    <LinearGradient
-      start={[0.0, 0.5]}
-      end={[1.0, 0.5]}
-      locations={[0.0, 1.0]}
-      colors={[colors.dark, "#001949"]}
-      style={moneyStyles.moneyCard}
-    >
-      <ImageBackground
-        style={moneyStyles.imageBackground}
-        source={require("../../assets/images/money-bg.png")}
+    <TouchableOpacity style={moneyStyles.moneyCard}>
+      <LinearGradient
+        start={[0.0, 0.5]}
+        end={[1.0, 0.5]}
+        locations={[0.0, 1.0]}
+        colors={[colors.dark, "#001949"]}
+        style={{ width: "100%", height: "100%" }}
       >
-        {children}
-      </ImageBackground>
-    </LinearGradient>
+        <ImageBackground
+          style={moneyStyles.imageBackground}
+          source={require("../../assets/images/money-bg.png")}
+        >
+          {children}
+        </ImageBackground>
+      </LinearGradient>
+    </TouchableOpacity>
   );
 }
 
