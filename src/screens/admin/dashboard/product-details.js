@@ -12,6 +12,8 @@ import Carousel from "react-native-reanimated-carousel";
 
 import noImage from "../../../assets/data/noImage";
 import colors from "../../../componets/colors/colors";
+import PrimaryButton from "../../../componets/buttons/primary-button";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 
 const width = Dimensions.get("window").width;
 
@@ -119,6 +121,11 @@ export default function AdminProductDetails({ route, navigation }) {
             {route.params.user.subCounty}
           </Text>
         </View>
+      </View>
+
+      <View style={styles.spaceBetween}>
+        <PrimaryButton style={{ width: "40%" }} buttonTitle="Approve" />
+        <TertiaryButton style={{ width: "40%" }} buttonTitle="Reject" />
       </View>
     </ScrollView>
   );
