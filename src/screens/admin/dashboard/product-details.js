@@ -6,7 +6,7 @@ import {
   View,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styles from "../../../componets/styles/global-styles";
 import Carousel from "react-native-reanimated-carousel";
 
@@ -15,9 +15,23 @@ import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 
+import { CredentialsContext } from "../../../componets/context/credentials-context";
+import axios from "axios";
+import { showMyToast } from "../../../functions/show-toast";
+
 const width = Dimensions.get("window").width;
 
 export default function AdminProductDetails({ route, navigation }) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials ? storedCredentials : "";
+  const token = storedCredentials ? data.token : "";
+  const userID = storedCredentials ? data.userID : "";
+
+  const [submitting, setSubmitting] = useState(false);
+  const [verified, setVerifies] = useState(false);
+
   const productImages = [
     route.params.item.image1
       ? route.params.item.image1
@@ -32,6 +46,44 @@ export default function AdminProductDetails({ route, navigation }) {
       ? route.params.item.image4
       : noImage.noProductImage,
   ];
+
+  const headers = {
+    "auth-token": token,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  async function approveOrReject() {
+    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+
+    setSubmitting(true);
+    await axios
+      .put(url, {}, { headers })
+      .then((response) => {
+        setSubmitting(false);
+        console.log(response.data);
+
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+
+          navigation.goBack();
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
 
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
@@ -64,10 +116,19 @@ export default function AdminProductDetails({ route, navigation }) {
         )}
       />
 
-      <View>
+      <View style={styles.section}>
         <View style={prodDetailsStyles.textsCont}>
-          <Text>Product name:</Text>
-          <Text>{route.params.item.productName}</Text>
+          <Text style={prodDetailsStyles.sub}>Product name:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.productName}
+          </Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Description:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.description}
+          </Text>
         </View>
 
         <View style={prodDetailsStyles.textsCont}>
@@ -90,7 +151,7 @@ export default function AdminProductDetails({ route, navigation }) {
         </View>
       </View>
 
-      <View>
+      <View style={styles.section}>
         <View style={prodDetailsStyles.textsCont}>
           <Text>First name:</Text>
           <Text>{route.params.item.user.firstName}</Text>
@@ -112,20 +173,28 @@ export default function AdminProductDetails({ route, navigation }) {
 
         <View style={prodDetailsStyles.textsCont}>
           <Text style={prodDetailsStyles.sub}>County:</Text>
-          <Text style={prodDetailsStyles.desc}>{route.params.user.county}</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.user.county}
+          </Text>
         </View>
 
         <View style={prodDetailsStyles.textsCont}>
           <Text style={prodDetailsStyles.sub}>Sub county:</Text>
           <Text style={prodDetailsStyles.desc}>
-            {route.params.user.subCounty}
+            {route.params.item.user.subCounty}
           </Text>
         </View>
       </View>
 
-      <View style={styles.spaceBetween}>
-        <PrimaryButton style={{ width: "40%" }} buttonTitle="Approve" />
-        <TertiaryButton style={{ width: "40%" }} buttonTitle="Reject" />
+      <View style={styles.section}>
+        <PrimaryButton
+          onPress={approveOrReject}
+          submitting={submitting}
+          disabled={submitting}
+          buttonTitle={
+            route.params.item.verified == false ? "Approve" : "Reject"
+          }
+        />
       </View>
     </ScrollView>
   );

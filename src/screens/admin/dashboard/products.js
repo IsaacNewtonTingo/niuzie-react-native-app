@@ -20,6 +20,8 @@ import { CredentialsContext } from "../../../componets/context/credentials-conte
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import axios from "axios";
+import NoData from "../../../componets/Text/no-data";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 export default function Products({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -50,9 +52,12 @@ export default function Products({ navigation }) {
 
   async function getProducts() {
     const url = `${process.env.ENDPOINT}/admin/get-products`;
+    setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
+        setLoadingData(false);
+
         if (response.data.status == "Success") {
           const products = response.data.data;
 
@@ -89,75 +94,86 @@ export default function Products({ navigation }) {
   }
 
   const newlyAddedProducts = () => (
-    <FlatList
-      data={newProducts}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {newProducts.length < 1 && <NoData text="No data" />}
+      <FlatList
+        data={newProducts}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+          />
+        )}
+      />
+    </>
   );
 
   const approvedProducts = () => (
-    <FlatList
-      data={approvedProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {approvedProductsList.length < 1 && <NoData text="No data" />}
+
+      <FlatList
+        data={approvedProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+          />
+        )}
+      />
+    </>
   );
 
   const rejectedProducts = () => (
-    <FlatList
-      data={rejectedProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {rejectedProductsList.length < 1 && <NoData text="No data" />}
+
+      <FlatList
+        data={rejectedProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+          />
+        )}
+      />
+    </>
   );
 
   const renderTabBar = (props) => (
@@ -177,6 +193,11 @@ export default function Products({ navigation }) {
       style={{ backgroundColor: colors.bar }}
     />
   );
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
   return (
     <View style={styles.container}>
       <TabView
