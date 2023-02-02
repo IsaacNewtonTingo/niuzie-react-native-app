@@ -11,6 +11,7 @@ import styles from "../../../componets/styles/global-styles";
 import Carousel from "react-native-reanimated-carousel";
 
 import noImage from "../../../assets/data/noImage";
+import colors from "../../../componets/colors/colors";
 
 const width = Dimensions.get("window").width;
 
@@ -60,8 +61,80 @@ export default function AdminProductDetails({ route, navigation }) {
           </View>
         )}
       />
+
+      <View>
+        <View style={prodDetailsStyles.textsCont}>
+          <Text>Product name:</Text>
+          <Text>{route.params.item.productName}</Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Category:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.category.categoryName}
+          </Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Sub category:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.subCategory.subCategoryName}
+          </Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Price:</Text>
+          <Text style={prodDetailsStyles.desc}>{route.params.item.price}</Text>
+        </View>
+      </View>
+
+      <View>
+        <View style={prodDetailsStyles.textsCont}>
+          <Text>First name:</Text>
+          <Text>{route.params.item.user.firstName}</Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Last name:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.user.lastName}
+          </Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Phone number:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.user.phoneNumber}
+          </Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>County:</Text>
+          <Text style={prodDetailsStyles.desc}>{route.params.user.county}</Text>
+        </View>
+
+        <View style={prodDetailsStyles.textsCont}>
+          <Text style={prodDetailsStyles.sub}>Sub county:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.user.subCounty}
+          </Text>
+        </View>
+      </View>
     </ScrollView>
   );
 }
 
-const prodDetailsStyles = StyleSheet.create({});
+const prodDetailsStyles = StyleSheet.create({
+  textsCont: {
+    flexDirection: "row",
+  },
+  sub: {
+    color: colors.gray,
+    fontWeight: "800",
+    marginRight: 10,
+  },
+  desc: {
+    color: colors.lightBlue,
+    fontWeight: "800",
+  },
+});
