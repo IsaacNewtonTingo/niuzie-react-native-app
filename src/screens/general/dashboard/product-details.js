@@ -60,25 +60,31 @@ export default function ProductDetails({ route, navigation }) {
 
   const [reviewList, setReviewList] = useState([]);
 
-  const productID = route.params.item._id;
-  const productName = route.params.item.productName;
-  const description = route.params.item.description;
-  const category = route.params.item.category.categoryName;
-  const categoryID = route.params.item.category._id;
-  const subCategory = route.params.item.subCategory.subCategoryName;
-  const subCategoryName = route.params.item.subCategory.subCategoryName;
-  const subCategoryID = route.params.item.subCategory._id;
-  const price = route.params.item.price;
-  const condition = route.params.item.condition;
-  const rating = route.params.item.rating.$numberDecimal;
+  let productID = route.params.productID;
+  let productOwnerID = route.params.productOwnerID;
 
-  const productOwnerID = route.params.item.user._id;
-  const firstName = route.params.item.user.firstName;
-  const lastName = route.params.item.user.lastName;
-  const phoneNumber = route.params.item.user.phoneNumber;
-  const profilePicture = route.params.item.user.profilePicture;
-  const county = route.params.item.user.county;
-  const subCounty = route.params.item.user.subCounty;
+  const [productName, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [categoryID, setCategoryID] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
+  const [subCategoryID, setSubCategoryID] = useState("");
+  const [price, setPrice] = useState("");
+  const [condition, setCondition] = useState("");
+  const [rating, setRating] = useState("");
+
+  const [image1, setImage1] = useState("");
+  const [image2, setImage2] = useState("");
+  const [image3, setImage3] = useState("");
+  const [image4, setImage4] = useState("");
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
 
   const [saved, setSaved] = useState(false);
 
@@ -87,8 +93,8 @@ export default function ProductDetails({ route, navigation }) {
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
 
   useEffect(() => {
+    getProducts();
     getOtherProducts();
-    getSimilarProducts();
     getReviews();
 
     if (userID) {
@@ -104,19 +110,58 @@ export default function ProductDetails({ route, navigation }) {
     Accept: "application/json",
   };
 
+  async function getProducts() {
+    const url = `${process.env.ENDPOINT}/product/get-one-product/${productID}`;
+    setLoadingData(true);
+    await axios
+      .get(url)
+      .then((response) => {
+        setLoadingData(false);
+
+        if (response.data.status == "Success") {
+          setProductName(response.data.data.productName);
+          setDescription(response.data.data.description);
+          setCategory(response.data.data.category.categoryName);
+          setCategoryID(response.data.data.category._id);
+          setSubCategory(response.data.data.subCategory._id);
+          setSubCategoryName(response.data.data.subCategory.subCategoryName);
+          setSubCategoryID(response.data.data.subCategory._id);
+          setPrice(response.data.data.price);
+          setCondition(response.data.data.condition);
+          setRating(response.data.data.rating.$numberDecimal);
+
+          setImage1(response.data.data.image1);
+          setImage2(response.data.data.image2);
+          setImage3(response.data.data.image3);
+          setImage4(response.data.data.image4);
+
+          setFirstName(response.data.data.user.firstName);
+          setLastName(response.data.data.user.lastName);
+          setPhoneNumber(response.data.data.user.phoneNumber);
+          setProfilePicture(response.data.data.user.profilePicture);
+          setCounty(response.data.data.user.county);
+          setSubCounty(response.data.data.user.subCounty);
+
+          getSimilarProducts(response.data.data.category._id);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
   const productImages = [
-    route.params.item.image1
-      ? route.params.item.image1
-      : noImage.noProductImage,
-    route.params.item.image2
-      ? route.params.item.image2
-      : noImage.noProductImage,
-    route.params.item.image3
-      ? route.params.item.image1
-      : noImage.noProductImage,
-    route.params.item.image4
-      ? route.params.item.image4
-      : noImage.noProductImage,
+    image1 ? image1 : noImage.noProductImage,
+    image2 ? image2 : noImage.noProductImage,
+    image3 ? image1 : noImage.noProductImage,
+    image4 ? image4 : noImage.noProductImage,
   ];
 
   async function getReviews() {
@@ -195,7 +240,7 @@ export default function ProductDetails({ route, navigation }) {
   };
 
   async function handleProductPressed(item) {
-    navigation.push("ProductDetails", { item });
+    navigation.push("ProductDetails", { productID: item._id });
   }
 
   async function getOtherProducts() {
@@ -203,28 +248,30 @@ export default function ProductDetails({ route, navigation }) {
     await axios
       .get(url)
       .then((response) => {
-        setOtherProducts(response.data.data);
-        setLoadingData(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoadingData(false);
-      });
-  }
-
-  async function getSimilarProducts() {
-    let url = `${ENDPOINT}/admin/get-category-products/${categoryID}`;
-    await axios
-      .get(url)
-      .then((response) => {
-        setLoadingData(false);
         if (response.data.status == "Success") {
-          setSimilarProducts(response.data.data);
+          setOtherProducts(response.data.data);
+        } else {
+          console.log(response.data);
         }
       })
       .catch((err) => {
         console.log(err);
-        setLoadingData(false);
+      });
+  }
+
+  async function getSimilarProducts(categoryID) {
+    let url = `${ENDPOINT}/admin/get-category-products/${categoryID}`;
+    await axios
+      .get(url)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setSimilarProducts(response.data.data);
+        } else {
+          console.log(response.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
@@ -496,10 +543,12 @@ export default function ProductDetails({ route, navigation }) {
         </View>
       )}
 
-      <View style={[styles.section, {}]}>
+      <View style={[styles.section, { minHeight: 200 }]}>
         <Text style={[styles.subText, { marginBottom: 20 }]}>
           Other products by <B>{firstName}</B>
         </Text>
+
+        {otherProducts.length < 1 && <NoData text="No other products found" />}
 
         <FlatList
           horizontal
