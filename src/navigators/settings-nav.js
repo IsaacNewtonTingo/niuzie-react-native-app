@@ -1,4 +1,3 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -13,7 +12,6 @@ import ContactUs from "../screens/general/profile/contact-us";
 import SavedProducts from "../screens/general/profile/saved-products";
 import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
-import Support from "../screens/general/profile/support";
 import AdminDashboard from "../screens/admin/dashboard/admin-dashboard";
 import Products from "../screens/admin/dashboard/products";
 import Users from "../screens/admin/dashboard/users";
@@ -97,14 +95,6 @@ export default function SettingsNav() {
         component={Payments}
         options={{
           headerTitle: "Transactions",
-        }}
-      />
-
-      <Stack.Screen
-        name="Support"
-        component={Support}
-        options={{
-          headerTitle: "Support",
         }}
       />
 
