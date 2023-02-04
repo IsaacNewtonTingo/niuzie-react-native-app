@@ -158,7 +158,10 @@ export default function Discover({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", { item });
+    navigation.navigate("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   async function handleItemClicked(navTo) {
