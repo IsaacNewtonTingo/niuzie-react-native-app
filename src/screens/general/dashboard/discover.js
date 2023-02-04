@@ -307,6 +307,7 @@ export default function Discover({ navigation }) {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
+            premium={item.user.premium}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}

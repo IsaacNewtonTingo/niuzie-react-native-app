@@ -11,6 +11,7 @@ import { ENDPOINT } from "@env";
 import axios from "axios";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import colors from "../../../componets/colors/colors";
+import NoData from "../../../componets/Text/no-data";
 
 export default function MyProducts({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -75,51 +76,60 @@ export default function MyProducts({ navigation }) {
   }
 
   const activeProducts = () => (
-    <FlatList
-      data={activeProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {activeProductsList.length < 1 && <NoData text="No data" />}
+      <FlatList
+        data={activeProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            premium={item.user.premium}
+            rating={item.rating.$numberDecimal}
+          />
+        )}
+      />
+    </>
   );
 
   const inactiveProducts = () => (
-    <FlatList
-      data={inactiveProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {inactiveProductsList.length < 1 && <NoData text="No data" />}
+
+      <FlatList
+        data={inactiveProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+            premium={item.user.premium}
+          />
+        )}
+      />
+    </>
   );
 
   const renderTabBar = (props) => (

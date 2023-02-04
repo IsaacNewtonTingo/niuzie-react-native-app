@@ -15,6 +15,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 import noImage from "../../assets/data/noImage";
 import PromotedCard from "./promoted";
+import { useEffect } from "react";
 
 const { width } = Dimensions.get("window");
 export default function HorizontalCard(props) {
