@@ -159,9 +159,8 @@ export default function ContactUs({ route }) {
         <View style={styles.textInputContainer}>
           <TextInput
             value={message}
-            multiline={true}
             onChangeText={setMessage}
-            style={[styles.textInput, { color: colors.dark, height: 100 }]}
+            style={[styles.textInput, { color: colors.dark }]}
             placeholder="e.g blah blah blah"
           />
         </View>
