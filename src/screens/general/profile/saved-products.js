@@ -74,7 +74,7 @@ export default function SavedProducts({ navigation }) {
             description={item.product.description}
             county={item.product.user.county}
             subCounty={item.product.user.subCounty}
-            rating={item.product.rating.$numberDecimal}
+            rating={parseFloat(item.product.rating.$numberDecimal).toFixed(1)}
             premium={item.product.user.premium}
           />
         )}

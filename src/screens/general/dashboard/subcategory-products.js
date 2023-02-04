@@ -285,7 +285,7 @@ export default function SubCategoryProducts({ route, navigation }) {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
-            rating={item.rating.$numberDecimal}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
       />

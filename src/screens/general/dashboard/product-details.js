@@ -72,7 +72,7 @@ export default function ProductDetails({ route, navigation }) {
   const [subCategoryID, setSubCategoryID] = useState("");
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState(null);
 
   const [image1, setImage1] = useState("");
   const [image2, setImage2] = useState("");
@@ -128,7 +128,9 @@ export default function ProductDetails({ route, navigation }) {
           setSubCategoryID(response.data.data.subCategory._id);
           setPrice(response.data.data.price);
           setCondition(response.data.data.condition);
-          setRating(response.data.data.rating.$numberDecimal);
+          setRating(
+            parseFloat(response.data.data.rating.$numberDecimal).toFixed(1)
+          );
 
           setImage1(response.data.data.image1);
           setImage2(response.data.data.image2);
@@ -302,7 +304,7 @@ export default function ProductDetails({ route, navigation }) {
         `${process.env.ENDPOINT}/product/review-product/${productID}`,
         {
           userID,
-          rating,
+          rating: defaultRating,
           reviewMessage: review,
         },
         { headers }
@@ -323,6 +325,8 @@ export default function ProductDetails({ route, navigation }) {
             title: response.data.status,
             description: response.data.message,
           });
+          getReviews();
+          getProducts();
         }
       })
       .catch((err) => {
