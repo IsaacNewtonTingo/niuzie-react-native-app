@@ -65,11 +65,10 @@ export default function ProductDetails({ route, navigation }) {
 
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
   const [categoryID, setCategoryID] = useState("");
-  const [subCategory, setSubCategory] = useState("");
-  const [subCategoryName, setSubCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState("");
   const [rating, setRating] = useState(null);
@@ -121,11 +120,10 @@ export default function ProductDetails({ route, navigation }) {
         if (response.data.status == "Success") {
           setProductName(response.data.data.productName);
           setDescription(response.data.data.description);
-          setCategory(response.data.data.category.categoryName);
           setCategoryID(response.data.data.category._id);
-          setSubCategory(response.data.data.subCategory._id);
-          setSubCategoryName(response.data.data.subCategory.subCategoryName);
+          setCategoryName(response.data.data.category.categoryName);
           setSubCategoryID(response.data.data.subCategory._id);
+          setSubCategoryName(response.data.data.subCategory.subCategoryName);
           setPrice(response.data.data.price);
           setCondition(response.data.data.condition);
           setRating(
@@ -614,9 +612,9 @@ export default function ProductDetails({ route, navigation }) {
               navigation.navigate("EditProduct", {
                 productID,
                 productName,
-                category,
+                categoryName,
                 categoryID,
-                subCategory,
+                subCategoryName,
                 subCategoryID,
                 description,
                 price,
@@ -626,6 +624,11 @@ export default function ProductDetails({ route, navigation }) {
                 phoneNumber,
                 county,
                 subCounty,
+
+                image1,
+                image2,
+                image3,
+                image4,
               })
             }
             buttonTitle="Edit product"

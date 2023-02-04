@@ -7,9 +7,16 @@ import {
   Dimensions,
   FlatList,
   Image,
-  KeyboardAvoidingView,
+  ImageBackground,
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
+
+import { getApps, initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import * as ImagePicker from "expo-image-picker";
+
+import * as SecureStore from "expo-secure-store";
 
 import { RadioButton } from "react-native-paper";
 import { Text, Button, Modal } from "native-base";
@@ -38,8 +45,24 @@ import { showMyToast } from "../../functions/show-toast";
 
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
+import StaticAlert from "../../componets/alerts/static-alert";
 import { BarIndicator } from "react-native-indicators";
+import LoginComponent from "../../componets/auth/login";
 import TertiaryButton from "../../componets/buttons/tertiaryBtn";
+import noImage from "../../assets/data/noImage";
+
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 export default function EditProduct({ navigation, route }, props) {
   const [submitting, setSubmitting] = useState(false);
@@ -47,20 +70,22 @@ export default function EditProduct({ navigation, route }, props) {
   const [loadingData, setLoadingData] = useState(false);
 
   const [productName, setProductName] = useState(route.params.productName);
-  const [category, setCategory] = useState(route.params.category);
+  const [categoryName, setCategoryName] = useState(route.params.categoryName);
   const [categoryID, setCategoryID] = useState(route.params.categoryID);
-  const [subCategory, setSubCatCategory] = useState(route.params.subCategory);
-  const [subCategoryID, setSubCatCategoryID] = useState(
+  const [subCategoryName, setSubCategoryName] = useState(
+    route.params.subCategoryName
+  );
+  const [subCategoryID, setSubCategoryID] = useState(
     route.params.subCategoryID
   );
   const [description, setDescription] = useState(route.params.description);
   const [price, setPrice] = useState(route.params.price);
   const [condition, setCondition] = useState(route.params.condition);
 
-  const [image1, setImage1] = useState("");
-  const [image2, setImage2] = useState("");
-  const [image3, setImage3] = useState("");
-  const [image4, setImage4] = useState("");
+  const [image1, setImage1] = useState(route.params.image1);
+  const [image2, setImage2] = useState(route.params.image2);
+  const [image3, setImage3] = useState(route.params.image3);
+  const [image4, setImage4] = useState(route.params.image4);
 
   const [firstName, setFirstName] = useState(route.params.firstName);
   const [lastName, setLastName] = useState(route.params.lastName);
@@ -99,14 +124,14 @@ export default function EditProduct({ navigation, route }, props) {
         description:
           "Product name is required. Please add a name then submit your product for review",
       });
-    } else if (!category) {
+    } else if (!categoryID) {
       showMyToast({
         status: "error",
         title: "Required field",
         description:
           "Category is required. Please add a category then submit your product for review",
       });
-    } else if (!subCategory) {
+    } else if (!subCategoryID) {
       showMyToast({
         status: "error",
         title: "Required field",
@@ -264,6 +289,158 @@ export default function EditProduct({ navigation, route }, props) {
       });
   }
 
+  async function openImage1Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage1(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function openImage2Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage2(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function openImage3Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage3(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function openImage4Picker() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.6,
+    });
+
+    if (!pickerResult.canceled) {
+      setImage4(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function uploadImage1() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image1, true);
+      xhr.send(null);
+    });
+
+    let filename = image1.substring(image1.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage2() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image2, true);
+      xhr.send(null);
+    });
+
+    let filename = image2.substring(image1.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage3() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image3, true);
+      xhr.send(null);
+    });
+
+    let filename = image3.substring(image3.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
+  async function uploadImage4() {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image4, true);
+      xhr.send(null);
+    });
+
+    let filename = image4.substring(image4.lastIndexOf("/") + 1);
+
+    const fileRef = ref(storage, `images/${filename}`);
+    const result = await uploadBytes(fileRef, blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await getDownloadURL(fileRef);
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
@@ -294,6 +471,7 @@ export default function EditProduct({ navigation, route }, props) {
             maxLength={20}
           />
         </View>
+
         <Text style={styles.label}>Category</Text>
         <TouchableOpacity
           onPress={handleCategory}
@@ -308,7 +486,7 @@ export default function EditProduct({ navigation, route }, props) {
             size={16}
             color={colors.dark}
           />
-          <Text style={postStyles.catText}>{category}</Text>
+          <Text style={postStyles.catText}>{categoryName}</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>Sub category</Text>
@@ -325,7 +503,7 @@ export default function EditProduct({ navigation, route }, props) {
             size={20}
             color={colors.dark}
           />
-          <Text style={postStyles.catText}>{subCategory}</Text>
+          <Text style={postStyles.catText}>{subCategoryName}</Text>
         </TouchableOpacity>
 
         <View style={styles.textComb}>
@@ -423,21 +601,41 @@ export default function EditProduct({ navigation, route }, props) {
           horizontal
           style={postStyles.horImaCont}
         >
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image1 ? image1 : noImage.noProductImage }}
+          >
+            <TouchableOpacity onPress={openImage1Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image2 ? image2 : noImage.noProductImage }}
+          >
+            <TouchableOpacity onPress={openImage2Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image3 ? image3 : noImage.noProductImage }}
+          >
+            <TouchableOpacity onPress={openImage3Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
 
-          <TouchableOpacity style={postStyles.imageContainer}>
-            <FontAwesome5 name="camera" size={24} color="black" />
-          </TouchableOpacity>
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image4 ? image4 : noImage.noProductImage }}
+          >
+            <TouchableOpacity onPress={openImage4Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
         </ScrollView>
       </View>
 
@@ -485,11 +683,11 @@ export default function EditProduct({ navigation, route }, props) {
               {categories.map((category) => (
                 <TouchableOpacity
                   onPress={() => {
-                    setCategory(category.categoryName);
+                    setCategoryName(category.categoryName);
                     setCategoryID(category._id);
 
-                    setSubCatCategory("");
-                    setSubCatCategoryID("");
+                    setSubCategoryName("");
+                    setSubCategoryID("");
                     setShowBottomSheet(false);
                   }}
                   style={homeStyles.miniCatItem}
@@ -515,8 +713,8 @@ export default function EditProduct({ navigation, route }, props) {
                   <PostSubCategoryList
                     key={item._id}
                     onPress={() => {
-                      setSubCatCategory(item.subCategoryName);
-                      setSubCatCategoryID(item._id);
+                      setSubCategoryName(item.subCategoryName);
+                      setSubCategoryID(item._id);
                       setShowBottomSheet(false);
                     }}
                     subCategoryID={item._id}
