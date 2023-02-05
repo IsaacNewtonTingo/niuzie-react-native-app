@@ -61,9 +61,10 @@ export default function Discover({ navigation }) {
   const [categoryID, setCategoryID] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
 
-  const [price, setPrice] = useState("1");
-  const [rating, setRating] = useState("1");
-  const [date, setDate] = useState("1");
+  const [price, setPrice] = useState(""); // 1 = Low to high
+  const [rating, setRating] = useState(""); // -1 = Highest to lowest
+  const [createdAt, setCreatedAt] = useState(""); // -1 = Latest to oldest
+  const [promoted, setPromoted] = useState(""); // -1 = Promoted true first
 
   const [filterModal, setFilterModal] = useState(false);
   const [categoriesModal, setCategoriesModal] = useState(false);
@@ -135,7 +136,7 @@ export default function Discover({ navigation }) {
   }
 
   async function getAllProducts() {
-    let url = `https://b0bf-105-163-157-62.eu.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
+    let url = `https://742c-105-163-0-162.in.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -494,10 +495,10 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={date === "-1" ? "checked" : "unchecked"}
+                  value="1"
+                  status={createdAt === "1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("-1");
+                    setCreatedAt("1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Oldest</Text>
@@ -505,10 +506,10 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="1"
-                  status={date === "1" ? "checked" : "unchecked"}
+                  value="-1"
+                  status={createdAt === "-1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("1");
+                    setCreatedAt("-1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Newest</Text>
