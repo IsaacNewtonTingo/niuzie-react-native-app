@@ -72,7 +72,10 @@ export default function MyProducts({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.push("ProductDetails", { item });
+    navigation.push("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   const activeProducts = () => (

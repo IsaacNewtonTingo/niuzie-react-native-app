@@ -465,107 +465,123 @@ export default function PostProduct({ navigation }, props) {
   }
 
   async function uploadImage1() {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image1, true);
-      xhr.send(null);
-    });
+    if (image1 == null) {
+      return null;
+    } else {
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+          console.log(e);
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", image1, true);
+        xhr.send(null);
+      });
 
-    let filename = image1.substring(image1.lastIndexOf("/") + 1);
+      let filename = image1.substring(image1.lastIndexOf("/") + 1);
 
-    const fileRef = ref(storage, `images/${filename}`);
-    const result = await uploadBytes(fileRef, blob);
+      const fileRef = ref(storage, `images/${filename}`);
+      const result = await uploadBytes(fileRef, blob);
 
-    // We're done with the blob, close and release it
-    blob.close();
+      // We're done with the blob, close and release it
+      blob.close();
 
-    return await getDownloadURL(fileRef);
+      return await getDownloadURL(fileRef);
+    }
   }
 
   async function uploadImage2() {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image2, true);
-      xhr.send(null);
-    });
+    if (image2 == null) {
+      return null;
+    } else {
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+          console.log(e);
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", image2, true);
+        xhr.send(null);
+      });
 
-    let filename = image2.substring(image1.lastIndexOf("/") + 1);
+      let filename = image2.substring(image2.lastIndexOf("/") + 1);
 
-    const fileRef = ref(storage, `images/${filename}`);
-    const result = await uploadBytes(fileRef, blob);
+      const fileRef = ref(storage, `images/${filename}`);
+      const result = await uploadBytes(fileRef, blob);
 
-    // We're done with the blob, close and release it
-    blob.close();
+      // We're done with the blob, close and release it
+      blob.close();
 
-    return await getDownloadURL(fileRef);
+      return await getDownloadURL(fileRef);
+    }
   }
 
   async function uploadImage3() {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image3, true);
-      xhr.send(null);
-    });
+    if (image3 == null) {
+      return null;
+    } else {
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+          console.log(e);
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", image3, true);
+        xhr.send(null);
+      });
 
-    let filename = image3.substring(image3.lastIndexOf("/") + 1);
+      let filename = image3.substring(image3.lastIndexOf("/") + 1);
 
-    const fileRef = ref(storage, `images/${filename}`);
-    const result = await uploadBytes(fileRef, blob);
+      const fileRef = ref(storage, `images/${filename}`);
+      const result = await uploadBytes(fileRef, blob);
 
-    // We're done with the blob, close and release it
-    blob.close();
+      // We're done with the blob, close and release it
+      blob.close();
 
-    return await getDownloadURL(fileRef);
+      return await getDownloadURL(fileRef);
+    }
   }
 
   async function uploadImage4() {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image4, true);
-      xhr.send(null);
-    });
+    if (image4 == null) {
+      return null;
+    } else {
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+          console.log(e);
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", image4, true);
+        xhr.send(null);
+      });
 
-    let filename = image4.substring(image4.lastIndexOf("/") + 1);
+      let filename = image4.substring(image4.lastIndexOf("/") + 1);
 
-    const fileRef = ref(storage, `images/${filename}`);
-    const result = await uploadBytes(fileRef, blob);
+      const fileRef = ref(storage, `images/${filename}`);
+      const result = await uploadBytes(fileRef, blob);
 
-    // We're done with the blob, close and release it
-    blob.close();
+      // We're done with the blob, close and release it
+      blob.close();
 
-    return await getDownloadURL(fileRef);
+      return await getDownloadURL(fileRef);
+    }
   }
 
   if (loadingData) {
@@ -690,7 +706,7 @@ export default function PostProduct({ navigation }, props) {
           <View style={styles.textComb}>
             <Text style={styles.label}>Product name</Text>
             <Text style={[styles.label, { color: "gray" }]}>
-              {productName.length}/20
+              {productName.length}/30
             </Text>
           </View>
 
@@ -707,7 +723,7 @@ export default function PostProduct({ navigation }, props) {
               placeholderTextColor="gray"
               value={productName}
               onChangeText={setProductName}
-              maxLength={20}
+              maxLength={30}
             />
           </View>
           <Text style={styles.label}>Category</Text>

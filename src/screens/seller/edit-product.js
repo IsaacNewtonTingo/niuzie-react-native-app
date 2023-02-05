@@ -451,7 +451,7 @@ export default function EditProduct({ navigation, route }, props) {
         <View style={styles.textComb}>
           <Text style={styles.label}>Product name</Text>
           <Text style={[styles.label, { color: "gray" }]}>
-            {productName.length}/20
+            {productName.length}/30
           </Text>
         </View>
 
@@ -468,7 +468,7 @@ export default function EditProduct({ navigation, route }, props) {
             placeholderTextColor="gray"
             value={productName}
             onChangeText={setProductName}
-            maxLength={20}
+            maxLength={30}
           />
         </View>
 

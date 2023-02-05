@@ -48,7 +48,7 @@ const countiesData = require("../../../assets/data/counties.json");
 
 export default function Discover({ navigation }) {
   let [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -135,7 +135,7 @@ export default function Discover({ navigation }) {
   }
 
   async function getAllProducts() {
-    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
+    let url = `https://b0bf-105-163-157-62.eu.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
     setLoadingData(true);
     setSubmitting(true);
 
