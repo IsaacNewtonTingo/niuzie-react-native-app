@@ -32,7 +32,7 @@ const { width } = Dimensions.get("window");
 
 export default function Home({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [categories, setCategories] = useState([]);
   const [productRequests, setProductRequests] = useState([]);
@@ -196,7 +196,7 @@ export default function Home({ navigation }) {
                 description={item.description}
                 county={item.user.county}
                 subCounty={item.user.subCounty}
-                rating={item.rating.$numberDecimal}
+                rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
                 premium={item.user.premium}
               />
             ))}

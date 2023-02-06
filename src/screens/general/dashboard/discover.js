@@ -48,7 +48,7 @@ const countiesData = require("../../../assets/data/counties.json");
 
 export default function Discover({ navigation }) {
   let [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,9 +61,10 @@ export default function Discover({ navigation }) {
   const [categoryID, setCategoryID] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
 
-  const [price, setPrice] = useState("1");
-  const [rating, setRating] = useState("1");
-  const [date, setDate] = useState("1");
+  const [price, setPrice] = useState(""); // 1 = Low to high
+  const [rating, setRating] = useState(""); // -1 = Highest to lowest
+  const [createdAt, setCreatedAt] = useState(""); // -1 = Latest to oldest
+  const [promoted, setPromoted] = useState(""); // -1 = Promoted true first
 
   const [filterModal, setFilterModal] = useState(false);
   const [categoriesModal, setCategoriesModal] = useState(false);
@@ -135,7 +136,7 @@ export default function Discover({ navigation }) {
   }
 
   async function getAllProducts() {
-    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
+    let url = `${process.env.ENDPOINT}/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -307,7 +308,8 @@ export default function Discover({ navigation }) {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
-            rating={item.rating.$numberDecimal}
+            premium={item.user.premium}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
       />
@@ -433,6 +435,17 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
+                  value=""
+                  status={price === "" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setPrice("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
                   value="1"
                   status={price === "1" ? "checked" : "unchecked"}
                   onPress={() => {
@@ -463,13 +476,13 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={rating === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={rating === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setRating("-1");
+                    setRating("");
                   }}
                 />
-                <Text style={postStyles.radioText}>Low to high</Text>
+                <Text style={postStyles.radioText}>All</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -480,6 +493,17 @@ export default function Discover({ navigation }) {
                     setRating("1");
                   }}
                 />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={rating === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setRating("-1");
+                  }}
+                />
                 <Text style={postStyles.radioText}>High to low</Text>
               </View>
             </View>
@@ -488,15 +512,26 @@ export default function Discover({ navigation }) {
               <Text
                 style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
               >
-                Date
+                Date posted
               </Text>
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={date === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={createdAt === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("-1");
+                    setCreatedAt("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="1"
+                  status={createdAt === "1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCreatedAt("1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Oldest</Text>
@@ -504,10 +539,10 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="1"
-                  status={date === "1" ? "checked" : "unchecked"}
+                  value="-1"
+                  status={createdAt === "-1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("1");
+                    setCreatedAt("-1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Newest</Text>

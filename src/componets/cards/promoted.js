@@ -9,18 +9,20 @@ export default function PromotedCard() {
   return (
     <View
       style={{
-        borderRadius: 10,
+        borderRadius: 50,
         position: "absolute",
         zIndex: 1,
         top: 10,
         left: 10,
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: colors.dark,
+        padding: 5,
       }}
     >
       <MaterialCommunityIcons
         name="diamond-stone"
-        size={16}
+        size={20}
         color={colors.orange}
       />
     </View>

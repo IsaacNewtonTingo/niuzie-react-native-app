@@ -11,17 +11,21 @@ import { ENDPOINT } from "@env";
 import axios from "axios";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import colors from "../../../componets/colors/colors";
+import NoData from "../../../componets/Text/no-data";
 
 export default function MyProducts({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [products, setProducts] = useState([]);
+
   const [activeProductsList, setActiveProductsList] = useState([]);
+  const [underReviewProductsList, setUnderReviewProductsList] = useState([]);
   const [inactiveProductsList, setInactiveProductsList] = useState([]);
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "Active", title: "Active" },
+    { key: "UnderReview", title: "Under review" },
     { key: "Inactive", title: "Inactive" },
   ]);
 
@@ -54,9 +58,26 @@ export default function MyProducts({ navigation }) {
           });
 
           setActiveProductsList(activeProductsList);
+          //---------------------------------------
+          const underReviewProductsList = products.filter(function (product) {
+            if (
+              product.reviewed == false &&
+              product.verified == false &&
+              product.active == false
+            ) {
+              return true;
+            }
+          });
+
+          setUnderReviewProductsList(underReviewProductsList);
+          //---------------------------------------
 
           const inactiveProductsList = products.filter(function (product) {
-            if (product.active == false) {
+            if (
+              product.reviewed == true &&
+              product.verified == false &&
+              product.active == false
+            ) {
               return true;
             }
           });
@@ -71,55 +92,96 @@ export default function MyProducts({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.push("ProductDetails", { item });
+    navigation.push("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   const activeProducts = () => (
-    <FlatList
-      data={activeProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {activeProductsList.length < 1 && <NoData text="No data" />}
+      <FlatList
+        data={activeProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            premium={item.user.premium}
+            rating={item.rating.$numberDecimal}
+          />
+        )}
+      />
+    </>
   );
 
   const inactiveProducts = () => (
-    <FlatList
-      data={inactiveProductsList}
-      renderItem={({ item }) => (
-        <HorizontalCard
-          onPress={() => handleProductPressed(item)}
-          style={{ marginBottom: 10 }}
-          key={item._id}
-          productImage1={item.image1}
-          productImage2={item.image2}
-          productImage3={item.image3}
-          productImage4={item.image4}
-          productName={item.productName}
-          price={item.price}
-          condition={item.condition}
-          description={item.description}
-          county={item.user.county}
-          subCounty={item.user.subCounty}
-          rating={item.rating.$numberDecimal}
-        />
-      )}
-    />
+    <>
+      {inactiveProductsList.length < 1 && <NoData text="No data" />}
+
+      <FlatList
+        data={inactiveProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+            premium={item.user.premium}
+          />
+        )}
+      />
+    </>
+  );
+
+  const underReviewProducts = () => (
+    <>
+      {underReviewProductsList.length < 1 && <NoData text="No data" />}
+
+      <FlatList
+        data={underReviewProductsList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            style={{ marginBottom: 10 }}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={item.rating.$numberDecimal}
+            premium={item.user.premium}
+          />
+        )}
+      />
+    </>
   );
 
   const renderTabBar = (props) => (
@@ -148,6 +210,7 @@ export default function MyProducts({ navigation }) {
       navigationState={{ index: index, routes: routes }}
       renderScene={SceneMap({
         Active: activeProducts,
+        UnderReview: underReviewProducts,
         Inactive: inactiveProducts,
       })}
       onIndexChange={setIndex}

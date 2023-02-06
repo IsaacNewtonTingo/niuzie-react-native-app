@@ -24,6 +24,8 @@ import { verticalProductCardStyles } from "../../../componets/cards/vertical-pro
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
@@ -65,14 +67,13 @@ export default function ProductDetails({ route, navigation }) {
 
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
   const [categoryID, setCategoryID] = useState("");
-  const [subCategory, setSubCategory] = useState("");
-  const [subCategoryName, setSubCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
   const [subCategoryID, setSubCategoryID] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState(null);
 
   const [image1, setImage1] = useState("");
   const [image2, setImage2] = useState("");
@@ -121,14 +122,15 @@ export default function ProductDetails({ route, navigation }) {
         if (response.data.status == "Success") {
           setProductName(response.data.data.productName);
           setDescription(response.data.data.description);
-          setCategory(response.data.data.category.categoryName);
           setCategoryID(response.data.data.category._id);
-          setSubCategory(response.data.data.subCategory._id);
-          setSubCategoryName(response.data.data.subCategory.subCategoryName);
+          setCategoryName(response.data.data.category.categoryName);
           setSubCategoryID(response.data.data.subCategory._id);
+          setSubCategoryName(response.data.data.subCategory.subCategoryName);
           setPrice(response.data.data.price);
           setCondition(response.data.data.condition);
-          setRating(response.data.data.rating.$numberDecimal);
+          setRating(
+            parseFloat(response.data.data.rating.$numberDecimal).toFixed(1)
+          );
 
           setImage1(response.data.data.image1);
           setImage2(response.data.data.image2);
@@ -302,7 +304,7 @@ export default function ProductDetails({ route, navigation }) {
         `${process.env.ENDPOINT}/product/review-product/${productID}`,
         {
           userID,
-          rating,
+          rating: defaultRating,
           reviewMessage: review,
         },
         { headers }
@@ -323,16 +325,16 @@ export default function ProductDetails({ route, navigation }) {
             title: response.data.status,
             description: response.data.message,
           });
+          getReviews();
+          getProducts();
+          setReview("");
+          setDefaultRating(0);
         }
       })
       .catch((err) => {
         setSubmitting(false);
         console.log(err);
       });
-  }
-
-  if (loadingData) {
-    return <LoadingIndicator />;
   }
 
   async function deleteReview(reviewID) {
@@ -361,6 +363,10 @@ export default function ProductDetails({ route, navigation }) {
         console.log(err);
       });
   }
+
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
@@ -396,10 +402,7 @@ export default function ProductDetails({ route, navigation }) {
         )}
       />
 
-      <LinearGradient
-        colors={[colors.cardColor, colors.almostDark, colors.dark]}
-        style={productDetailStyles.prodData}
-      >
+      <View style={[productDetailStyles.prodData, productDetailStyles.hr]}>
         <View style={styles.spaceBetween}>
           <Text style={productDetailStyles.prodNameText}>{productName}</Text>
 
@@ -426,7 +429,7 @@ export default function ProductDetails({ route, navigation }) {
 
         <View style={styles.spaceBetween}>
           <Text style={verticalProductCardStyles.conditionText}>
-            {condition}
+            ~ {condition} ~
           </Text>
 
           <View style={verticalProductCardStyles.ratingContainer}>
@@ -434,14 +437,14 @@ export default function ProductDetails({ route, navigation }) {
             <Text style={verticalProductCardStyles.ratingText}>{rating}</Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
 
-      <Text style={productDetailStyles.descriptionText}>{description}</Text>
+      <View style={[productDetailStyles.prodData, productDetailStyles.hr]}>
+        <Text style={productDetailStyles.descSubText}>Description:</Text>
+        <Text style={productDetailStyles.descriptionText}>{description}</Text>
+      </View>
 
-      <LinearGradient
-        colors={[colors.dark, colors.almostDark, colors.cardColor]}
-        style={[productDetailStyles.prodData, { minHeight: 180 }]}
-      >
+      <View style={[productDetailStyles.prodData, productDetailStyles.hr]}>
         <View style={productDetailStyles.profileContainer}>
           <Image
             style={productDetailStyles.profileImage}
@@ -449,36 +452,39 @@ export default function ProductDetails({ route, navigation }) {
               uri: profilePicture ? profilePicture : noImage.noProfilePic,
             }}
           />
+
           <View>
             <Text style={productDetailStyles.nameText}>
               {firstName} {lastName}
             </Text>
+
             <Text style={productDetailStyles.locationText}>
               {county} {subCounty}
             </Text>
           </View>
-        </View>
 
-        <View style={styles.spaceBetween}>
-          <PrimaryButton style={{ width: "45%" }} buttonTitle="Call" />
-          <TertiaryButton style={{ width: "45%" }} buttonTitle="Text" />
-        </View>
-      </LinearGradient>
+          <TouchableOpacity style={productDetailStyles.actionIcons}>
+            <Feather name="phone-call" size={18} color={colors.lightBlue} />
+          </TouchableOpacity>
 
-      <View style={[styles.section, { marginTop: 40, minHeight: 200 }]}>
+          <TouchableOpacity style={productDetailStyles.actionIcons}>
+            <FontAwesome5 name="sms" size={18} color={colors.lightBlue} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={[styles.section, { marginTop: 40 }]}>
         <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>Reviews</Text>
+          <Text style={styles.subText}>
+            Reviews <B>({reviewList.length})</B>
+          </Text>
 
-          {reviewList.leng > 0 && (
+          {reviewList.length > 0 && (
             <TouchableOpacity>
               <Text style={styles.viewAll}>View all</Text>
             </TouchableOpacity>
           )}
         </View>
-
-        {reviewList.length < 1 && (
-          <NoData text="No reviews found for this product" />
-        )}
 
         {reviewList.map((review) => (
           <ReviewComponent
@@ -488,7 +494,7 @@ export default function ProductDetails({ route, navigation }) {
             lastName={review.user.lastName}
             profilePicture={review.user.profilePicture}
             date={dateFormat(review.createdAt, "mediumDate")}
-            rating={review.rating}
+            rating={review.rating.toFixed(1)}
             reviewMessage={review.reviewMessage}
             onPress={() => deleteReview(review._id)}
           />
@@ -568,7 +574,8 @@ export default function ProductDetails({ route, navigation }) {
               description={item.description}
               county={item.user.county}
               subCounty={item.user.subCounty}
-              rating={item.rating.$numberDecimal}
+              premium={item.user.premium}
+              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             />
           )}
         />
@@ -597,7 +604,8 @@ export default function ProductDetails({ route, navigation }) {
               description={item.description}
               county={item.user.county}
               subCounty={item.user.subCounty}
-              rating={item.rating.$numberDecimal}
+              premium={item.user.premium}
+              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             />
           )}
         />
@@ -610,9 +618,9 @@ export default function ProductDetails({ route, navigation }) {
               navigation.navigate("EditProduct", {
                 productID,
                 productName,
-                category,
+                categoryName,
                 categoryID,
-                subCategory,
+                subCategoryName,
                 subCategoryID,
                 description,
                 price,
@@ -622,6 +630,11 @@ export default function ProductDetails({ route, navigation }) {
                 phoneNumber,
                 county,
                 subCounty,
+
+                image1,
+                image2,
+                image3,
+                image4,
               })
             }
             buttonTitle="Edit product"
@@ -650,7 +663,7 @@ const productDetailStyles = StyleSheet.create({
   },
   descriptionText: {
     color: colors.lightBlue,
-    margin: 20,
+    marginVertical: 20,
   },
   profileContainer: {
     flexDirection: "row",
@@ -682,5 +695,17 @@ const productDetailStyles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 40,
     textAlign: "center",
+  },
+  actionIcons: {
+    marginHorizontal: 10,
+  },
+  descSubText: {
+    color: colors.gray,
+    fontWeight: "800",
+    marginTop: 20,
+  },
+  hr: {
+    borderBottomWidth: 0.2,
+    borderBottomColor: colors.gray,
   },
 });

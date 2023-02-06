@@ -434,7 +434,12 @@ export default function Settings({ navigation }) {
     } else if (navTo == "Payments") {
       navigation.navigate("Payments");
     } else if (navTo == "ContactUs") {
-      navigation.navigate("Support");
+      navigation.navigate("ContactUs", {
+        firstName,
+        lastName,
+        phoneNumber,
+        userID,
+      });
     } else if (navTo == "Admin") {
       navigation.navigate("AdminDashboard");
     } else if (navTo == "Logout") {

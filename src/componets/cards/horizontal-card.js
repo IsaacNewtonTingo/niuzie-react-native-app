@@ -15,6 +15,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 import noImage from "../../assets/data/noImage";
 import PromotedCard from "./promoted";
+import { useEffect } from "react";
 
 const { width } = Dimensions.get("window");
 export default function HorizontalCard(props) {
@@ -59,16 +60,13 @@ export default function HorizontalCard(props) {
         <View>
           <View style={verticalProductCardStyles.nameAndCondition}>
             <Text style={verticalProductCardStyles.productNameText}>
-              {productName.length <= 15
-                ? productName
-                : productName.slice(0, 14) + "..."}
-            </Text>
-            <Text style={verticalProductCardStyles.conditionText}>
-              {condition.length <= 8
-                ? condition
-                : condition.slice(0, 7) + "..."}
+              {productName}
             </Text>
           </View>
+
+          <Text style={verticalProductCardStyles.conditionText}>
+            ~ {condition} ~
+          </Text>
 
           <Text style={verticalProductCardStyles.priceText}>Ksh. {price}</Text>
         </View>
@@ -85,7 +83,7 @@ export default function HorizontalCard(props) {
           </Text>
 
           <View style={verticalProductCardStyles.ratingContainer}>
-            <AntDesign name="star" size={14} color={colors.orange} />
+            <AntDesign name="star" size={10} color={colors.orange} />
             <Text style={verticalProductCardStyles.ratingText}>{rating}</Text>
           </View>
         </View>
@@ -96,16 +94,17 @@ export default function HorizontalCard(props) {
 
 const verticalProductCardStyles = StyleSheet.create({
   card: {
-    width: width,
+    width: width - 20,
     minHeight: 160,
     backgroundColor: colors.cardColor,
     borderRadius: 10,
     marginBottom: 10,
     flexDirection: "row",
+    alignSelf: "center",
   },
   productImage: {
     width: 160,
-    height: 160,
+    minHeight: 160,
     borderRadius: 10,
   },
   detailsContainer: {
@@ -125,33 +124,34 @@ const verticalProductCardStyles = StyleSheet.create({
   },
   productNameText: {
     color: colors.lightBlue,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "800",
   },
   conditionText: {
     color: colors.gray,
-    backgroundColor: colors.dark,
-    borderRadius: 10,
-    padding: 5,
     fontSize: 10,
+    marginVertical: 5,
   },
   priceText: {
     color: colors.orange,
     fontWeight: "800",
-    marginTop: 5,
+    fontSize: 12,
   },
   locationText: {
     color: colors.linkText,
     fontWeight: "800",
+    fontSize: 12,
   },
   ratingText: {
     color: colors.lightBlue,
     fontWeight: "800",
     marginLeft: 5,
+    fontSize: 12,
   },
   descriptionText: {
     color: colors.abitGray,
     marginVertical: 20,
+    fontSize: 12,
   },
   locationAndRating: {
     flexDirection: "row",

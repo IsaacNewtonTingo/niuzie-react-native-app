@@ -38,7 +38,6 @@ export default function ReviewComponent(props) {
         borderBottomWidth: 1,
         borderBottomColor: "#1a1a1a",
         marginBottom: 20,
-        minHeight: 80,
         justifyContent: "space-between",
       }}
     >
