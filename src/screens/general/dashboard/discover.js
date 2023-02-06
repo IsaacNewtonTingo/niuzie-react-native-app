@@ -136,7 +136,7 @@ export default function Discover({ navigation }) {
   }
 
   async function getAllProducts() {
-    let url = `https://742c-105-163-0-162.in.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
+    let url = `${process.env.ENDPOINT}/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -435,6 +435,17 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
+                  value=""
+                  status={price === "" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setPrice("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
                   value="1"
                   status={price === "1" ? "checked" : "unchecked"}
                   onPress={() => {
@@ -465,13 +476,13 @@ export default function Discover({ navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={rating === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={rating === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setRating("-1");
+                    setRating("");
                   }}
                 />
-                <Text style={postStyles.radioText}>Low to high</Text>
+                <Text style={postStyles.radioText}>All</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -482,6 +493,17 @@ export default function Discover({ navigation }) {
                     setRating("1");
                   }}
                 />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={rating === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setRating("-1");
+                  }}
+                />
                 <Text style={postStyles.radioText}>High to low</Text>
               </View>
             </View>
@@ -490,8 +512,19 @@ export default function Discover({ navigation }) {
               <Text
                 style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
               >
-                Date
+                Date posted
               </Text>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value=""
+                  status={createdAt === "" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCreatedAt("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
