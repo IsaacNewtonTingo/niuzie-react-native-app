@@ -18,7 +18,6 @@ import styles from "../../../componets/styles/global-styles";
 import moment from "moment";
 import colors from "../../../componets/colors/colors";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
-import socket from "../../../utils/socket";
 
 const { width } = Dimensions.get("window");
 
@@ -35,18 +34,7 @@ export default function Notifications({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
-    socket.on("Fuck", (data) => {
-      console.log(data);
-    });
-
-    socket.on("New", (data) => {
-      console.log(data);
-    });
     getNotifications();
-
-    return () => {
-      socket.disconnect();
-    };
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));

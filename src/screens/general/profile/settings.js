@@ -153,6 +153,8 @@ export default function Settings({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
+  const [isChecked, setChecked] = useState(false);
+
   const [confirmCodeModal, setConfirmCodeModal] = useState(false);
   const [countiesModal, setCountiesModal] = useState(false);
   const [subCountiesModal, setSubCategoriesModal] = useState(false);
@@ -296,6 +298,13 @@ export default function Settings({ navigation }) {
         status: "error",
         title: "Non matching fields",
         description: "Passwords don't match",
+      });
+    } else if (isChecked == false) {
+      showMyToast({
+        status: "error",
+        title: "Terms and conditions",
+        description:
+          "You must accept terms and conditions to complete the signup process",
       });
     } else {
       const url = `${process.env.ENDPOINT}/user/signup`;
@@ -528,6 +537,8 @@ export default function Settings({ navigation }) {
                   setCounty={setCounty}
                   subCounty={subCounty}
                   setSubCounty={setSubCounty}
+                  isChecked={isChecked}
+                  setChecked={setChecked}
                 />
               ) : (
                 <></>

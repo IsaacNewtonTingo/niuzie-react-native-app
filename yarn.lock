@@ -4615,6 +4615,11 @@ expo-asset@~8.7.0:
     path-browserify "^1.0.0"
     url-parse "^1.5.9"
 
+expo-checkbox@~2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/expo-checkbox/-/expo-checkbox-2.2.2.tgz#651c3fbf461e34137e9b49920a8041d9645d8dc8"
+  integrity sha512-0DXbeJdVAPfqiy+RBkGXHYU2dLxdpyaWAaV3+N+/xWEC2ilqrqCiSqsPcbFQer1f9qaqjNeDUi51qPuF5AgTIw==
+
 expo-clipboard@~4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/expo-clipboard/-/expo-clipboard-4.0.1.tgz#74385c2deacbfc75583ebb22e95067bd8f79a037"
