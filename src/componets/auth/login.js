@@ -68,6 +68,13 @@ export default function LoginComponent(props) {
       />
 
       <View style={styles.optTextSign}>
+        <Text style={styles.firstText}>Forgot password ?</Text>
+        <TouchableOpacity onPress={props.setResetPasswordOtpModal}>
+          <Text style={styles.opt2Text}>Reset</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.optTextSign}>
         <Text style={styles.firstText}>Don't have an account ?</Text>
         <TouchableOpacity onPress={onSignupPress}>
           <Text style={styles.opt2Text}>Signup</Text>

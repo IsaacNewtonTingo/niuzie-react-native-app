@@ -33,12 +33,13 @@ import { BottomSheet } from "react-native-btr";
 import SignUpComponent from "../../../componets/auth/signup";
 
 import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+
+import { Entypo } from "@expo/vector-icons";
+
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import noImage from "../../../assets/data/noImage";
-import { discoverStyles } from "../dashboard/discover";
-import { FlatList } from "react-native";
-import NoData from "../../../componets/Text/no-data";
-import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
+
 import { TouchableWithoutFeedback } from "react-native";
 import { Keyboard } from "react-native";
 
@@ -153,14 +154,14 @@ export default function Settings({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
-  const [confirmCodeModal, setConfirmCodeModal] = useState(false);
-  const [countiesModal, setCountiesModal] = useState(false);
-  const [subCountiesModal, setSubCategoriesModal] = useState(false);
-  const [subCounties, setSubCounties] = useState([]);
+  const [isChecked, setChecked] = useState(false);
 
-  const countiesData = require("../../../assets/data/counties.json");
+  const [confirmCodeModal, setConfirmCodeModal] = useState(false);
+  const [resetPasswordOtpModal, setResetPasswordOtpModal] = useState(false);
+  const [resetPasswordModal, setResetPasswordModal] = useState(false);
 
   const [otp, setOtp] = useState("");
+  const [reseOtp, setResetOtp] = useState("");
 
   useEffect(() => {
     checkStoreCredentials();
@@ -296,6 +297,13 @@ export default function Settings({ navigation }) {
         status: "error",
         title: "Non matching fields",
         description: "Passwords don't match",
+      });
+    } else if (isChecked == false) {
+      showMyToast({
+        status: "error",
+        title: "Terms and conditions",
+        description:
+          "You must accept terms and conditions to complete the signup process",
       });
     } else {
       const url = `${process.env.ENDPOINT}/user/signup`;
@@ -453,6 +461,12 @@ export default function Settings({ navigation }) {
       .then(async () => {
         setLoadingData(false);
         setStoredCredentials("");
+
+        setPhoneNumber("");
+        setPassword("");
+        setResetOtp("");
+        setFirstName("");
+        setLastName("");
       })
       .catch((err) => {
         console.log(err);
@@ -468,6 +482,99 @@ export default function Settings({ navigation }) {
   function onLoginPress() {
     setLoginItem(true);
     setSignupItem(false);
+  }
+
+  async function resetPassword() {
+    const url = `${process.env.ENDPOINT}/user/send-reset-pass-otp`;
+
+    setSubmitting(true);
+    await axios
+      .post(url, { phoneNumber })
+      .then((response) => {
+        setSubmitting(false);
+        console.log(response.data);
+
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          setResetPasswordOtpModal(false);
+          setResetPasswordModal(true);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+
+          setPhoneNumber("");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitting(false);
+        setPhoneNumber("");
+      });
+  }
+
+  async function changePassword() {
+    const url = `${process.env.ENDPOINT}/user/change-password`;
+    setSubmitting(true);
+
+    if (!reseOtp) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Please enter an otp",
+      });
+    } else if (!password) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Please enter a new password",
+      });
+    } else if (password !== confirmPassword) {
+      showMyToast({
+        status: "error",
+        title: "Password mismatch",
+        description: "Passwords don't match",
+      });
+    } else {
+      await axios
+        .post(url, { phoneNumber, otp: reseOtp, password })
+        .then((response) => {
+          setSubmitting(false);
+          console.log(response.data);
+
+          if (response.data.status == "Success") {
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message + ". Please login",
+            });
+            setResetPasswordOtpModal(false);
+            setResetPasswordModal(false);
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+            setPhoneNumber("");
+            setPassword("");
+            setResetOtp("");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setSubmitting(false);
+          setPhoneNumber("");
+          setPassword("");
+          setResetOtp("");
+        });
+    }
   }
 
   if (loadingData) {
@@ -505,6 +612,8 @@ export default function Settings({ navigation }) {
                   password={password}
                   setPassword={setPassword}
                   onSignupPress={onSignupPress}
+                  resetPasswordOtpModal={resetPasswordOtpModal}
+                  setResetPasswordOtpModal={setResetPasswordOtpModal}
                 />
               ) : signupItem == true ? (
                 <SignUpComponent
@@ -528,6 +637,8 @@ export default function Settings({ navigation }) {
                   setCounty={setCounty}
                   subCounty={subCounty}
                   setSubCounty={setSubCounty}
+                  isChecked={isChecked}
+                  setChecked={setChecked}
                 />
               ) : (
                 <></>
@@ -580,6 +691,144 @@ export default function Settings({ navigation }) {
                   <Text style={styles.firstText}>Didn't recieve code ?</Text>
                   <TouchableOpacity>
                     <Text style={styles.opt2Text}>Resend</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </BottomSheet>
+
+            <BottomSheet
+              visible={resetPasswordOtpModal}
+              onBackButtonPress={() => setResetPasswordOtpModal(false)}
+              onBackdropPress={() => setResetPasswordOtpModal(false)}
+            >
+              <View style={settingsStyls.bottomNavigationView}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    marginVertical: 20,
+                    fontWeight: "800",
+                    color: colors.gray,
+                  }}
+                >
+                  Enter your phone number to receive an otp to proceed with the
+                  password reset process
+                </Text>
+
+                {/* <Text style={styles.label}>Phone number</Text> */}
+                <View style={styles.textInputContainer}>
+                  <Entypo
+                    name="old-phone"
+                    size={18}
+                    color="black"
+                    style={styles.searchIcon}
+                  />
+                  <TextInput
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    style={[styles.textInput, { color: colors.dark }]}
+                    placeholder="e.g +254724753175"
+                    placeholderTextColor={colors.gray}
+                    keyboardType="phone-pad"
+                  />
+                </View>
+
+                <PrimaryButton
+                  disabled={submitting}
+                  submitting={submitting}
+                  onPress={resetPassword}
+                  buttonTitle="Submit"
+                />
+              </View>
+            </BottomSheet>
+
+            <BottomSheet
+              visible={resetPasswordModal}
+              onBackButtonPress={() => setResetPasswordModal(false)}
+              onBackdropPress={() => setResetPasswordModal(false)}
+            >
+              <View style={settingsStyls.bottomNavigationView}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    marginVertical: 20,
+                    fontWeight: "800",
+                    color: colors.gray,
+                  }}
+                >
+                  Enter the otp sent to your phone to complete password reset
+                  process.
+                </Text>
+
+                <Text style={styles.label}>OTP</Text>
+                <View style={styles.textInputContainer}>
+                  <FontAwesome
+                    name="qrcode"
+                    size={18}
+                    color="black"
+                    style={styles.searchIcon}
+                  />
+                  <TextInput
+                    value={reseOtp}
+                    onChangeText={setResetOtp}
+                    style={[
+                      styles.textInput,
+                      { color: colors.dark, width: "100%" },
+                    ]}
+                    placeholder="e.g 2763"
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                <Text style={styles.label}>Password</Text>
+                <View style={styles.textInputContainer}>
+                  <FontAwesome5
+                    name="lock"
+                    size={18}
+                    color="black"
+                    style={styles.searchIcon}
+                  />
+                  <TextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    style={[styles.textInput, { color: colors.dark }]}
+                    placeholder="*******"
+                    secureTextEntry={true}
+                  />
+                </View>
+
+                <Text style={styles.label}>Confirm password</Text>
+                <View style={styles.textInputContainer}>
+                  <FontAwesome5
+                    name="lock"
+                    size={18}
+                    color="black"
+                    style={styles.searchIcon}
+                  />
+                  <TextInput
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    style={[styles.textInput, { color: colors.dark }]}
+                    placeholder="********"
+                    secureTextEntry={true}
+                  />
+                </View>
+
+                <PrimaryButton
+                  disabled={submitting}
+                  submitting={submitting}
+                  onPress={changePassword}
+                  buttonTitle="Submit"
+                />
+
+                <View style={styles.optTextSign}>
+                  <Text style={styles.firstText}>Didn't recieve code ?</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setResetPasswordModal(false),
+                        setResetPasswordOtpModal(true);
+                    }}
+                  >
+                    <Text style={styles.opt2Text}>Check phone number</Text>
                   </TouchableOpacity>
                 </View>
               </View>

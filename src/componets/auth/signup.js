@@ -19,6 +19,9 @@ import { discoverStyles } from "../../screens/general/dashboard/discover";
 import PostSubCategoryList from "../subcategories/post-sub-cat-list";
 import NoData from "../Text/no-data";
 
+import Checkbox from "expo-checkbox";
+import { HStack } from "native-base";
+
 const countiesData = require("../../assets/data/counties.json");
 
 export default function SignUpComponent(props) {
@@ -36,6 +39,9 @@ export default function SignUpComponent(props) {
 
   const submitting = props.submitting;
   const onLoginPress = props.onLoginPress;
+
+  const isChecked = props.isChecked;
+  const setChecked = props.setChecked;
 
   const [countiesModal, setCountiesModal] = useState(false);
   const [subCountiesModal, setSubCountiesModal] = useState(false);
@@ -58,7 +64,6 @@ export default function SignUpComponent(props) {
           placeholder="e.g John"
         />
       </View>
-
       <Text style={styles.label}>Last name</Text>
       <View style={styles.textInputContainer}>
         <FontAwesome5
@@ -74,7 +79,6 @@ export default function SignUpComponent(props) {
           placeholder="e.g Doe"
         />
       </View>
-
       <Text style={styles.label}>County</Text>
       <View style={styles.textInputContainer}>
         <MaterialCommunityIcons
@@ -93,7 +97,6 @@ export default function SignUpComponent(props) {
           <Text>{props.county}</Text>
         </TouchableOpacity>
       </View>
-
       <Text style={styles.label}>Sub county</Text>
       <View style={styles.textInputContainer}>
         <MaterialCommunityIcons
@@ -112,7 +115,6 @@ export default function SignUpComponent(props) {
           <Text>{props.subCounty}</Text>
         </TouchableOpacity>
       </View>
-
       <Text style={styles.label}>Phone number</Text>
       <View style={styles.textInputContainer}>
         <Entypo
@@ -129,7 +131,6 @@ export default function SignUpComponent(props) {
           keyboardType="phone-pad"
         />
       </View>
-
       <Text style={styles.label}>Password</Text>
       <View style={styles.textInputContainer}>
         <FontAwesome5
@@ -146,7 +147,6 @@ export default function SignUpComponent(props) {
           secureTextEntry={true}
         />
       </View>
-
       <Text style={styles.label}>Confirm password</Text>
       <View style={styles.textInputContainer}>
         <FontAwesome5
@@ -164,20 +164,36 @@ export default function SignUpComponent(props) {
         />
       </View>
 
+      <View style={signStyles.section}>
+        <Checkbox
+          style={signStyles.checkbox}
+          value={isChecked}
+          onValueChange={setChecked}
+          color={isChecked ? "#4630EB" : undefined}
+        />
+        <HStack>
+          <Text style={signStyles.paragraph}>I accept </Text>
+
+          <TouchableOpacity>
+            <Text style={[signStyles.paragraph, { color: colors.linkText }]}>
+              terms & conditions
+            </Text>
+          </TouchableOpacity>
+        </HStack>
+      </View>
+
       <PrimaryButton
         disabled={submitting}
         onPress={props.signupPress}
         buttonTitle="Signup"
         submitting={submitting}
       />
-
       <View style={styles.optTextSign}>
         <Text style={styles.firstText}>Already have an account ?</Text>
         <TouchableOpacity onPress={onLoginPress}>
           <Text style={styles.opt2Text}>Login</Text>
         </TouchableOpacity>
       </View>
-
       {countiesModal == true && (
         <View
           setCountiesModal={setCountiesModal}
@@ -206,7 +222,6 @@ export default function SignUpComponent(props) {
           {countiesData.length < 1 && <NoData text="No data" />}
         </View>
       )}
-
       {subCountiesModal == true && (
         <View style={discoverStyles.backdrop}>
           <TouchableOpacity
@@ -249,5 +264,17 @@ const signStyles = StyleSheet.create({
     borderRadius: 10,
     width: "100%",
     alignSelf: "center",
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  paragraph: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: colors.lightBlue,
+  },
+  checkbox: {
+    margin: 8,
   },
 });
