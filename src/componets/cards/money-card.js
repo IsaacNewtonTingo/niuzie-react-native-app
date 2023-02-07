@@ -14,7 +14,7 @@ export default function MoneyCard({ children }) {
         end={[1.0, 0.5]}
         locations={[0.0, 1.0]}
         colors={[colors.dark, "#001949"]}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", borderRadius: 10 }}
       >
         <ImageBackground
           style={moneyStyles.imageBackground}
@@ -34,10 +34,11 @@ const moneyStyles = StyleSheet.create({
     height: 200,
     borderRadius: 10,
     marginTop: 20,
+    flex: 1,
   },
   imageBackground: {
-    height: "100%",
-    width: "100%",
     justifyContent: "center",
+    borderRadius: 10,
+    flex: 1,
   },
 });
