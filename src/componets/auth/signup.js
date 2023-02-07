@@ -15,9 +15,10 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import PrimaryButton from "../buttons/primary-button";
 import colors from "../colors/colors";
-import { discoverStyles } from "../../screens/general/dashboard/discover";
 import PostSubCategoryList from "../subcategories/post-sub-cat-list";
 import NoData from "../Text/no-data";
+
+import { discoverStyles } from "../../screens/general/dashboard/discover";
 
 import Checkbox from "expo-checkbox";
 import { HStack } from "native-base";
