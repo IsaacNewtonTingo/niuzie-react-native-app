@@ -12,12 +12,40 @@ import styles from "../../../componets/styles/global-styles";
 import colors from "../../../componets/colors/colors";
 import MoneyCard from "../../../componets/cards/money-card";
 
-import { Divider, Flex } from "native-base";
+import { Divider, Flex, HStack } from "native-base";
 import AdminAction from "../../../componets/cards/admin-actions";
 
 const { width } = Dimensions.get("window");
 
+import { CredentialsContext } from "../../../componets/context/credentials-context";
+import axios from "axios";
+import { showMyToast } from "../../../functions/show-toast";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+
+const B = (props) => (
+  <Text style={{ fontWeight: "800" }}>{props.children}</Text>
+);
+
 export default function AdminDashboard({ navigation }) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials;
+  const userID = data.userID;
+  const token = data.token;
+
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [premiumRevenue, setPremiumRevenue] = useState(0);
+  const [extraProductRevenue, setExtraProductRevenue] = useState(0);
+  const [productPromoRevenue, setProductPromoRevenue] = useState(0);
+
+  const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getRevenue();
+  }, []);
+
   const adminItems = [
     {
       title: "Products",
@@ -56,23 +84,88 @@ export default function AdminDashboard({ navigation }) {
       navigation.navigate("AdminProfile");
     }
   }
+
+  async function getRevenue() {
+    const url = `${process.env.ENDPOINT}/admin/get-revenue/${userID}`;
+
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        setLoadingData(false);
+
+        if (response.data.status == "Success") {
+          setTotalRevenue(response.data.data.totalRevenue);
+          setPremiumRevenue(response.data.data.premiumRevenue);
+          setExtraProductRevenue(response.data.data.extraProductRevenue);
+          setProductPromoRevenue(response.data.data.productPromoRevenue);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
   return (
     <ScrollView style={styles.container}>
       <MoneyCard>
         <View style={{ opacity: 1, padding: 20 }}>
-          <Text style={adminDashStyles.subText}>Total revenue</Text>
-          <Text style={adminDashStyles.bigText}>KSH. 45000</Text>
+          <Text style={adminDashStyles.subText}>~Total revenue~</Text>
+          <Text style={adminDashStyles.bigText}>
+            KSH. {totalRevenue.toFixed(2)}
+          </Text>
 
-          <Flex direction="row">
-            <Text style={adminDashStyles.subText}>Premium payments</Text>
-            <Divider
-              bg="amber.500"
-              thickness="2"
-              mx="1"
-              h="4"
-              orientation="vertical"
-            />
-            <Text style={adminDashStyles.subText}>Product payments</Text>
+          <Flex direction="column">
+            <HStack>
+              <Divider
+                bg="amber.500"
+                thickness="2"
+                mx="1"
+                h="4"
+                orientation="vertical"
+              />
+              <Text style={adminDashStyles.subText}>
+                Premium payments: <B>KSH.{premiumRevenue.toFixed(2)}</B>
+              </Text>
+            </HStack>
+
+            <HStack>
+              <Divider
+                bg="blue.500"
+                thickness="2"
+                mx="1"
+                h="4"
+                orientation="vertical"
+              />
+              <Text style={adminDashStyles.subText}>
+                Product promo payments:{" "}
+                <B>KSH.{productPromoRevenue.toFixed(2)}</B>
+              </Text>
+            </HStack>
+
+            <HStack>
+              <Divider
+                bg="red.500"
+                thickness="2"
+                mx="1"
+                h="4"
+                orientation="vertical"
+              />
+              <Text style={adminDashStyles.subText}>
+                Extra product payments:{" "}
+                <B>KSH.{extraProductRevenue.toFixed(2)}</B>
+              </Text>
+            </HStack>
           </Flex>
         </View>
       </MoneyCard>
