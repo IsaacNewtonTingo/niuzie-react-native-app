@@ -54,7 +54,7 @@ export default function AdminDashboard({ navigation }) {
       iconName: "shirtsinbulk",
     },
     {
-      title: "Categories",
+      title: "Sub categories",
       navTo: "AddCategories",
       iconType: "Ionicons",
       iconName: "shirt-sharp",

@@ -14,6 +14,7 @@ import colors from "../colors/colors";
 
 import dateFormat from "dateformat";
 import styles from "../styles/global-styles";
+import { Avatar } from "react-native-paper";
 
 export default function FullProductRequest(props) {
   const userName = props.data.buyerName;
@@ -48,7 +49,7 @@ export default function FullProductRequest(props) {
           }}
         >
           {profilePicture ? (
-            <Image source={{ uri: profilePicture }} />
+            <Avatar.Image source={{ uri: profilePicture }} size={40} />
           ) : (
             <FontAwesome name="user-circle-o" size={40} color="#A8B8D8" />
           )}
