@@ -81,12 +81,15 @@ async function registerForPushNotificationsAsync(userID, authToken) {
   return token;
 }
 
-export default function App() {
+export default function App({ navigation }) {
   const [storedCredentials, setStoredCredentials] = useState("");
 
   useEffect(() => {
     checkLoginCredentials();
     Notifications.addNotificationReceivedListener(handleNotification);
+    Notifications.addNotificationResponseReceivedListener(
+      handleNotificationResponse
+    );
   }, []);
 
   const checkLoginCredentials = async () => {
@@ -113,6 +116,10 @@ export default function App() {
       title: notification.request.content.title,
       description: notification.request.content.body,
     });
+  };
+
+  const handleNotificationResponse = () => {
+    navigation.navigate("Notifications");
   };
 
   return (
