@@ -13,18 +13,12 @@ import React, { useState, useEffect } from "react";
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
 
-import VerticalProductCard from "../../../componets/cards/vertical-product";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import ProductRequest from "../../../componets/cards/product-request.js";
 
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, Input } from "native-base";
 
-import * as SecureStore from "expo-secure-store";
+import * as Notifications from "expo-notifications";
 
 import axios from "axios";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
@@ -43,9 +37,25 @@ export default function Home({ navigation }) {
     getCategories();
     getPremiumProducts();
     getProductRequests();
+
+    // Notifications.addNotificationResponseReceivedListener(
+    //   handleNotificationResponse
+    // );
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  // const handleNotificationResponse = (notification) => {
+  //   console.log(notification.notification.request.content.data.product);
+  //   if (notification.notification.request.content.data.product) {
+  //     navigation.navigate("ProductDetails", {
+  //       productID: notification.notification.request.content.data.product._id,
+  //       productOwnerID:
+  //         notification.notification.request.content.data.product.user._id,
+  //     });
+  //   }
+  //   // navigation.navigate("Notifications");
+  // };
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;

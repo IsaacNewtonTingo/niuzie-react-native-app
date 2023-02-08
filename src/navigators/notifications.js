@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import Notifications from "../screens/general/dashboard/notifications";
+import NotificationsScreen from "../screens/general/dashboard/notifications";
 import NotificationDetails from "../screens/general/dashboard/notification-details";
 import colors from "../componets/colors/colors";
 import ProductDetails from "../screens/general/dashboard/product-details";
@@ -20,7 +20,7 @@ export default function NotificationsNav() {
         },
       }}
     >
-      <Stack.Screen name="Notifications" component={Notifications} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen
         name="NotificationDetails"
         component={NotificationDetails}

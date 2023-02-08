@@ -48,7 +48,7 @@ async function registerForPushNotificationsAsync(userID, authToken) {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      console.log("Failed to get push token for push notification!");
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -81,15 +81,12 @@ async function registerForPushNotificationsAsync(userID, authToken) {
   return token;
 }
 
-export default function App({ navigation }) {
+export default function App() {
   const [storedCredentials, setStoredCredentials] = useState("");
 
   useEffect(() => {
     checkLoginCredentials();
     Notifications.addNotificationReceivedListener(handleNotification);
-    Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
-    );
   }, []);
 
   const checkLoginCredentials = async () => {
@@ -116,10 +113,6 @@ export default function App({ navigation }) {
       title: notification.request.content.title,
       description: notification.request.content.body,
     });
-  };
-
-  const handleNotificationResponse = () => {
-    navigation.navigate("Notifications");
   };
 
   return (

@@ -364,9 +364,9 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
-  // if (loadingData) {
-  //   return <LoadingIndicator />;
-  // }
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
