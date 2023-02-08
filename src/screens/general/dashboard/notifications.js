@@ -50,7 +50,7 @@ export default function Notifications({ navigation }) {
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
-          setNotificationsList(response.data.data);
+          setNotificationsList(response.data.data.notifications);
         } else {
           showMyToast({
             status: "error",
