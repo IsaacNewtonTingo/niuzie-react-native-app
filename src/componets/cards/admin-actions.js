@@ -6,7 +6,7 @@ import colors from "../colors/colors";
 
 const { width } = Dimensions.get("window");
 
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function AdminAction(props) {
@@ -30,12 +30,14 @@ export default function AdminAction(props) {
             size={24}
             color={colors.gray}
           />
-        ) : (
+        ) : props.item.iconType == "MaterialCommunityIcons" ? (
           <MaterialCommunityIcons
             name={props.item.iconName}
             size={24}
             color={colors.gray}
           />
+        ) : (
+          <Ionicons name={props.item.iconName} size={24} color={colors.gray} />
         )}
         <Text
           style={{

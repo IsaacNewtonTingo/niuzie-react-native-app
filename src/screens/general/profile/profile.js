@@ -1,119 +1,201 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  ImageBackground,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { Avatar } from "react-native-paper";
+import noImage from "../../../assets/data/noImage";
+
+import { CredentialsContext } from "../../../componets/context/credentials-context";
+
 import styles from "../../../componets/styles/global-styles";
-import { LinearGradient } from "expo-linear-gradient";
+import { showMyToast } from "../../../functions/show-toast";
+
+const { width } = Dimensions.get("window");
 
 import { FontAwesome } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../../../componets/colors/colors";
-import PrimaryButton from "../../../componets/buttons/primary-button";
 
-export default function Profile({ route, navigation }) {
-  const firstName = route.params.firstName;
-  const lastName = route.params.lastName;
-  const email = route.params.email;
-  const phoneNumber = route.params.phoneNumber;
+export default function Profile({ navigation }) {
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+
+  const { data } = storedCredentials;
+  const userID = data.userID;
+  const token = data.token;
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+
+  const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  async function getProfile() {
+    setLoadingData(true);
+    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    await axios
+      .get(url, { headers: headers })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setFirstName(response.data.data.firstName);
+          setLastName(response.data.data.lastName);
+          setPhoneNumber(response.data.data.phoneNumber);
+          setProfilePicture(response.data.data.profilePicture);
+          setCounty(response.data.data.county);
+          setSubCounty(response.data.data.subCounty);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setLoadingData(false);
+        console.log(err);
+      });
+  }
   return (
-    <ScrollView style={[styles.container, { padding: 20 }]}>
-      <Image
-        source={require("../../../assets/images/tabs.jpg")}
-        style={profileStyles.image}
-      />
-
-      <LinearGradient
-        start={[0.0, 0.5]}
-        end={[1.0, 0.5]}
-        locations={[0.0, 1.0]}
-        style={profileStyles.detailsContainer}
-        colors={["#070b2c", colors.dark]}
+    <ScrollView style={styles.container}>
+      <ImageBackground
+        style={profileStyles.bg}
+        source={require("../../../assets/images/bg.jpg")}
       >
-        <View style={profileStyles.hor}>
-          <View>
-            <View style={profileStyles.iconAndLabel}>
-              <FontAwesome name="user" size={18} color={colors.gray} />
-              <Text style={profileStyles.label}>First name</Text>
-            </View>
+        <Avatar.Image
+          size={200}
+          source={{
+            uri: profilePicture ? profilePicture : noImage.noProfilePic,
+          }}
+        />
 
-            <View style={profileStyles.iconAndLabel}>
-              <FontAwesome name="user-circle" size={14} color={colors.gray} />
-              <Text style={profileStyles.label}>Last name</Text>
-            </View>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("EditAdminProfile", {
+              firstName,
+              lastName,
+              phoneNumber,
+              profilePicture,
+              county,
+              subCounty,
+              userID,
+            })
+          }
+          style={{ position: "absolute", bottom: -20, right: 20 }}
+        >
+          <FontAwesome name="edit" size={30} color={colors.linkText} />
+        </TouchableOpacity>
+      </ImageBackground>
 
-            <View style={profileStyles.iconAndLabel}>
-              <FontAwesome name="phone-square" size={17} color={colors.gray} />
-              <Text style={profileStyles.label}>Phone</Text>
-            </View>
-
-            <View style={profileStyles.iconAndLabel}>
-              <Ionicons name="mail" size={16} color={colors.gray} />
-              <Text style={profileStyles.label}>Email</Text>
-            </View>
-          </View>
-
-          <View>
-            <Text style={profileStyles.labDetails}>{firstName}</Text>
-            <Text style={profileStyles.labDetails}>{lastName}</Text>
-            <Text style={profileStyles.labDetails}>{email}</Text>
-            <Text style={profileStyles.labDetails}>{phoneNumber}</Text>
+      <View style={profileStyles.cont}>
+        <View style={profileStyles.flee}>
+          <FontAwesome name="user" size={30} color={colors.gray} />
+          <View style={profileStyles.it}>
+            <Text style={profileStyles.label}>First name</Text>
+            <Text style={profileStyles.may}>{firstName}</Text>
           </View>
         </View>
 
-        <PrimaryButton
-          buttonTitle="Edit profile"
-          onPress={() =>
-            navigation.navigate("EditProfile", {
-              firstName,
-              lastName,
-              email,
-              phoneNumber,
-            })
-          }
-        />
-      </LinearGradient>
+        <View style={profileStyles.flee}>
+          <FontAwesome5 name="user" size={30} color={colors.gray} />
+          <View style={profileStyles.it}>
+            <Text style={profileStyles.label}>Last name</Text>
+            <Text style={profileStyles.may}>{lastName}</Text>
+          </View>
+        </View>
+
+        <View style={profileStyles.flee}>
+          <FontAwesome5 name="phone-square-alt" size={30} color={colors.gray} />
+          <View style={profileStyles.it}>
+            <Text style={profileStyles.label}>Phone number</Text>
+            <Text style={profileStyles.may}>{phoneNumber}</Text>
+          </View>
+        </View>
+
+        <View style={profileStyles.flee}>
+          <MaterialCommunityIcons
+            name="home-city"
+            size={30}
+            color={colors.gray}
+          />
+          <View style={profileStyles.it}>
+            <Text style={profileStyles.label}>County</Text>
+            <Text style={profileStyles.may}>{county}</Text>
+          </View>
+        </View>
+
+        <View style={profileStyles.flee}>
+          <MaterialCommunityIcons
+            name="home-city-outline"
+            size={30}
+            color={colors.gray}
+          />
+          <View style={profileStyles.it}>
+            <Text style={profileStyles.label}>Sub county</Text>
+            <Text style={profileStyles.may}>{subCounty}</Text>
+          </View>
+        </View>
+
+        {/* <PrimaryButton buttonTitle="Edit" /> */}
+      </View>
     </ScrollView>
   );
 }
 
 const profileStyles = StyleSheet.create({
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 20,
-    position: "absolute",
-    zIndex: 1,
+  bg: {
+    width: width,
+    height: width / 1.7,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  detailsContainer: {
-    width: "100%",
-    borderRadius: 10,
-    height: 400,
+  cont: {
     padding: 20,
-    paddingTop: 80,
-    top: 150,
-    marginBottom: 200,
-  },
-  iconAndLabel: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  hor: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 40,
   },
   label: {
     fontWeight: "800",
     color: colors.gray,
-    marginLeft: 10,
   },
-  labDetails: {
+  may: {
     fontWeight: "800",
     color: colors.lightBlue,
-    textAlign: "right",
+  },
+  flee: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 0.18,
+    borderBottomColor: colors.gray,
+    paddingBottom: 20,
+  },
+  it: {
+    marginLeft: 10,
   },
 });
