@@ -7,7 +7,10 @@ import TabNavigator from "./src/navigators/tab-navigator";
 
 import { NativeBaseProvider, extendTheme } from "native-base";
 
-import { CredentialsContext } from "./src/componets/context/credentials-context";
+import {
+  CredentialsContext,
+  NotificationContext,
+} from "./src/componets/context/credentials-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import * as Device from "expo-device";
@@ -48,7 +51,7 @@ async function registerForPushNotificationsAsync(userID, authToken) {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      console.log("Failed to get push token for push notification!");
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -81,15 +84,12 @@ async function registerForPushNotificationsAsync(userID, authToken) {
   return token;
 }
 
-export default function App({ navigation }) {
+export default function App() {
   const [storedCredentials, setStoredCredentials] = useState("");
+  const [notifications, setNotifications] = useState(0);
 
   useEffect(() => {
     checkLoginCredentials();
-    Notifications.addNotificationReceivedListener(handleNotification);
-    Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
-    );
   }, []);
 
   const checkLoginCredentials = async () => {
@@ -102,7 +102,9 @@ export default function App({ navigation }) {
 
           const userID = jsonData.data.userID;
           const authToken = jsonData.data.token;
+
           registerForPushNotificationsAsync(userID, authToken);
+          getNotifications(userID, authToken);
         } else {
           setStoredCredentials(null);
         }
@@ -110,29 +112,46 @@ export default function App({ navigation }) {
       .catch((error) => console.log(error));
   };
 
-  const handleNotification = (notification) => {
-    showMyToast({
-      status: "info",
-      title: notification.request.content.title,
-      description: notification.request.content.body,
-    });
-  };
+  async function getNotifications(userID, token) {
+    const url = `${process.env.ENDPOINT}/user/get-notifications/${userID}`;
+    const headers = {
+      "auth-token": token,
+    };
 
-  const handleNotificationResponse = () => {
-    navigation.navigate("Notifications");
-  };
+    await axios
+      .get(url, { headers })
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setNotifications(response.data.data.unread);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setLoadingData(false);
+        console.log(err);
+      });
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <CredentialsContext.Provider
         value={{ storedCredentials, setStoredCredentials }}
       >
-        <NativeBaseProvider theme={theme}>
-          <NavigationContainer>
-            <TabNavigator />
-            <StatusBar style="light" />
-          </NavigationContainer>
-        </NativeBaseProvider>
+        <NotificationContext.Provider
+          value={{ notifications, setNotifications }}
+        >
+          <NativeBaseProvider theme={theme}>
+            <NavigationContainer>
+              <TabNavigator />
+              <StatusBar style="light" />
+            </NavigationContainer>
+          </NativeBaseProvider>
+        </NotificationContext.Provider>
       </CredentialsContext.Provider>
     </GestureHandlerRootView>
   );

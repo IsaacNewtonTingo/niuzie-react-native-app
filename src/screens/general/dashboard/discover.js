@@ -132,11 +132,11 @@ export default function Discover({ navigation }) {
     setSubCategoryID("");
     setPrice("");
     setRating("");
-    setDate("");
+    setCreatedAt("");
   }
 
   async function getAllProducts() {
-    let url = `${process.env.ENDPOINT}/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
     setLoadingData(true);
     setSubmitting(true);
 

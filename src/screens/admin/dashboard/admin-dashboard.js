@@ -54,10 +54,10 @@ export default function AdminDashboard({ navigation }) {
       iconName: "shirtsinbulk",
     },
     {
-      title: "Users",
-      navTo: "Users",
-      iconType: "FontAwesome",
-      iconName: "users",
+      title: "Categories",
+      navTo: "AddCategories",
+      iconType: "Ionicons",
+      iconName: "shirt-sharp",
     },
     {
       title: "Messages",
@@ -76,8 +76,8 @@ export default function AdminDashboard({ navigation }) {
   async function handlePressed({ navTo }) {
     if (navTo == "Products") {
       navigation.navigate("Products");
-    } else if (navTo == "Users") {
-      navigation.navigate("Users");
+    } else if (navTo == "AddCategories") {
+      navigation.navigate("AddCategories");
     } else if (navTo == "Messages") {
       navigation.navigate("Messages");
     } else if (navTo == "AdminProfile") {

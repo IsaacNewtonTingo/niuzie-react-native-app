@@ -4,6 +4,7 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import React from "react";
 
@@ -18,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "../colors/colors";
 
 import dateFormat from "dateformat";
+import { Avatar } from "react-native-paper";
 
 export default function ProductRequest(props) {
   const userName = props.item.user.firstName + " " + props.item.user.lastName;
@@ -40,7 +42,7 @@ export default function ProductRequest(props) {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {profilePicture ? (
-            <Image source={{ uri: profilePicture }} />
+            <Avatar.Image source={{ uri: profilePicture }} size={18} />
           ) : (
             <FontAwesome name="user-circle-o" size={18} color="#A8B8D8" />
           )}

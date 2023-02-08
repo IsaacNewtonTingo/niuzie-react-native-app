@@ -13,18 +13,10 @@ import React, { useState, useEffect } from "react";
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
 
-import VerticalProductCard from "../../../componets/cards/vertical-product";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import ProductRequest from "../../../componets/cards/product-request.js";
 
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, Input } from "native-base";
-
-import * as SecureStore from "expo-secure-store";
 
 import axios from "axios";
 import HorizontalCard from "../../../componets/cards/horizontal-card";

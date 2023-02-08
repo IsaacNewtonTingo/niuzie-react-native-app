@@ -1,5 +1,6 @@
 import {
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -578,330 +579,331 @@ export default function Settings({ navigation }) {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView
-        keyboardShouldPersistTaps="always"
-        style={[styles.container, { padding: 20 }]}
-      >
-        {!storedCredentials ? (
-          <>
-            <View style={{ backgroundColor: colors.almostDark, width: "100%" }}>
-              <TouchableOpacity
-                onPress={async () => await Updates.reloadAsync()}
-                style={{
-                  alignSelf: "flex-end",
-                  top: 20,
-                  right: 20,
-                }}
-              >
-                <Text style={{ color: colors.orange, fontWeight: "800" }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-
-              {loginItem == true ? (
-                <LoginComponent
-                  submitting={submitting}
-                  loginPress={login}
-                  phoneNumber={phoneNumber}
-                  setPhoneNumber={setPhoneNumber}
-                  password={password}
-                  setPassword={setPassword}
-                  onSignupPress={onSignupPress}
-                  resetPasswordOtpModal={resetPasswordOtpModal}
-                  setResetPasswordOtpModal={setResetPasswordOtpModal}
-                />
-              ) : signupItem == true ? (
-                <SignUpComponent
-                  submitting={submitting}
-                  onLoginPress={onLoginPress}
-                  signupPress={signUp}
-                  firstName={firstName}
-                  setFirstName={setFirstName}
-                  lastName={lastName}
-                  setLastName={setLastName}
-                  phoneNumber={phoneNumber}
-                  setPhoneNumber={setPhoneNumber}
-                  password={password}
-                  setPassword={setPassword}
-                  confirmPassword={confirmPassword}
-                  setConfirmPassword={setConfirmPassword}
-                  confirmCodeModal={confirmCodeModal}
-                  setConfirmCodeModal={setConfirmCodeModal}
-                  verifyCode={verifyCode}
-                  county={county}
-                  setCounty={setCounty}
-                  subCounty={subCounty}
-                  setSubCounty={setSubCounty}
-                  isChecked={isChecked}
-                  setChecked={setChecked}
-                />
-              ) : (
-                <></>
-              )}
-            </View>
-
-            <BottomSheet
-              visible={confirmCodeModal}
-              // onBackButtonPress={() => setConfirmCodeModal(false)}
-              // onBackdropPress={() => setConfirmCodeModal(false)}
-            >
-              <View style={settingsStyls.bottomNavigationView}>
-                <Text
-                  style={[
-                    styles.label,
-                    { textAlign: "center", marginVertical: 20 },
-                  ]}
-                >
-                  Enter verification code sent to your phone number to finish
-                  setting up your account
-                </Text>
-
-                <View style={styles.textInputContainer}>
-                  <FontAwesome
-                    name="qrcode"
-                    size={18}
-                    color="black"
-                    style={styles.searchIcon}
-                  />
-                  <TextInput
-                    value={otp}
-                    onChangeText={setOtp}
-                    style={[
-                      styles.textInput,
-                      { color: colors.dark, width: "100%" },
-                    ]}
-                    placeholder="e.g 2763"
-                    keyboardType="numeric"
-                  />
-                </View>
-
-                <PrimaryButton
-                  disabled={submitting}
-                  submitting={submitting}
-                  onPress={verifyCode}
-                  buttonTitle="Submit"
-                />
-
-                <View style={styles.optTextSign}>
-                  <Text style={styles.firstText}>Didn't recieve code ?</Text>
-                  <TouchableOpacity>
-                    <Text style={styles.opt2Text}>Resend</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </BottomSheet>
-
-            <BottomSheet
-              visible={resetPasswordOtpModal}
-              onBackButtonPress={() => setResetPasswordOtpModal(false)}
-              onBackdropPress={() => setResetPasswordOtpModal(false)}
-            >
-              <View style={settingsStyls.bottomNavigationView}>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    marginVertical: 20,
-                    fontWeight: "800",
-                    color: colors.gray,
-                  }}
-                >
-                  Enter your phone number to receive an otp to proceed with the
-                  password reset process
-                </Text>
-
-                {/* <Text style={styles.label}>Phone number</Text> */}
-                <View style={styles.textInputContainer}>
-                  <Entypo
-                    name="old-phone"
-                    size={18}
-                    color="black"
-                    style={styles.searchIcon}
-                  />
-                  <TextInput
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    style={[styles.textInput, { color: colors.dark }]}
-                    placeholder="e.g +254724753175"
-                    placeholderTextColor={colors.gray}
-                    keyboardType="phone-pad"
-                  />
-                </View>
-
-                <PrimaryButton
-                  disabled={submitting}
-                  submitting={submitting}
-                  onPress={resetPassword}
-                  buttonTitle="Submit"
-                />
-              </View>
-            </BottomSheet>
-
-            <BottomSheet
-              visible={resetPasswordModal}
-              onBackButtonPress={() => setResetPasswordModal(false)}
-              onBackdropPress={() => setResetPasswordModal(false)}
-            >
-              <View style={settingsStyls.bottomNavigationView}>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    marginVertical: 20,
-                    fontWeight: "800",
-                    color: colors.gray,
-                  }}
-                >
-                  Enter the otp sent to your phone to complete password reset
-                  process.
-                </Text>
-
-                <Text style={styles.label}>OTP</Text>
-                <View style={styles.textInputContainer}>
-                  <FontAwesome
-                    name="qrcode"
-                    size={18}
-                    color="black"
-                    style={styles.searchIcon}
-                  />
-                  <TextInput
-                    value={reseOtp}
-                    onChangeText={setResetOtp}
-                    style={[
-                      styles.textInput,
-                      { color: colors.dark, width: "100%" },
-                    ]}
-                    placeholder="e.g 2763"
-                    keyboardType="numeric"
-                  />
-                </View>
-
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.textInputContainer}>
-                  <FontAwesome5
-                    name="lock"
-                    size={18}
-                    color="black"
-                    style={styles.searchIcon}
-                  />
-                  <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    style={[styles.textInput, { color: colors.dark }]}
-                    placeholder="*******"
-                    secureTextEntry={true}
-                  />
-                </View>
-
-                <Text style={styles.label}>Confirm password</Text>
-                <View style={styles.textInputContainer}>
-                  <FontAwesome5
-                    name="lock"
-                    size={18}
-                    color="black"
-                    style={styles.searchIcon}
-                  />
-                  <TextInput
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    style={[styles.textInput, { color: colors.dark }]}
-                    placeholder="********"
-                    secureTextEntry={true}
-                  />
-                </View>
-
-                <PrimaryButton
-                  disabled={submitting}
-                  submitting={submitting}
-                  onPress={changePassword}
-                  buttonTitle="Submit"
-                />
-
-                <View style={styles.optTextSign}>
-                  <Text style={styles.firstText}>Didn't recieve code ?</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setResetPasswordModal(false),
-                        setResetPasswordOtpModal(true);
-                    }}
-                  >
-                    <Text style={styles.opt2Text}>Check phone number</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </BottomSheet>
-          </>
-        ) : (
-          <>
+    <ScrollView
+      keyboardShouldPersistTaps="always"
+      style={[
+        styles.container,
+        { padding: 10, paddingTop: StatusBar.currentHeight + 20 },
+      ]}
+    >
+      {!storedCredentials ? (
+        <>
+          <View style={{ backgroundColor: colors.almostDark, width: "100%" }}>
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("Profile", {
-                  firstName,
-                  lastName,
-                  phoneNumber,
-                })
-              }
-              style={[
-                settingsListStyles.btn,
-                {
-                  minHeight: 80,
-                  marginBottom: 20,
-                  backgroundColor: colors.almostDark,
-                },
-              ]}
+              onPress={async () => await Updates.reloadAsync()}
+              style={{
+                alignSelf: "flex-end",
+                top: 20,
+                right: 20,
+              }}
             >
-              <View style={settingsListStyles.close}>
-                <Avatar.Image
-                  style={{ marginRight: 20 }}
-                  size={50}
-                  source={{
-                    uri: profilePicture ? profilePicture : noImage.noProfilePic,
-                  }}
-                />
-
-                <View>
-                  <Text style={settingsStyls.name}>
-                    {firstName} {lastName}
-                  </Text>
-                  <Text style={settingsStyls.prof}>View profile</Text>
-                </View>
-              </View>
-
-              <AntDesign name="right" size={16} color={colors.gray} />
+              <Text style={{ color: colors.orange, fontWeight: "800" }}>
+                Cancel
+              </Text>
             </TouchableOpacity>
 
-            {admin == true ? (
-              <>
-                {adminSettingList.map((item) => (
-                  <SettingsList
-                    onPress={() => {
-                      handleSettingPressed(item.navTo);
-                    }}
-                    key={item.title}
-                    iconName={item.iconName}
-                    iconType={item.iconType}
-                    title={item.title}
-                  />
-                ))}
-              </>
+            {loginItem == true ? (
+              <LoginComponent
+                submitting={submitting}
+                loginPress={login}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+                password={password}
+                setPassword={setPassword}
+                onSignupPress={onSignupPress}
+                resetPasswordOtpModal={resetPasswordOtpModal}
+                setResetPasswordOtpModal={setResetPasswordOtpModal}
+              />
+            ) : signupItem == true ? (
+              <SignUpComponent
+                submitting={submitting}
+                onLoginPress={onLoginPress}
+                signupPress={signUp}
+                firstName={firstName}
+                setFirstName={setFirstName}
+                lastName={lastName}
+                setLastName={setLastName}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+                password={password}
+                setPassword={setPassword}
+                confirmPassword={confirmPassword}
+                setConfirmPassword={setConfirmPassword}
+                confirmCodeModal={confirmCodeModal}
+                setConfirmCodeModal={setConfirmCodeModal}
+                verifyCode={verifyCode}
+                county={county}
+                setCounty={setCounty}
+                subCounty={subCounty}
+                setSubCounty={setSubCounty}
+                isChecked={isChecked}
+                setChecked={setChecked}
+              />
             ) : (
-              <>
-                {regularSettingList.map((item) => (
-                  <SettingsList
-                    onPress={() => {
-                      handleSettingPressed(item.navTo);
-                    }}
-                    key={item.title}
-                    iconName={item.iconName}
-                    iconType={item.iconType}
-                    title={item.title}
-                  />
-                ))}
-              </>
+              <></>
             )}
-          </>
-        )}
-      </ScrollView>
-    </TouchableWithoutFeedback>
+          </View>
+
+          <BottomSheet
+            visible={confirmCodeModal}
+            // onBackButtonPress={() => setConfirmCodeModal(false)}
+            // onBackdropPress={() => setConfirmCodeModal(false)}
+          >
+            <View style={settingsStyls.bottomNavigationView}>
+              <Text
+                style={[
+                  styles.label,
+                  { textAlign: "center", marginVertical: 20 },
+                ]}
+              >
+                Enter verification code sent to your phone number to finish
+                setting up your account
+              </Text>
+
+              <View style={styles.textInputContainer}>
+                <FontAwesome
+                  name="qrcode"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={otp}
+                  onChangeText={setOtp}
+                  style={[
+                    styles.textInput,
+                    { color: colors.dark, width: "100%" },
+                  ]}
+                  placeholder="e.g 2763"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <PrimaryButton
+                disabled={submitting}
+                submitting={submitting}
+                onPress={verifyCode}
+                buttonTitle="Submit"
+              />
+
+              <View style={styles.optTextSign}>
+                <Text style={styles.firstText}>Didn't recieve code ?</Text>
+                <TouchableOpacity>
+                  <Text style={styles.opt2Text}>Resend</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BottomSheet>
+
+          <BottomSheet
+            visible={resetPasswordOtpModal}
+            onBackButtonPress={() => setResetPasswordOtpModal(false)}
+            onBackdropPress={() => setResetPasswordOtpModal(false)}
+          >
+            <View style={settingsStyls.bottomNavigationView}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 20,
+                  fontWeight: "800",
+                  color: colors.gray,
+                }}
+              >
+                Enter your phone number to receive an otp to proceed with the
+                password reset process
+              </Text>
+
+              {/* <Text style={styles.label}>Phone number</Text> */}
+              <View style={styles.textInputContainer}>
+                <Entypo
+                  name="old-phone"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  style={[styles.textInput, { color: colors.dark }]}
+                  placeholder="e.g +254724753175"
+                  placeholderTextColor={colors.gray}
+                  keyboardType="phone-pad"
+                />
+              </View>
+
+              <PrimaryButton
+                disabled={submitting}
+                submitting={submitting}
+                onPress={resetPassword}
+                buttonTitle="Submit"
+              />
+            </View>
+          </BottomSheet>
+
+          <BottomSheet
+            visible={resetPasswordModal}
+            onBackButtonPress={() => setResetPasswordModal(false)}
+            onBackdropPress={() => setResetPasswordModal(false)}
+          >
+            <View style={settingsStyls.bottomNavigationView}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 20,
+                  fontWeight: "800",
+                  color: colors.gray,
+                }}
+              >
+                Enter the otp sent to your phone to complete password reset
+                process.
+              </Text>
+
+              <Text style={styles.label}>OTP</Text>
+              <View style={styles.textInputContainer}>
+                <FontAwesome
+                  name="qrcode"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={reseOtp}
+                  onChangeText={setResetOtp}
+                  style={[
+                    styles.textInput,
+                    { color: colors.dark, width: "100%" },
+                  ]}
+                  placeholder="e.g 2763"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.textInputContainer}>
+                <FontAwesome5
+                  name="lock"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  style={[styles.textInput, { color: colors.dark }]}
+                  placeholder="*******"
+                  secureTextEntry={true}
+                />
+              </View>
+
+              <Text style={styles.label}>Confirm password</Text>
+              <View style={styles.textInputContainer}>
+                <FontAwesome5
+                  name="lock"
+                  size={18}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  style={[styles.textInput, { color: colors.dark }]}
+                  placeholder="********"
+                  secureTextEntry={true}
+                />
+              </View>
+
+              <PrimaryButton
+                disabled={submitting}
+                submitting={submitting}
+                onPress={changePassword}
+                buttonTitle="Submit"
+              />
+
+              <View style={styles.optTextSign}>
+                <Text style={styles.firstText}>Didn't recieve code ?</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setResetPasswordModal(false),
+                      setResetPasswordOtpModal(true);
+                  }}
+                >
+                  <Text style={styles.opt2Text}>Check phone number</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BottomSheet>
+        </>
+      ) : (
+        <>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Profile", {
+                firstName,
+                lastName,
+                phoneNumber,
+              })
+            }
+            style={[
+              settingsListStyles.btn,
+              {
+                minHeight: 80,
+                marginBottom: 20,
+                backgroundColor: colors.almostDark,
+              },
+            ]}
+          >
+            <View style={settingsListStyles.close}>
+              <Avatar.Image
+                style={{ marginRight: 20 }}
+                size={50}
+                source={{
+                  uri: profilePicture ? profilePicture : noImage.noProfilePic,
+                }}
+              />
+
+              <View>
+                <Text style={settingsStyls.name}>
+                  {firstName} {lastName}
+                </Text>
+                <Text style={settingsStyls.prof}>View profile</Text>
+              </View>
+            </View>
+
+            <AntDesign name="right" size={16} color={colors.gray} />
+          </TouchableOpacity>
+
+          {admin == true ? (
+            <>
+              {adminSettingList.map((item) => (
+                <SettingsList
+                  onPress={() => {
+                    handleSettingPressed(item.navTo);
+                  }}
+                  key={item.title}
+                  iconName={item.iconName}
+                  iconType={item.iconType}
+                  title={item.title}
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              {regularSettingList.map((item) => (
+                <SettingsList
+                  onPress={() => {
+                    handleSettingPressed(item.navTo);
+                  }}
+                  key={item.title}
+                  iconName={item.iconName}
+                  iconType={item.iconType}
+                  title={item.title}
+                />
+              ))}
+            </>
+          )}
+        </>
+      )}
+    </ScrollView>
   );
 }
 const settingsStyls = StyleSheet.create({
