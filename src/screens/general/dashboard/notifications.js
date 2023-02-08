@@ -9,7 +9,10 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  NotificationContext,
+} from "../../../componets/context/credentials-context";
 import { showMyToast } from "../../../functions/show-toast";
 import { Avatar } from "react-native-paper";
 
@@ -26,6 +29,7 @@ const { width } = Dimensions.get("window");
 export default function NotificationsScreen({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+  const { notifications, setNotifications } = useContext(NotificationContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = data?.userID;
@@ -35,15 +39,22 @@ export default function NotificationsScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
+  const [allRead, setAllRead] = useState(false);
+
   useEffect(() => {
     getNotifications();
 
+    Notifications.addNotificationReceivedListener(handleNotification);
     Notifications.addNotificationResponseReceivedListener(
       handleNotificationResponse
     );
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  const handleNotification = () => {
+    getNotifications();
+  };
 
   const handleNotificationResponse = (notification) => {
     if (notification.notification.request.content.data.product) {
@@ -57,6 +68,7 @@ export default function NotificationsScreen({ navigation }) {
 
   async function getNotifications() {
     setLoadingData(true);
+    setAllRead(false);
 
     const url = `${process.env.ENDPOINT}/user/get-notifications/${userID}`;
     const headers = {
@@ -69,6 +81,7 @@ export default function NotificationsScreen({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setNotificationsList(response.data.data.notifications);
+          setNotifications(response.data.data.unread);
         } else {
           showMyToast({
             status: "error",
@@ -84,11 +97,21 @@ export default function NotificationsScreen({ navigation }) {
   }
 
   async function handleClicked(item) {
+    if (item.read == false) {
+      setNotifications(notifications - 1);
+    }
     const notificationID = item._id;
     const url = `${process.env.ENDPOINT}/user/read-notification/${notificationID}?userID=${userID}`;
     const headers = {
       "auth-token": token,
     };
+
+    if (item.product !== null) {
+      navigation.navigate("ProductDetails", {
+        productID: item.product._id,
+        productOwnerID: item.product.user._id,
+      });
+    }
 
     await axios
       .put(url, {}, { headers })
@@ -108,16 +131,12 @@ export default function NotificationsScreen({ navigation }) {
         setLoadingData(false);
         console.log(err);
       });
-
-    if (item.product !== null) {
-      navigation.navigate("ProductDetails", {
-        productID: item.product._id,
-        productOwnerID: item.product.user._id,
-      });
-    }
   }
 
   async function markAsRead() {
+    setAllRead(true);
+    setNotifications(0);
+
     const url = `${process.env.ENDPOINT}/user/read-all-notifications/${userID}`;
     const headers = {
       "auth-token": token,
@@ -126,14 +145,7 @@ export default function NotificationsScreen({ navigation }) {
     await axios
       .put(url, {}, { headers })
       .then((response) => {
-        if (response.data.status == "Success") {
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-          getNotifications();
-        } else {
+        if (response.data.status == "Failed") {
           showMyToast({
             status: "error",
             title: "Failed",
@@ -187,7 +199,7 @@ export default function NotificationsScreen({ navigation }) {
             onPress={() => handleClicked(item)}
             style={[
               notificationStyles.notCont,
-              { opacity: item.read == false ? 1 : 0.6 },
+              { opacity: allRead == true ? 0.6 : item.read == false ? 1 : 0.6 },
             ]}
           >
             <Avatar.Icon
@@ -247,7 +259,7 @@ const notificationStyles = StyleSheet.create({
     alignSelf: "center",
   },
   markCont: {
-    alignSelf: "flex-end",
+    alignSelf: "flex-start",
   },
   markText: {
     color: colors.linkText,

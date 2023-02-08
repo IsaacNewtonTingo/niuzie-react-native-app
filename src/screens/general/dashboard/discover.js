@@ -132,7 +132,7 @@ export default function Discover({ navigation }) {
     setSubCategoryID("");
     setPrice("");
     setRating("");
-    setDate("");
+    setCreatedAt("");
   }
 
   async function getAllProducts() {

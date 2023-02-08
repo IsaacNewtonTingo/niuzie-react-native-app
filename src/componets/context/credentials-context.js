@@ -5,3 +5,8 @@ export const CredentialsContext = createContext({
   storedCredentials: {},
   setStoredCredentials: () => {},
 });
+
+export const NotificationContext = createContext({
+  notifications: {},
+  setNotifications: () => {},
+});

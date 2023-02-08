@@ -12,9 +12,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
+import { NotificationContext } from "../componets/context/credentials-context";
+
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const { notifications, setNotifications } =
+    React.useContext(NotificationContext);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -63,6 +68,7 @@ export default function TabNavigator() {
         name="NotificationsNav"
         component={NotificationsNav}
         options={{
+          tabBarBadge: notifications,
           tabBarIcon: ({ focused, color, size }) => {
             return (
               <MaterialCommunityIcons

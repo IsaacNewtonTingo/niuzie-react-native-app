@@ -18,8 +18,6 @@ import ProductRequest from "../../../componets/cards/product-request.js";
 
 import { LinearGradient } from "expo-linear-gradient";
 
-import * as Notifications from "expo-notifications";
-
 import axios from "axios";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 const { width } = Dimensions.get("window");
@@ -37,25 +35,9 @@ export default function Home({ navigation }) {
     getCategories();
     getPremiumProducts();
     getProductRequests();
-
-    // Notifications.addNotificationResponseReceivedListener(
-    //   handleNotificationResponse
-    // );
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
-
-  // const handleNotificationResponse = (notification) => {
-  //   console.log(notification.notification.request.content.data.product);
-  //   if (notification.notification.request.content.data.product) {
-  //     navigation.navigate("ProductDetails", {
-  //       productID: notification.notification.request.content.data.product._id,
-  //       productOwnerID:
-  //         notification.notification.request.content.data.product.user._id,
-  //     });
-  //   }
-  //   // navigation.navigate("Notifications");
-  // };
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
