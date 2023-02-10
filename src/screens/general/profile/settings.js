@@ -41,9 +41,6 @@ import { Entypo } from "@expo/vector-icons";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import noImage from "../../../assets/data/noImage";
 
-import { TouchableWithoutFeedback } from "react-native";
-import { Keyboard } from "react-native";
-
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
@@ -54,52 +51,6 @@ export default function Settings({ navigation }) {
 
   const [loginItem, setLoginItem] = useState(true);
   const [signupItem, setSignupItem] = useState(false);
-
-  const adminSettingList = [
-    {
-      title: "My products",
-      iconType: "FontAwesome5",
-      iconName: "luggage-cart",
-      navTo: "MyProducts",
-    },
-    {
-      title: "Saved products",
-      iconType: "FontAwesome5",
-      iconName: "save",
-      navTo: "SavedProducts",
-    },
-
-    {
-      title: "Premium services",
-      iconType: "FontAwesome5",
-      iconName: "crown",
-      navTo: "PremiumServices",
-    },
-    {
-      title: "Transaction",
-      iconType: "MaterialCommunityIcons",
-      iconName: "hand-coin",
-      navTo: "Payments",
-    },
-    {
-      title: "Support",
-      iconType: "MaterialIcons",
-      iconName: "support-agent",
-      navTo: "ContactUs",
-    },
-    {
-      title: "Admin panel",
-      iconType: "MaterialIcons",
-      iconName: "admin-panel-settings",
-      navTo: "Admin",
-    },
-    {
-      title: "Logout",
-      iconType: "MaterialCommunityIcons",
-      iconName: "logout",
-      navTo: "Logout",
-    },
-  ];
 
   const regularSettingList = [
     {
@@ -872,35 +823,17 @@ export default function Settings({ navigation }) {
             <AntDesign name="right" size={16} color={colors.gray} />
           </TouchableOpacity>
 
-          {admin == true ? (
-            <>
-              {adminSettingList.map((item) => (
-                <SettingsList
-                  onPress={() => {
-                    handleSettingPressed(item.navTo);
-                  }}
-                  key={item.title}
-                  iconName={item.iconName}
-                  iconType={item.iconType}
-                  title={item.title}
-                />
-              ))}
-            </>
-          ) : (
-            <>
-              {regularSettingList.map((item) => (
-                <SettingsList
-                  onPress={() => {
-                    handleSettingPressed(item.navTo);
-                  }}
-                  key={item.title}
-                  iconName={item.iconName}
-                  iconType={item.iconType}
-                  title={item.title}
-                />
-              ))}
-            </>
-          )}
+          {regularSettingList.map((item) => (
+            <SettingsList
+              onPress={() => {
+                handleSettingPressed(item.navTo);
+              }}
+              key={item.title}
+              iconName={item.iconName}
+              iconType={item.iconType}
+              title={item.title}
+            />
+          ))}
         </>
       )}
     </ScrollView>

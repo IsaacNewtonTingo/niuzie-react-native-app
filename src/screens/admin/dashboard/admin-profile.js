@@ -25,6 +25,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import * as SecureStore from "expo-secure-store";
+
 import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
@@ -90,9 +92,23 @@ export default function AdminProfile({ navigation }) {
       });
   }
 
+  async function logout() {
+    setLoadingData(true);
+    await SecureStore.deleteItemAsync("loginCredentials")
+      .then(async () => {
+        setLoadingData(false);
+        setStoredCredentials("");
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
+
   return (
     <ScrollView style={styles.container}>
       <ImageBackground
@@ -174,7 +190,12 @@ export default function AdminProfile({ navigation }) {
           </View>
         </View>
 
-        {/* <PrimaryButton buttonTitle="Edit" /> */}
+        <PrimaryButton
+          buttonTitle="Logout"
+          submitting={submitting}
+          disabled={submitting}
+          onPress={logout}
+        />
       </View>
     </ScrollView>
   );

@@ -18,6 +18,7 @@ import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { showMyToast } from "./src/functions/show-toast";
+import Decider from "./src/navigators/decider";
 
 LogBox.ignoreAllLogs();
 
@@ -147,7 +148,7 @@ export default function App() {
         >
           <NativeBaseProvider theme={theme}>
             <NavigationContainer>
-              <TabNavigator />
+              <Decider />
               <StatusBar style="light" />
             </NavigationContainer>
           </NativeBaseProvider>
