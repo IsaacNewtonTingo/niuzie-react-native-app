@@ -27,6 +27,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 export default function AdminProfile({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,9 @@ export default function AdminProfile({ navigation }) {
 
   useEffect(() => {
     getProfile();
-  }, []);
+  }, [(loading, navigation)]);
+
+  navigation.addListener("focus", () => setLoading(!loading));
 
   async function getProfile() {
     setLoadingData(true);
@@ -86,6 +89,10 @@ export default function AdminProfile({ navigation }) {
         console.log(err);
       });
   }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
   return (
     <ScrollView style={styles.container}>
       <ImageBackground
@@ -109,6 +116,7 @@ export default function AdminProfile({ navigation }) {
               county,
               subCounty,
               userID,
+              token,
             })
           }
           style={{ position: "absolute", bottom: -20, right: 20 }}

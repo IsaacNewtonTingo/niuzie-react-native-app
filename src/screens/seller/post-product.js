@@ -12,15 +12,12 @@ import {
   Share,
   ImageBackground,
 } from "react-native";
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
-import { getApps, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
-import * as Clipboard from "expo-clipboard";
-
-import { v4 as uuidv4 } from "uuid";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -48,11 +45,11 @@ const { width } = Dimensions.get("window");
 
 import { homeStyles } from "../general/dashboard/home";
 import { showMyToast } from "../../functions/show-toast";
+import { BarIndicator } from "react-native-indicators";
 
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
-import { BarIndicator } from "react-native-indicators";
 import LoginComponent from "../../componets/auth/login";
 
 const firebaseConfig = {
