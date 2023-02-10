@@ -13,7 +13,7 @@ export default function SubCategoryList(props) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[settingsListStyles.btn, { paddingHorizontal: 20 }]}
+      style={[settingsListStyles.btn, { paddingHorizontal: 20 }, props.style]}
     >
       <Text style={settingsListStyles.text}>{subCategoryName}</Text>
       <AntDesign name="right" size={16} color={colors.gray} />

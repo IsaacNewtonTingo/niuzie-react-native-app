@@ -10,6 +10,7 @@ import AdminProfile from "../screens/admin/dashboard/admin-profile";
 import AdminProductDetails from "../screens/admin/dashboard/product-details";
 import EditAdminProfile from "../screens/admin/dashboard/edit-profile";
 import AddCategories from "../screens/admin/dashboard/add-categories";
+import SubCategoriesAdmin from "../screens/admin/dashboard/subcategories";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,14 @@ export default function AdminNav() {
         options={{
           headerTitle: "Products",
         }}
+      />
+
+      <Stack.Screen
+        name="SubCategoriesAdmin"
+        component={SubCategoriesAdmin}
+        options={({ route }) => ({
+          title: route.params.categoryName,
+        })}
       />
 
       <Stack.Screen
