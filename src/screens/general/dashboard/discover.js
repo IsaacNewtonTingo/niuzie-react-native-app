@@ -91,7 +91,7 @@ export default function Discover({ navigation }) {
     setTimeout(() => {
       getAllProducts();
       setRefreshing(false);
-    }, 2000);
+    }, 5000);
   }, []);
 
   const filters = [

@@ -119,7 +119,7 @@ export default function MyProducts({ navigation }) {
             county={item.user.county}
             subCounty={item.user.subCounty}
             premium={item.user.premium}
-            rating={item.rating.$numberDecimal}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
       />
@@ -147,7 +147,7 @@ export default function MyProducts({ navigation }) {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
-            rating={item.rating.$numberDecimal}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
           />
         )}
@@ -176,7 +176,7 @@ export default function MyProducts({ navigation }) {
             description={item.description}
             county={item.user.county}
             subCounty={item.user.subCounty}
-            rating={item.rating.$numberDecimal}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
           />
         )}

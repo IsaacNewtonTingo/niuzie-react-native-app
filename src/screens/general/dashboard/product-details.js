@@ -89,6 +89,8 @@ export default function ProductDetails({ route, navigation }) {
 
   const [saved, setSaved] = useState(false);
 
+  const [noProduct, setNoProduct] = useState(false);
+
   const [review, setReview] = useState("");
   const [defaultRating, setDefaultRating] = useState(0);
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
@@ -145,6 +147,8 @@ export default function ProductDetails({ route, navigation }) {
           setSubCounty(response.data.data.user.subCounty);
 
           getSimilarProducts(response.data.data.category._id);
+        } else if (response.data.message == "Product not found") {
+          setNoProduct(true);
         } else {
           showMyToast({
             status: "error",
@@ -366,6 +370,10 @@ export default function ProductDetails({ route, navigation }) {
 
   if (loadingData) {
     return <LoadingIndicator />;
+  }
+
+  if (noProduct) {
+    return <NoData text="Product not found. Might have been deleted" />;
   }
 
   return (

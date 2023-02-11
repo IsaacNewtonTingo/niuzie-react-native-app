@@ -6,8 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 
 import * as SecureStore from "expo-secure-store";
 import * as Updates from "expo-updates";
@@ -114,6 +115,8 @@ export default function Settings({ navigation }) {
 
   const [otp, setOtp] = useState("");
   const [reseOtp, setResetOtp] = useState("");
+
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     checkStoreCredentials();
@@ -525,12 +528,28 @@ export default function Settings({ navigation }) {
     }
   }
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      checkStoreCredentials();
+      setRefreshing(false);
+    }, 5000);
+  }, []);
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
 
   return (
     <ScrollView
+      refreshControl={
+        <RefreshControl
+          tintColor={colors.lightBlue}
+          colors={[colors.lightBlue]}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
       keyboardShouldPersistTaps="always"
       style={[
         styles.container,
