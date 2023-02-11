@@ -7,6 +7,8 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import styles from "../../../componets/styles/global-styles";
@@ -21,17 +23,18 @@ import colors from "../../../componets/colors/colors";
 
 import { verticalProductCardStyles } from "../../../componets/cards/vertical-product";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  FontAwesome,
+  MaterialCommunityIcons,
+  AntDesign,
+  MaterialIcons,
+  Feather,
+} from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
-import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 import ReviewComponent from "../../../componets/cards/reviews";
 import axios from "axios";
-import { FlatList } from "react-native";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import { showMyToast } from "../../../functions/show-toast";
 
@@ -40,6 +43,8 @@ import dateFormat from "dateformat";
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 import NoData from "../../../componets/Text/no-data";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+
+import * as Sharing from "expo-sharing";
 
 const width = Dimensions.get("window").width;
 
@@ -368,9 +373,27 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
-  if (loadingData) {
-    return <LoadingIndicator />;
+  async function handlePhoneAction(action) {
+    if (userID) {
+      if (action == "call") {
+        await Linking.openURL(`tel:+${phoneNumber}`);
+      } else {
+        await Linking.openURL(`sms:+${phoneNumber}`);
+      }
+    } else {
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "You need to login to perform this operation",
+      });
+    }
   }
+
+  async function shareProduct() {}
+
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   if (noProduct) {
     return <NoData text="Product not found. Might have been deleted" />;
@@ -452,7 +475,17 @@ export default function ProductDetails({ route, navigation }) {
         <Text style={productDetailStyles.descriptionText}>{description}</Text>
       </View>
 
-      <View style={[productDetailStyles.prodData, productDetailStyles.hr]}>
+      <View
+        style={[
+          productDetailStyles.prodData,
+          productDetailStyles.hr,
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          },
+        ]}
+      >
         <View style={productDetailStyles.profileContainer}>
           <Image
             style={productDetailStyles.profileImage}
@@ -471,14 +504,27 @@ export default function ProductDetails({ route, navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={productDetailStyles.actionIcons}>
+          <TouchableOpacity
+            onPress={() => handlePhoneAction("call")}
+            style={productDetailStyles.actionIcons}
+          >
             <Feather name="phone-call" size={18} color={colors.lightBlue} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={productDetailStyles.actionIcons}>
-            <FontAwesome5 name="sms" size={18} color={colors.lightBlue} />
+          <TouchableOpacity
+            onPress={() => handlePhoneAction("sms")}
+            style={productDetailStyles.actionIcons}
+          >
+            <FontAwesome5 name="sms" size={20} color={colors.lightBlue} />
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          onPress={shareProduct}
+          style={productDetailStyles.actionIcons}
+        >
+          <FontAwesome name="share-square-o" size={25} color={colors.gray} />
+        </TouchableOpacity>
       </View>
 
       <View style={[styles.section, { marginTop: 40 }]}>

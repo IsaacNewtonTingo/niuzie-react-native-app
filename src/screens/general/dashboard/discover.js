@@ -40,6 +40,8 @@ import SettingsList from "../../../componets/cards/settings-list";
 import FilterList from "../../../componets/lists/filter";
 import NoData from "../../../componets/Text/no-data";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
+import { showMyToast } from "../../../functions/show-toast";
+import { ActivityIndicator } from "react-native";
 
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");
@@ -79,6 +81,7 @@ export default function Discover({ navigation }) {
   const [submitting, setSubmitting] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [reachedEnd, setReachedEnd] = useState(false);
 
   useEffect(() => {
     getAllProducts();
@@ -135,8 +138,11 @@ export default function Discover({ navigation }) {
     setCreatedAt("");
   }
 
+  let pageNumber = 0;
+  let limit = 20;
+
   async function getAllProducts() {
-    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}`;
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -148,7 +154,20 @@ export default function Discover({ navigation }) {
         setFilterModal(false);
 
         if (response.data.status == "Success") {
-          setAllProducts(response.data.data);
+          if (response.data.data.length < 1) {
+            setReachedEnd(true);
+          } else {
+            setAllProducts(response.data.data);
+            if (response.data.data.length < 20) {
+              setReachedEnd(true);
+            }
+          }
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {
@@ -156,6 +175,23 @@ export default function Discover({ navigation }) {
         setSubmitting(false);
         setLoadingData(false);
       });
+  }
+
+  async function getMoreProducts() {
+    pageNumber += 1;
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
+
+    if (reachedEnd == true) {
+      return;
+    } else {
+      await axios.get(url).then((response) => {
+        if (response.data.data.length === allProducts.length) {
+          setReachedEnd(true);
+        } else {
+          setAllProducts([...allProducts, ...response.data.data]);
+        }
+      });
+    }
   }
 
   async function handleProductPressed(item) {
@@ -290,8 +326,11 @@ export default function Discover({ navigation }) {
             onRefresh={onRefresh}
           />
         }
+        onEndReached={() => {
+          getMoreProducts();
+        }}
+        onEndReachedThreshold={0}
         style={styles.flatlist}
-        // numColumns={2}
         data={allProducts}
         renderItem={({ item }) => (
           <HorizontalCard
@@ -312,6 +351,13 @@ export default function Discover({ navigation }) {
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
+        ListFooterComponent={() => {
+          return reachedEnd ? (
+            <NoData text="No more data" />
+          ) : (
+            <ActivityIndicator size="large" color="white" />
+          );
+        }}
       />
 
       {allProducts.length < 1 && <NoData text="No data" />}

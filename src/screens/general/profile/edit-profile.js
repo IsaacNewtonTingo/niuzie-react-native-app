@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
   ImageBackground,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import styles from "../../../componets/styles/global-styles";
@@ -35,6 +36,7 @@ import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-l
 import { discoverStyles } from "../../general/dashboard/discover";
 import { showMyToast } from "../../../functions/show-toast";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import NoData from "../../../componets/Text/no-data";
 
 const countiesData = require("../../../assets/data/counties.json");
 
@@ -482,8 +484,8 @@ export default function EditProfile({ route, navigation }) {
 
       <BottomSheet
         visible={otpPassModal}
-        // onBackButtonPress={() => setOtpPassModal(false)}
-        // onBackdropPress={() => setOtpPassModal(false)}
+        onBackButtonPress={() => setOtpPassModal(false)}
+        onBackdropPress={() => setOtpPassModal(false)}
       >
         <LinearGradient
           colors={[colors.cardColor, colors.dark]}
@@ -612,18 +614,21 @@ export default function EditProfile({ route, navigation }) {
             <Text style={discoverStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
-          {countiesData.map((item) => (
-            <PostSubCategoryList
-              key={item.code}
-              onPress={() => {
-                setCounty(item.name);
-                setSubCounties(item.sub_counties);
-                setSubCounty("");
-                setCountiesModal(false);
-              }}
-              subCategoryName={item.name}
-            />
-          ))}
+          <FlatList
+            data={countiesData}
+            renderItem={({ item }) => (
+              <PostSubCategoryList
+                key={item.code}
+                onPress={() => {
+                  setCounty(item.name);
+                  setSubCounties(item.sub_counties);
+                  setSubCounty("");
+                  setCountiesModal(false);
+                }}
+                subCategoryName={item.name}
+              />
+            )}
+          />
 
           {countiesData.length < 1 && <NoData text="No data" />}
         </View>
@@ -638,16 +643,19 @@ export default function EditProfile({ route, navigation }) {
             <Text style={discoverStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
-          {subCounties.map((item, i) => (
-            <PostSubCategoryList
-              key={i}
-              onPress={() => {
-                setSubCounty(item);
-                setSubCountiesModal(false);
-              }}
-              subCategoryName={item}
-            />
-          ))}
+          <FlatList
+            data={subCounties}
+            renderItem={({ item, i }) => (
+              <PostSubCategoryList
+                key={i}
+                onPress={() => {
+                  setSubCounty(item);
+                  setSubCountiesModal(false);
+                }}
+                subCategoryName={item}
+              />
+            )}
+          />
 
           {!county && <NoData text="Please select county first" />}
           {subCounties.length < 1 && <NoData text="No data" />}

@@ -50,6 +50,7 @@ import { BarIndicator } from "react-native-indicators";
 import LoginComponent from "../../componets/auth/login";
 import TertiaryButton from "../../componets/buttons/tertiaryBtn";
 import noImage from "../../assets/data/noImage";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -446,7 +447,10 @@ export default function EditProduct({ navigation, route }, props) {
   }
 
   return (
-    <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       <View style={postStyles.holdingContainer}>
         <View style={styles.textComb}>
           <Text style={styles.label}>Product name</Text>
@@ -728,7 +732,7 @@ export default function EditProduct({ navigation, route }, props) {
           )}
         </View>
       </BottomSheet>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 
