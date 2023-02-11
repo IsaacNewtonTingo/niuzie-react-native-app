@@ -18,13 +18,35 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.niuzie.app",
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:niuzie.ape30technologies.com"
+      ]
     },
     "android": {
+      "bundleIdentifier": "com.niuzie.app",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/niuzie-logo.png",
         "backgroundColor": "#02030C"
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "*.ape30technologies.com",
+              "pathPrefix": "/api"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

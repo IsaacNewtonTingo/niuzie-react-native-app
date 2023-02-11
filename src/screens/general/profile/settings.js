@@ -22,7 +22,7 @@ import SettingsList, {
 
 import colors from "../../../componets/colors/colors";
 
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 
 import axios from "axios";
@@ -46,7 +46,7 @@ export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -59,6 +59,12 @@ export default function Settings({ navigation }) {
       iconType: "FontAwesome5",
       iconName: "luggage-cart",
       navTo: "MyProducts",
+    },
+    {
+      title: "My products requests",
+      iconType: "MaterialCommunityIcons",
+      iconName: "frequently-asked-questions",
+      navTo: "MyProductRequests",
     },
     {
       title: "Saved products",
@@ -386,6 +392,8 @@ export default function Settings({ navigation }) {
         phoneNumber,
         userID,
       });
+    } else if (navTo == "MyProductRequests") {
+      navigation.navigate("MyProductRequests");
     } else if (navTo == "SavedProducts") {
       navigation.navigate("SavedProducts");
     } else if (navTo == "PremiumServices") {

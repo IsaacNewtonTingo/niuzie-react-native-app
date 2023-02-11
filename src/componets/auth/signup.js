@@ -4,26 +4,31 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Dimensions,
+  StatusBar,
 } from "react-native";
 import React, { useState } from "react";
 
 import styles from "../styles/global-styles";
 
-import { FontAwesome5 } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Entypo,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 import PrimaryButton from "../buttons/primary-button";
 import colors from "../colors/colors";
 import PostSubCategoryList from "../subcategories/post-sub-cat-list";
 import NoData from "../Text/no-data";
 
-import { discoverStyles } from "../../screens/general/dashboard/discover";
-
 import Checkbox from "expo-checkbox";
 import { HStack } from "native-base";
 
 const countiesData = require("../../assets/data/counties.json");
+
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default function SignUpComponent(props) {
   const firstName = props.firstName;
@@ -196,15 +201,12 @@ export default function SignUpComponent(props) {
         </TouchableOpacity>
       </View>
       {countiesModal == true && (
-        <View
-          setCountiesModal={setCountiesModal}
-          style={discoverStyles.backdrop}
-        >
+        <View setCountiesModal={setCountiesModal} style={signStyles.backdrop}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={signStyles.cancel}
             onPress={() => setCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={signStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
           {countiesData.map((item) => (
@@ -224,12 +226,12 @@ export default function SignUpComponent(props) {
         </View>
       )}
       {subCountiesModal == true && (
-        <View style={discoverStyles.backdrop}>
+        <View style={signStyles.backdrop}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={signStyles.cancel}
             onPress={() => setSubCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={signStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
           {subCounties.map((item, i) => (
@@ -277,5 +279,25 @@ const signStyles = StyleSheet.create({
   },
   checkbox: {
     margin: 8,
+  },
+  backdrop: {
+    backgroundColor: "#336699",
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    bottom: 0,
+    height: height,
+    alignSelf: "center",
+    position: "absolute",
+    paddingTop: StatusBar.currentHeight + 40,
+  },
+  close: {
+    color: colors.orange,
+    fontWeight: "800",
+  },
+  cancel: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    padding: 20,
   },
 });

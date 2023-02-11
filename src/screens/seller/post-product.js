@@ -42,6 +42,7 @@ import { CredentialsContext } from "../../componets/context/credentials-context"
 import { BottomSheet } from "react-native-btr";
 
 const { width } = Dimensions.get("window");
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { homeStyles } from "../general/dashboard/home";
 import { showMyToast } from "../../functions/show-toast";
@@ -51,7 +52,6 @@ import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
 import LoginComponent from "../../componets/auth/login";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SignUpComponent from "../../componets/auth/signup";
 
 const firebaseConfig = {

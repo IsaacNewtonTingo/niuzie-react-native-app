@@ -12,6 +12,7 @@ import ContactUs from "../screens/general/profile/contact-us";
 import SavedProducts from "../screens/general/profile/saved-products";
 import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
+import MyProductRequests from "../screens/general/profile/my-product-requests";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,14 @@ export default function SettingsNav() {
         component={MyProducts}
         options={{
           headerTitle: "My products",
+        }}
+      />
+
+      <Stack.Screen
+        name="MyProductRequests"
+        component={MyProductRequests}
+        options={{
+          headerTitle: "My product requests",
         }}
       />
 

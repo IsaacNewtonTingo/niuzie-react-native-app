@@ -9,6 +9,7 @@ import {
   TextInput,
   FlatList,
   Linking,
+  Share,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import styles from "../../../componets/styles/global-styles";
@@ -389,7 +390,46 @@ export default function ProductDetails({ route, navigation }) {
     }
   }
 
-  async function shareProduct() {}
+  async function shareProduct() {
+    try {
+      // const deepLink = `../../../assets/images/bg.jpg`;
+
+      // Linking.canOpenURL(deepLink).then(async (supported) => {
+      //   if (supported) {
+      //     const result = await Sharing.isAvailableAsync();
+      //     const shareOptions = {
+      //       message: "Hello world",
+      //     };
+      //     if (result) {
+      //       await Sharing.shareAsync(deepLink, shareOptions);
+      //     } else {
+      //       showMyToast({
+      //         status: "error",
+      //         title: "Failed",
+      //         description: "An error occured while trying to share product",
+      //       });
+      //     }
+
+      //     // if (result.action === Share.sharedAction) {
+      //     //   console.log("Link shared successfully");
+      //     // } else if (result.action === Share.dismissedAction) {
+      //     //   console.log("Link sharing dismissed");
+      //     // }
+      //   } else {
+      //     console.error(`Cannot open deep link: ${deepLink}`);
+      //   }
+      // });
+
+      const shareOptions = {
+        message:
+          "Hello. Look at my product on the niuzie mobile application by clicking on the link below.",
+      };
+
+      await Share.share(shareOptions);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   // if (loadingData) {
   //   return <LoadingIndicator />;

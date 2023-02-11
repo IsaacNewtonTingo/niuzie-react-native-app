@@ -23,20 +23,17 @@ import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import { Input, Icon } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { BottomSheet } from "react-native-btr";
-import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { RadioButton } from "react-native-paper";
 import { postStyles } from "../../seller/post-product";
 
 import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
-import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
-import SettingsList from "../../../componets/cards/settings-list";
+
 import FilterList from "../../../componets/lists/filter";
 import NoData from "../../../componets/Text/no-data";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
