@@ -5,9 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Dimensions,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { BottomSheet } from "react-native-btr";
+import { Modal } from "native-base";
 
 import axios from "axios";
 import styles from "../../../componets/styles/global-styles";
@@ -21,10 +23,15 @@ import PrimaryButton from "../../../componets/buttons/primary-button";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 import { showMyToast } from "../../../functions/show-toast";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
+import NoData from "../../../componets/Text/no-data";
+
+const { width } = Dimensions.get("window");
 
 export default function SubCategoriesAdmin({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
   const { data } = storedCredentials;
   const userID = data.userID;
   const token = data.token;
@@ -36,6 +43,11 @@ export default function SubCategoriesAdmin({ route, navigation }) {
 
   const [subCategory, setSubCategory] = useState("");
   const [addSubCatModal, setAddSubCatModal] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [clickedName, setClickedName] = useState("");
+  const [clickedID, setClickedID] = useState("");
 
   const categoryID = route.params.categoryID;
 
@@ -77,6 +89,66 @@ export default function SubCategoriesAdmin({ route, navigation }) {
             description: response.data.message,
           });
           getSubCategories();
+          setSubCategory("");
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitting(false);
+      });
+  }
+
+  async function updateSubCategory() {
+    const url = `${process.env.ENDPOINT}/admin/update-sub-category/${clickedID}`;
+    setSubmitting(true);
+    await axios
+      .put(url, { userID, subCategoryName: clickedName }, { headers })
+      .then((response) => {
+        setSubmitting(false);
+
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          getSubCategories();
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitting(false);
+      });
+  }
+
+  async function deleteSubCategory() {
+    const url = `${process.env.ENDPOINT}/admin/delete-sub-category/${clickedID}?userID=${userID}`;
+    setSubmitting(true);
+    await axios
+      .delete(url, { headers })
+      .then((response) => {
+        setSubmitting(false);
+
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          getSubCategories();
+          setShowDeleteModal(false);
         } else {
           showMyToast({
             status: "error",
@@ -97,12 +169,20 @@ export default function SubCategoriesAdmin({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      {subCategories.length < 1 && (
+        <NoData text="No subcategories in this category" />
+      )}
       <FlatList
         data={subCategories}
         renderItem={({ item }) => (
           <SubCategoryList
             subCategoryID={item._id}
             subCategoryName={item.subCategoryName}
+            onPress={() => {
+              setShowDeleteModal(true);
+              setClickedName(item.subCategoryName);
+              setClickedID(item._id);
+            }}
           />
         )}
       />
@@ -117,6 +197,48 @@ export default function SubCategoriesAdmin({ route, navigation }) {
       >
         <Ionicons name="add-circle-sharp" size={50} color={colors.lightBlue} />
       </TouchableOpacity>
+
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <View style={subStyles.mod}>
+          <Modal.CloseButton />
+
+          {/* <Text>Do you want to delete the subcategory "{tobeDeleted}" ?</Text> */}
+
+          <Text style={[styles.label, { color: colors.dark }]}>
+            Edit sub category name
+          </Text>
+          <View style={styles.textInputContainer}>
+            <Ionicons
+              name="shirt"
+              size={18}
+              color={colors.gray}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              value={clickedName}
+              onChangeText={setClickedName}
+              style={[styles.textInput, { color: colors.dark, width: "100%" }]}
+              placeholder="e.g Sneakers"
+            />
+          </View>
+
+          <PrimaryButton
+            buttonTitle="Update"
+            disabled={submitting}
+            submitting={submitting}
+            onPress={updateSubCategory}
+            style={{ borderColor: colors.lightBlue }}
+          />
+
+          <TertiaryButton
+            buttonTitle="Delete"
+            disabled={submitting}
+            submitting={submitting}
+            onPress={deleteSubCategory}
+            labelStyles={{ color: colors.dark }}
+          />
+        </View>
+      </Modal>
 
       <BottomSheet
         visible={addSubCatModal}
@@ -138,7 +260,6 @@ export default function SubCategoriesAdmin({ route, navigation }) {
               onChangeText={setSubCategory}
               style={[styles.textInput, { color: colors.dark, width: "100%" }]}
               placeholder="e.g Sneakers"
-              keyboardType="numeric"
             />
           </View>
 
@@ -160,5 +281,11 @@ const subStyles = StyleSheet.create({
     backgroundColor: colors.cardColor,
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
+  },
+  mod: {
+    backgroundColor: colors.lightBlue,
+    padding: 20,
+    width: width - 40,
+    borderRadius: 10,
   },
 });
