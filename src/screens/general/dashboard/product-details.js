@@ -467,7 +467,7 @@ export default function ProductDetails({ route, navigation }) {
             </Text>
 
             <Text style={productDetailStyles.locationText}>
-              {county} {subCounty}
+              {county}, {subCounty}
             </Text>
           </View>
 

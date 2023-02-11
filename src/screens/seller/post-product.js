@@ -51,6 +51,7 @@ import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
 import LoginComponent from "../../componets/auth/login";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -587,7 +588,10 @@ export default function PostProduct({ navigation }, props) {
 
   return (
     <>
-      <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="always"
+        style={styles.container}
+      >
         {!storedCredentials && (
           <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
             <TouchableOpacity
@@ -980,7 +984,7 @@ export default function PostProduct({ navigation }, props) {
             )}
           </View>
         </BottomSheet>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </>
   );
 }

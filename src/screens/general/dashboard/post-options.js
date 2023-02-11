@@ -70,7 +70,7 @@ export default function PostOptions({ navigation }) {
 
         <TertiaryButton
           onPress={() => navigation.navigate("PostProductRequest")}
-          buttonTitle="Post product"
+          buttonTitle="Post product request"
         />
       </LinearGradient>
     </ScrollView>
