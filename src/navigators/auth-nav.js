@@ -7,6 +7,7 @@ import ResetPassword from "../screens/general/auth/reset-password";
 import colors from "../componets/colors/colors";
 import ConfirmOtp from "../screens/general/auth/phone-otp";
 import CancelAuth from "../componets/buttons/cancel-auth";
+import NewPassword from "../screens/general/auth/new-password";
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,14 @@ export default function AuthNav() {
       <Stack.Screen
         name="ResetPassword"
         component={ResetPassword}
+        options={{
+          headerTitle: "Reset password",
+        }}
+      />
+
+      <Stack.Screen
+        name="NewPassword"
+        component={NewPassword}
         options={{
           headerTitle: "Reset password",
         }}

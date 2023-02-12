@@ -46,7 +46,6 @@ export default function Settings({ navigation }) {
   const { notifications, setNotifications } = useContext(NotificationContext);
 
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const regularSettingList = [
@@ -109,13 +108,6 @@ export default function Settings({ navigation }) {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [resetPasswordOtpModal, setResetPasswordOtpModal] = useState(false);
-  const [resetPasswordModal, setResetPasswordModal] = useState(false);
-
-  const [reseOtp, setResetOtp] = useState("");
 
   useEffect(() => {
     checkStoreCredentials();
@@ -216,99 +208,6 @@ export default function Settings({ navigation }) {
         console.log(err);
         setLoadingData(false);
       });
-  }
-
-  async function resetPassword() {
-    const url = `${process.env.ENDPOINT}/user/send-reset-pass-otp`;
-
-    setSubmitting(true);
-    await axios
-      .post(url, { phoneNumber })
-      .then((response) => {
-        setSubmitting(false);
-        console.log(response.data);
-
-        if (response.data.status == "Success") {
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-          setResetPasswordOtpModal(false);
-          setResetPasswordModal(true);
-        } else {
-          showMyToast({
-            status: "error",
-            title: "Failed",
-            description: response.data.message,
-          });
-
-          setPhoneNumber("");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setSubmitting(false);
-        setPhoneNumber("");
-      });
-  }
-
-  async function changePassword() {
-    const url = `${process.env.ENDPOINT}/user/change-password`;
-    setSubmitting(true);
-
-    if (!reseOtp) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "Please enter an otp",
-      });
-    } else if (!password) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "Please enter a new password",
-      });
-    } else if (password !== confirmPassword) {
-      showMyToast({
-        status: "error",
-        title: "Password mismatch",
-        description: "Passwords don't match",
-      });
-    } else {
-      await axios
-        .post(url, { phoneNumber, otp: reseOtp, password })
-        .then((response) => {
-          setSubmitting(false);
-          console.log(response.data);
-
-          if (response.data.status == "Success") {
-            showMyToast({
-              status: "success",
-              title: "Success",
-              description: response.data.message + ". Please login",
-            });
-            setResetPasswordOtpModal(false);
-            setResetPasswordModal(false);
-          } else {
-            showMyToast({
-              status: "error",
-              title: "Failed",
-              description: response.data.message,
-            });
-            setPhoneNumber("");
-            setPassword("");
-            setResetOtp("");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          setSubmitting(false);
-          setPhoneNumber("");
-          setPassword("");
-          setResetOtp("");
-        });
-    }
   }
 
   if (loadingData) {

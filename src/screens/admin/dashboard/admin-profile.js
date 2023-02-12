@@ -12,7 +12,10 @@ import {
 import { Avatar } from "react-native-paper";
 import noImage from "../../../assets/data/noImage";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
 
 import styles from "../../../componets/styles/global-styles";
 import { showMyToast } from "../../../functions/show-toast";
@@ -38,6 +41,7 @@ export default function AdminProfile({ navigation }) {
 
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials;
   const userID = data.userID;
@@ -98,6 +102,7 @@ export default function AdminProfile({ navigation }) {
       .then(async () => {
         setLoadingData(false);
         setStoredCredentials("");
+        setAuth(true);
       })
       .catch((err) => {
         console.log(err);

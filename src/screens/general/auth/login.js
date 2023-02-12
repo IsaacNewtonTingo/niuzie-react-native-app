@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Text,
-  View,
-} from "react-native";
+import { TouchableOpacity, TextInput, Text, View } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
@@ -18,7 +11,6 @@ import { Entypo } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import colors from "../../../componets/colors/colors";
-import TopAlert from "../../../componets/alerts/top-alert";
 
 import {
   CredentialsContext,
@@ -26,7 +18,7 @@ import {
 } from "../../../componets/context/credentials-context";
 import { showMyToast } from "../../../functions/show-toast";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import CancelAuth from "../../../componets/buttons/cancel-auth";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 
 export default function Login({ navigation, route }, props) {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -34,26 +26,10 @@ export default function Login({ navigation, route }, props) {
 
   const [submitting, setSubmitting] = useState(false);
 
-  const [alert, setAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertStatus, setAlertStatus] = useState("");
-
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
   const { auth, setAuth } = useContext(AuthContext);
-
-  const { data } = storedCredentials ? storedCredentials : "";
-
-  useEffect(() => {
-    if (route.params) {
-      if (route.params.alertMessage) {
-        setAlert(true);
-        setAlertMessage(route.params.alertMessage);
-        setAlertStatus(route.params.alertStatus);
-      }
-    }
-  }, []);
 
   async function login() {
     if (!phoneNumber) {
@@ -160,12 +136,12 @@ export default function Login({ navigation, route }, props) {
           buttonTitle="Login"
         />
 
-        <View style={styles.optTextSign}>
-          <Text style={styles.firstText}>Don't have an account ?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-            <Text style={styles.opt2Text}>Signup</Text>
-          </TouchableOpacity>
-        </View>
+        <TertiaryButton
+          submitting={submitting}
+          disabled={submitting}
+          onPress={() => navigation.navigate("SignUp")}
+          buttonTitle="Signup"
+        />
 
         <View style={styles.optTextSign}>
           <Text style={styles.firstText}>Forgot password ?</Text>
@@ -175,6 +151,13 @@ export default function Login({ navigation, route }, props) {
             <Text style={styles.opt2Text}>Reset</Text>
           </TouchableOpacity>
         </View>
+
+        {/* <View style={styles.optTextSign}>
+          <Text style={styles.firstText}>Don't have an account ?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <Text style={styles.opt2Text}>Signup</Text>
+          </TouchableOpacity>
+        </View> */}
       </View>
     </KeyboardAwareScrollView>
   );
