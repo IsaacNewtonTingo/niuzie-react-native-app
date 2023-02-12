@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import styles from "../../../componets/styles/global-styles";
 
 export default function ResetPassword() {
   return (
-    <View>
-      <Text>ResetPassword</Text>
-    </View>
+    <KeyboardAwareScrollView style={styles.container}></KeyboardAwareScrollView>
   );
 }
 
-const styles = StyleSheet.create({});
+const resetStyles = StyleSheet.create({});

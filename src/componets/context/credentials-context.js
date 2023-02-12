@@ -10,3 +10,8 @@ export const NotificationContext = createContext({
   notifications: {},
   setNotifications: () => {},
 });
+
+export const AuthContext = createContext({
+  auth: {},
+  setAuth: () => {},
+});

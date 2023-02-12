@@ -12,6 +12,7 @@ import React, { useEffect, useState, useContext } from "react";
 import {
   CredentialsContext,
   NotificationContext,
+  AuthContext,
 } from "../../../componets/context/credentials-context";
 import { showMyToast } from "../../../functions/show-toast";
 import { Avatar } from "react-native-paper";
@@ -30,6 +31,8 @@ const { width } = Dimensions.get("window");
 export default function NotificationsScreen({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
   const { notifications, setNotifications } = useContext(NotificationContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
@@ -43,12 +46,16 @@ export default function NotificationsScreen({ navigation }) {
   const [allRead, setAllRead] = useState(false);
 
   useEffect(() => {
-    getNotifications();
+    if (!userID) {
+      setAuth(true);
+    } else {
+      getNotifications();
 
-    Notifications.addNotificationReceivedListener(handleNotification);
-    Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
-    );
+      Notifications.addNotificationReceivedListener(handleNotification);
+      Notifications.addNotificationResponseReceivedListener(
+        handleNotificationResponse
+      );
+    }
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));

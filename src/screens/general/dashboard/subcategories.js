@@ -15,7 +15,10 @@ import SubCategoryList from "../../../componets/lists/sub-category-list";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import colors from "../../../componets/colors/colors";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { showMyToast } from "../../../functions/show-toast";
@@ -32,6 +35,8 @@ const B = (props) => (
 export default function Subcategories({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = data?.userID;
@@ -108,33 +113,37 @@ export default function Subcategories({ route, navigation }) {
   }
 
   async function subToCategory() {
-    const url = `${process.env.ENDPOINT}/category/subscribe/${categoryID}`;
-    setSubmitting(true);
+    if (!userID) {
+      setAuth(true);
+    } else {
+      const url = `${process.env.ENDPOINT}/category/subscribe/${categoryID}`;
+      setSubmitting(true);
 
-    await axios
-      .post(url, { userID }, { headers })
-      .then((response) => {
-        setSubmitting(false);
+      await axios
+        .post(url, { userID }, { headers })
+        .then((response) => {
+          setSubmitting(false);
 
-        if (response.data.status == "Success") {
-          setSubscribed(response.data.data);
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-        } else {
-          showMyToast({
-            status: "error",
-            title: "Failed",
-            description: response.data.message,
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setSubmitting(false);
-      });
+          if (response.data.status == "Success") {
+            setSubscribed(response.data.data);
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setSubmitting(false);
+        });
+    }
   }
 
   if (loadingData) {

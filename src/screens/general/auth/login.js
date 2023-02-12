@@ -20,7 +20,13 @@ import PrimaryButton from "../../../componets/buttons/primary-button";
 import colors from "../../../componets/colors/colors";
 import TopAlert from "../../../componets/alerts/top-alert";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
+import { showMyToast } from "../../../functions/show-toast";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import CancelAuth from "../../../componets/buttons/cancel-auth";
 
 export default function Login({ navigation, route }, props) {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -34,6 +40,8 @@ export default function Login({ navigation, route }, props) {
 
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
 
@@ -49,17 +57,20 @@ export default function Login({ navigation, route }, props) {
 
   async function login() {
     if (!phoneNumber) {
-      setAlertMessage("Phone number is required");
-      setAlertStatus("error");
-      setAlert(true);
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Phone number is required",
+      });
     } else if (!password) {
-      setAlertMessage("Password is required");
-      setAlertStatus("error");
-      setAlert(true);
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
     } else {
       setSubmitting(true);
       const url = `${process.env.ENDPOINT}/user/login`;
-
       await axios
         .post(url, {
           phoneNumber: parseInt(phoneNumber),
@@ -68,17 +79,20 @@ export default function Login({ navigation, route }, props) {
         .then((response) => {
           setSubmitting(false);
           if (response.data.status == "Success") {
-            setAlertMessage(response.data.message);
-            setAlertStatus("success");
-            setAlert(true);
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
 
             const { data } = response.data;
-
             storeCredentials({ data });
           } else {
-            setAlertMessage(response.data.message);
-            setAlertStatus("error");
-            setAlert(true);
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
           }
         })
         .catch((err) => {
@@ -92,7 +106,7 @@ export default function Login({ navigation, route }, props) {
     await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
       .then(() => {
         setStoredCredentials(values);
-        props.getStoredCredentialsAfterLogin();
+        setAuth(false);
       })
       .catch((err) => {
         console.log(err);
@@ -100,14 +114,10 @@ export default function Login({ navigation, route }, props) {
   }
 
   return (
-    <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
-      {alert && (
-        <TopAlert
-          onPress={() => setAlert(false)}
-          alertMessage={alertMessage}
-          alertStatus={alertStatus}
-        />
-      )}
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       <View style={postStyles.holdingContainer}>
         <Text style={styles.label}>Phone number</Text>
         <View style={styles.textInputContainer}>
@@ -159,11 +169,13 @@ export default function Login({ navigation, route }, props) {
 
         <View style={styles.optTextSign}>
           <Text style={styles.firstText}>Forgot password ?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("ResetPassword")}
+          >
             <Text style={styles.opt2Text}>Reset</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }

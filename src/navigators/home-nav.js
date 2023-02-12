@@ -10,6 +10,8 @@ import UserProfile from "../screens/general/dashboard/user-profile";
 import colors from "../componets/colors/colors";
 import ProductRequestDetails from "../screens/general/dashboard/product-request-details";
 import EditProduct from "../screens/seller/edit-product";
+import PublicProfile from "../screens/general/dashboard/public-profile";
+import SellerProducts from "../screens/seller/seller-products";
 
 const Stack = createNativeStackNavigator();
 
@@ -81,6 +83,22 @@ export default function HomeNav() {
         component={ProductRequestDetails}
         options={{
           headerTitle: "Product request",
+        }}
+      />
+
+      <Stack.Screen
+        name="PublicProfile"
+        component={PublicProfile}
+        options={{
+          headerTitle: "Profile",
+        }}
+      />
+
+      <Stack.Screen
+        name="SellerProducts"
+        component={SellerProducts}
+        options={{
+          headerTitle: "Products and reviews",
         }}
       />
     </Stack.Navigator>

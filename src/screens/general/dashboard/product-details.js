@@ -41,7 +41,10 @@ import { showMyToast } from "../../../functions/show-toast";
 
 import dateFormat from "dateformat";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
 import NoData from "../../../componets/Text/no-data";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
@@ -55,6 +58,8 @@ const B = (props) => (
 export default function ProductDetails({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
@@ -211,18 +216,22 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function handleSave() {
-    setSaved(!saved);
+    if (!userID) {
+      setAuth(true);
+    } else {
+      setSaved(!saved);
 
-    const url = `${process.env.ENDPOINT}/product/save-product/${productID}`;
+      const url = `${process.env.ENDPOINT}/product/save-product/${productID}`;
 
-    await axios
-      .post(url, { userID }, { headers })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      await axios
+        .post(url, { userID }, { headers })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   const starImgFilled = () => {
@@ -307,44 +316,47 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function reviewProduct() {
-    setSubmitting(true);
+    if (!userID) {
+      setAuth(true);
+    } else {
+      setSubmitting(true);
+      await axios
+        .post(
+          `${process.env.ENDPOINT}/product/review-product/${productID}`,
+          {
+            userID,
+            rating: defaultRating,
+            reviewMessage: review,
+          },
+          { headers }
+        )
+        .then((response) => {
+          setSubmitting(false);
+          console.log(response.data);
 
-    await axios
-      .post(
-        `${process.env.ENDPOINT}/product/review-product/${productID}`,
-        {
-          userID,
-          rating: defaultRating,
-          reviewMessage: review,
-        },
-        { headers }
-      )
-      .then((response) => {
-        setSubmitting(false);
-        console.log(response.data);
-
-        if (response.data.status == "Failed") {
-          showMyToast({
-            status: "error",
-            title: response.data.status,
-            description: response.data.message,
-          });
-        } else {
-          showMyToast({
-            status: "success",
-            title: response.data.status,
-            description: response.data.message,
-          });
-          getReviews();
-          getProducts();
-          setReview("");
-          setDefaultRating(0);
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
-      });
+          if (response.data.status == "Failed") {
+            showMyToast({
+              status: "error",
+              title: response.data.status,
+              description: response.data.message,
+            });
+          } else {
+            showMyToast({
+              status: "success",
+              title: response.data.status,
+              description: response.data.message,
+            });
+            getReviews();
+            getProducts();
+            setReview("");
+            setDefaultRating(0);
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
   }
 
   async function deleteReview(reviewID) {
@@ -382,11 +394,8 @@ export default function ProductDetails({ route, navigation }) {
         await Linking.openURL(`sms:+${phoneNumber}`);
       }
     } else {
-      showMyToast({
-        status: "error",
-        title: "Failed",
-        description: "You need to login to perform this operation",
-      });
+      setAuth(true);
+      console.log(auth);
     }
   }
 
@@ -477,23 +486,21 @@ export default function ProductDetails({ route, navigation }) {
         <View style={styles.spaceBetween}>
           <Text style={productDetailStyles.prodNameText}>{productName}</Text>
 
-          {userID && (
-            <TouchableOpacity onPress={handleSave}>
-              {saved ? (
-                <MaterialCommunityIcons
-                  name="heart-multiple"
-                  size={24}
-                  color={colors.linkText}
-                />
-              ) : (
-                <MaterialCommunityIcons
-                  name="heart-multiple-outline"
-                  size={24}
-                  color={colors.linkText}
-                />
-              )}
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={handleSave}>
+            {saved ? (
+              <MaterialCommunityIcons
+                name="heart-multiple"
+                size={24}
+                color={colors.linkText}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="heart-multiple-outline"
+                size={24}
+                color={colors.linkText}
+              />
+            )}
+          </TouchableOpacity>
         </View>
 
         <Text style={productDetailStyles.priceText}>KSH. {price}</Text>
@@ -527,22 +534,33 @@ export default function ProductDetails({ route, navigation }) {
         ]}
       >
         <View style={productDetailStyles.profileContainer}>
-          <Image
-            style={productDetailStyles.profileImage}
-            source={{
-              uri: profilePicture ? profilePicture : noImage.noProfilePic,
+          <TouchableOpacity
+            onPress={() => {
+              if (productOwnerID == userID) {
+                navigation.navigate("Profile");
+              } else {
+                navigation.navigate("PublicProfile", { productOwnerID });
+              }
             }}
-          />
+            style={productDetailStyles.profileContainer}
+          >
+            <Image
+              style={productDetailStyles.profileImage}
+              source={{
+                uri: profilePicture ? profilePicture : noImage.noProfilePic,
+              }}
+            />
 
-          <View>
-            <Text style={productDetailStyles.nameText}>
-              {firstName} {lastName}
-            </Text>
+            <View>
+              <Text style={productDetailStyles.nameText}>
+                {firstName} {lastName}
+              </Text>
 
-            <Text style={productDetailStyles.locationText}>
-              {county}, {subCounty}
-            </Text>
-          </View>
+              <Text style={productDetailStyles.locationText}>
+                {county}, {subCounty}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handlePhoneAction("call")}
@@ -567,33 +585,35 @@ export default function ProductDetails({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.section, { marginTop: 40 }]}>
-        <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>
-            Reviews <B>({reviewList.length})</B>
-          </Text>
+      {reviewList.length > 0 && (
+        <View style={[styles.section, { marginTop: 40 }]}>
+          <View style={[styles.textComb, { marginBottom: 20 }]}>
+            <Text style={styles.subText}>
+              Reviews <B>({reviewList.length})</B>
+            </Text>
 
-          {reviewList.length > 0 && (
-            <TouchableOpacity>
-              <Text style={styles.viewAll}>View all</Text>
-            </TouchableOpacity>
-          )}
+            {reviewList.length > 0 && (
+              <TouchableOpacity>
+                <Text style={styles.viewAll}>View all</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {reviewList.map((review) => (
+            <ReviewComponent
+              key={review._id}
+              productOwnerID={productOwnerID}
+              firstName={review.user.firstName}
+              lastName={review.user.lastName}
+              profilePicture={review.user.profilePicture}
+              date={dateFormat(review.createdAt, "mediumDate")}
+              rating={review.rating.toFixed(1)}
+              reviewMessage={review.reviewMessage}
+              onPress={() => deleteReview(review._id)}
+            />
+          ))}
         </View>
-
-        {reviewList.map((review) => (
-          <ReviewComponent
-            key={review._id}
-            productOwnerID={productOwnerID}
-            firstName={review.user.firstName}
-            lastName={review.user.lastName}
-            profilePicture={review.user.profilePicture}
-            date={dateFormat(review.createdAt, "mediumDate")}
-            rating={review.rating.toFixed(1)}
-            reviewMessage={review.reviewMessage}
-            onPress={() => deleteReview(review._id)}
-          />
-        ))}
-      </View>
+      )}
 
       {userID !== productOwnerID && (
         <View style={[styles.section, {}]}>
@@ -643,67 +663,69 @@ export default function ProductDetails({ route, navigation }) {
         </View>
       )}
 
-      <View style={[styles.section, { minHeight: 200 }]}>
-        <Text style={[styles.subText, { marginBottom: 20 }]}>
-          Other products by <B>{firstName}</B>
-        </Text>
+      {otherProducts.length > 0 && (
+        <View style={[styles.section, { minHeight: 200 }]}>
+          <Text style={[styles.subText, { marginBottom: 20 }]}>
+            Other products by <B>{firstName}</B>
+          </Text>
 
-        {otherProducts.length < 1 && <NoData text="No other products found" />}
+          <FlatList
+            horizontal
+            data={otherProducts}
+            renderItem={({ item }) => (
+              <HorizontalCard
+                onPress={() => handleProductPressed(item)}
+                style={{ width: width - 40, marginRight: 10 }}
+                myKey={item._id}
+                productImage1={item.image1}
+                productImage2={item.image2}
+                productImage3={item.image3}
+                productImage4={item.image4}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                premium={item.user.premium}
+                rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+              />
+            )}
+          />
+        </View>
+      )}
 
-        <FlatList
-          horizontal
-          data={otherProducts}
-          renderItem={({ item }) => (
-            <HorizontalCard
-              onPress={() => handleProductPressed(item)}
-              style={{ width: width - 40, marginRight: 10 }}
-              myKey={item._id}
-              productImage1={item.image1}
-              productImage2={item.image2}
-              productImage3={item.image3}
-              productImage4={item.image4}
-              productName={item.productName}
-              price={item.price}
-              condition={item.condition}
-              description={item.description}
-              county={item.user.county}
-              subCounty={item.user.subCounty}
-              premium={item.user.premium}
-              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
-            />
-          )}
-        />
-      </View>
+      {similarProducts.length > 0 && (
+        <View style={[styles.section, {}]}>
+          <Text style={[styles.subText, { marginBottom: 20 }]}>
+            Similar products
+          </Text>
 
-      <View style={[styles.section, {}]}>
-        <Text style={[styles.subText, { marginBottom: 20 }]}>
-          Similar products
-        </Text>
-
-        <FlatList
-          horizontal
-          data={similarProducts}
-          renderItem={({ item }) => (
-            <HorizontalCard
-              onPress={() => handleProductPressed(item)}
-              style={{ width: width - 40, marginRight: 10 }}
-              key={item._id}
-              productImage1={item.image1}
-              productImage2={item.image2}
-              productImage3={item.image3}
-              productImage4={item.image4}
-              productName={item.productName}
-              price={item.price}
-              condition={item.condition}
-              description={item.description}
-              county={item.user.county}
-              subCounty={item.user.subCounty}
-              premium={item.user.premium}
-              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
-            />
-          )}
-        />
-      </View>
+          <FlatList
+            horizontal
+            data={similarProducts}
+            renderItem={({ item }) => (
+              <HorizontalCard
+                onPress={() => handleProductPressed(item)}
+                style={{ width: width - 40, marginRight: 10 }}
+                key={item._id}
+                productImage1={item.image1}
+                productImage2={item.image2}
+                productImage3={item.image3}
+                productImage4={item.image4}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                premium={item.user.premium}
+                rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+              />
+            )}
+          />
+        </View>
+      )}
 
       {userID == productOwnerID && (
         <View style={[styles.section, {}]}>

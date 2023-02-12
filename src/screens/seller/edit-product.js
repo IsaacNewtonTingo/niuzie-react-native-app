@@ -16,8 +16,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
 
-import * as SecureStore from "expo-secure-store";
-
 import { RadioButton } from "react-native-paper";
 import { Text, Button, Modal } from "native-base";
 
@@ -45,9 +43,7 @@ import { showMyToast } from "../../functions/show-toast";
 
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
-import StaticAlert from "../../componets/alerts/static-alert";
 import { BarIndicator } from "react-native-indicators";
-import LoginComponent from "../../componets/auth/login";
 import TertiaryButton from "../../componets/buttons/tertiaryBtn";
 import noImage from "../../assets/data/noImage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

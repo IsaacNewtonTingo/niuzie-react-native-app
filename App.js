@@ -8,6 +8,7 @@ import { NativeBaseProvider, extendTheme } from "native-base";
 import {
   CredentialsContext,
   NotificationContext,
+  AuthContext,
 } from "./src/componets/context/credentials-context";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -105,6 +106,7 @@ export default function App() {
 
   const [storedCredentials, setStoredCredentials] = useState("");
   const [notifications, setNotifications] = useState(0);
+  const [auth, setAuth] = useState(false);
 
   useEffect(() => {
     checkLoginCredentials();
@@ -160,16 +162,18 @@ export default function App() {
       <CredentialsContext.Provider
         value={{ storedCredentials, setStoredCredentials }}
       >
-        <NotificationContext.Provider
-          value={{ notifications, setNotifications }}
-        >
-          <NativeBaseProvider theme={theme}>
-            <NavigationContainer>
-              <Decider />
-              <StatusBar style="light" />
-            </NavigationContainer>
-          </NativeBaseProvider>
-        </NotificationContext.Provider>
+        <AuthContext.Provider value={{ auth, setAuth }}>
+          <NotificationContext.Provider
+            value={{ notifications, setNotifications }}
+          >
+            <NativeBaseProvider theme={theme}>
+              <NavigationContainer>
+                <Decider />
+                <StatusBar style="light" />
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </NotificationContext.Provider>
+        </AuthContext.Provider>
       </CredentialsContext.Provider>
     </GestureHandlerRootView>
   );
