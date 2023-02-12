@@ -30,7 +30,7 @@ import { HStack } from "native-base";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
 import NoData from "../../../componets/Text/no-data";
 
-const countiesData = require("../../../assets/data/counties.json");
+const countiesData = require("../../../assets/data/counties2.json");
 
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");

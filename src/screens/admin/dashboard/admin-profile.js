@@ -19,8 +19,6 @@ import {
 
 import styles from "../../../componets/styles/global-styles";
 import { showMyToast } from "../../../functions/show-toast";
-import { homeStyles } from "../../general/dashboard/home";
-import { postStyles } from "../../seller/post-product";
 
 const { width } = Dimensions.get("window");
 

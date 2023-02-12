@@ -217,6 +217,12 @@ export default function ProductDetails({ route, navigation }) {
 
   async function handleSave() {
     if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
       setAuth(true);
     } else {
       setSaved(!saved);
@@ -317,6 +323,12 @@ export default function ProductDetails({ route, navigation }) {
 
   async function reviewProduct() {
     if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
       setAuth(true);
     } else {
       setSubmitting(true);
@@ -394,6 +406,12 @@ export default function ProductDetails({ route, navigation }) {
         await Linking.openURL(`sms:+${phoneNumber}`);
       }
     } else {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
       setAuth(true);
       console.log(auth);
     }

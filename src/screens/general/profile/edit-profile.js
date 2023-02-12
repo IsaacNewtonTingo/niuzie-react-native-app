@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
   Dimensions,
   ImageBackground,
   FlatList,
@@ -33,14 +32,13 @@ import noImage from "../../../assets/data/noImage";
 import { Avatar } from "react-native-paper";
 
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
-import { discoverStyles } from "../../general/dashboard/discover";
 import { showMyToast } from "../../../functions/show-toast";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import NoData from "../../../componets/Text/no-data";
 
-const countiesData = require("../../../assets/data/counties.json");
+const countiesData = require("../../../assets/data/counties2.json");
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -602,16 +600,17 @@ export default function EditProfile({ route, navigation }) {
         </LinearGradient>
       </BottomSheet>
 
-      {countiesModal == true && (
-        <View
-          setCountiesModal={setCountiesModal}
-          style={discoverStyles.backdrop}
-        >
+      <BottomSheet
+        onBackButtonPress={() => setCountiesModal(false)}
+        onBackdropPress={() => setCountiesModal(false)}
+        visible={countiesModal}
+      >
+        <View style={editProfileStyles.bottomSheet}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={editProfileStyles.cancel}
             onPress={() => setCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={editProfileStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
           <FlatList
@@ -632,15 +631,19 @@ export default function EditProfile({ route, navigation }) {
 
           {countiesData.length < 1 && <NoData text="No data" />}
         </View>
-      )}
+      </BottomSheet>
 
-      {subCountiesModal == true && (
-        <View style={discoverStyles.backdrop}>
+      <BottomSheet
+        visible={subCountiesModal}
+        onBackButtonPress={() => setSubCountiesModal(false)}
+        onBackdropPress={() => setSubCountiesModal(false)}
+      >
+        <View style={editProfileStyles.bottomSheet}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={editProfileStyles.cancel}
             onPress={() => setSubCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={editProfileStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
           <FlatList
@@ -658,9 +661,8 @@ export default function EditProfile({ route, navigation }) {
           />
 
           {!county && <NoData text="Please select county first" />}
-          {subCounties.length < 1 && <NoData text="No data" />}
         </View>
-      )}
+      </BottomSheet>
     </KeyboardAwareScrollView>
   );
 }
@@ -694,5 +696,25 @@ const editProfileStyles = StyleSheet.create({
     height: width / 1.7,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bottomSheet: {
+    backgroundColor: colors.cardColor,
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    bottom: 0,
+    height: height / 2,
+    alignSelf: "center",
+    position: "absolute",
+    zIndex: 2,
+  },
+  close: {
+    color: colors.orange,
+    fontWeight: "800",
+  },
+  cancel: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    padding: 20,
   },
 });

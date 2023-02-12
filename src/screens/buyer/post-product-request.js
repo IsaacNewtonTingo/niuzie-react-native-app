@@ -9,7 +9,10 @@ import axios from "axios";
 import { postStyles } from "../seller/post-product";
 import { showMyToast } from "../../functions/show-toast";
 
-import { CredentialsContext } from "../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../componets/context/credentials-context";
 
 export default function PostProductRequest() {
   const [content, setContent] = useState("");
@@ -17,6 +20,8 @@ export default function PostProductRequest() {
 
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
@@ -41,41 +46,51 @@ export default function PostProductRequest() {
   };
 
   async function postProductRequest() {
-    const url = `${process.env.ENDPOINT}/buyer-needs/post-need`;
-    setSubmitting(true);
-
-    await axios
-      .post(
-        url,
-        {
-          content,
-          userID,
-        },
-        { headers: headers }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setSubmitting(false);
-
-        if (response.data.status == "Success") {
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-          setContent("");
-        } else {
-          showMyToast({
-            status: "error",
-            title: "Failed",
-            description: response.data.message,
-          });
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
+    if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
       });
+      setAuth(true);
+    } else {
+      const url = `${process.env.ENDPOINT}/buyer-needs/post-need`;
+      setSubmitting(true);
+
+      await axios
+        .post(
+          url,
+          {
+            content,
+            userID,
+          },
+          { headers: headers }
+        )
+        .then((response) => {
+          console.log(response.data);
+          setSubmitting(false);
+
+          if (response.data.status == "Success") {
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+            setContent("");
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
   }
   return (
     <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>

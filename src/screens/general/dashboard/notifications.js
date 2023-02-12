@@ -47,6 +47,12 @@ export default function NotificationsScreen({ navigation }) {
 
   useEffect(() => {
     if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
       setAuth(true);
     } else {
       getNotifications();

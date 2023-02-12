@@ -151,10 +151,10 @@ export default function Discover({ navigation }) {
         setFilterModal(false);
 
         if (response.data.status == "Success") {
+          setAllProducts(response.data.data);
           if (response.data.data.length < 1) {
             setReachedEnd(true);
           } else {
-            setAllProducts(response.data.data);
             if (response.data.data.length < 20) {
               setReachedEnd(true);
             }
@@ -349,10 +349,10 @@ export default function Discover({ navigation }) {
           />
         )}
         ListFooterComponent={() => {
-          return reachedEnd ? (
-            <NoData text="No more data" />
-          ) : (
+          return !reachedEnd ? (
             <ActivityIndicator size="large" color="white" />
+          ) : (
+            <></>
           );
         }}
       />

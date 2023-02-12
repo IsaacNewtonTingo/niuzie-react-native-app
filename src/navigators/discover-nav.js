@@ -6,6 +6,7 @@ import colors from "../componets/colors/colors";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import EditProduct from "../screens/seller/edit-product";
+import PublicProfile from "../screens/general/dashboard/public-profile";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +46,14 @@ export default function DiscoverNav() {
       />
 
       <Stack.Screen name="UserProfile" component={UserProfile} />
+
+      <Stack.Screen
+        name="PublicProfile"
+        component={PublicProfile}
+        options={{
+          headerTitle: "Profile",
+        }}
+      />
     </Stack.Navigator>
   );
 }

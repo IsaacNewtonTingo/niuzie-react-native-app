@@ -124,6 +124,12 @@ export default function Settings({ navigation }) {
 
       getUserData(data.userID, data.token);
     } else {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to access this page. Signup if you don't have an account",
+      });
       setAuth(true);
       setLoadingData(false);
     }

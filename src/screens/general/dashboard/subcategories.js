@@ -114,6 +114,12 @@ export default function Subcategories({ route, navigation }) {
 
   async function subToCategory() {
     if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
       setAuth(true);
     } else {
       const url = `${process.env.ENDPOINT}/category/subscribe/${categoryID}`;
