@@ -86,6 +86,12 @@ export default function Settings({ navigation }) {
       navTo: "Payments",
     },
     {
+      title: "Notifications",
+      iconType: "Ionicons",
+      iconName: "notifications",
+      navTo: "NotificationSettings",
+    },
+    {
       title: "Support",
       iconType: "MaterialIcons",
       iconName: "support-agent",
@@ -409,6 +415,8 @@ export default function Settings({ navigation }) {
       });
     } else if (navTo == "Admin") {
       navigation.navigate("AdminDashboard");
+    } else if (navTo == "NotificationSettings") {
+      navigation.navigate("NotificationSettings");
     } else if (navTo == "Logout") {
       handleLogout();
     }

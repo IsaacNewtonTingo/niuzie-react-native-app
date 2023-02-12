@@ -13,6 +13,7 @@ import SavedProducts from "../screens/general/profile/saved-products";
 import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
 import MyProductRequests from "../screens/general/profile/my-product-requests";
+import NotificationSettings from "../screens/general/profile/notification-settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +97,14 @@ export default function SettingsNav() {
         component={Payments}
         options={{
           headerTitle: "Transactions",
+        }}
+      />
+
+      <Stack.Screen
+        name="NotificationSettings"
+        component={NotificationSettings}
+        options={{
+          headerTitle: "Notification settings",
         }}
       />
     </Stack.Navigator>

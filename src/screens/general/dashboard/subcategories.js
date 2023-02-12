@@ -166,7 +166,7 @@ export default function Subcategories({ route, navigation }) {
         ) : (
           <Text style={subCatStyles.subText}>
             Unsubscribe from this category.{" "}
-            <B>You can subscribe any time you want.</B>
+            <B>You can subscribe back at any time.</B>
           </Text>
         )}
 

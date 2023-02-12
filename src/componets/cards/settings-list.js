@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -46,8 +46,10 @@ export default function SettingsList(props) {
             <MaterialIcons name={iconName} size={16} color={colors.gray} />
           ) : iconType == "AntDesign" ? (
             <AntDesign name={iconName} size={16} color={colors.gray} />
-          ) : (
+          ) : iconType == "AntDesign" ? (
             <FontAwesome name={iconName} size={16} color={colors.gray} />
+          ) : (
+            <Ionicons name={iconName} size={16} color={colors.gray} />
           )}
 
           <Text style={settingsListStyles.text}>{title}</Text>
