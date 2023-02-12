@@ -7,9 +7,6 @@ import {
   Dimensions,
   FlatList,
   Image,
-  KeyboardAvoidingView,
-  ActivityIndicator,
-  Share,
   ImageBackground,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
@@ -18,8 +15,6 @@ import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
-
-import * as SecureStore from "expo-secure-store";
 
 import { RadioButton } from "react-native-paper";
 import { Text, Button, Modal } from "native-base";
@@ -37,7 +32,10 @@ import PrimaryButton from "../../componets/buttons/primary-button";
 import SecondaryButton from "../../componets/buttons/secondary-button";
 import axios from "axios";
 
-import { CredentialsContext } from "../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../componets/context/credentials-context";
 
 import { BottomSheet } from "react-native-btr";
 
@@ -90,8 +88,6 @@ export default function PostProduct({ navigation }, props) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
-  const [password, setPassword] = useState("");
-
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [showCatSheet, setShowCatSheet] = useState(false);
   const [showSubCatSheet, setShowSubCatSheet] = useState(false);
@@ -105,23 +101,11 @@ export default function PostProduct({ navigation }, props) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
+  const { auth, setAuth } = useContext(AuthContext);
+
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
   const [premiumUser, setPremiumUser] = useState(false);
-
-  const [loginItem, setLoginItem] = useState(true);
-  const [signupItem, setSignupItem] = useState(false);
-
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [isChecked, setChecked] = useState(false);
-
-  const [confirmCodeModal, setConfirmCodeModal] = useState(false);
-  const [resetPasswordOtpModal, setResetPasswordOtpModal] = useState(false);
-  const [resetPasswordModal, setResetPasswordModal] = useState(false);
-
-  const [otp, setOtp] = useState("");
-  const [reseOtp, setResetOtp] = useState("");
 
   useEffect(() => {
     checkStoreCredentials();
@@ -142,6 +126,14 @@ export default function PostProduct({ navigation }, props) {
       setUserID("");
       setToken("");
       setLoadingData(false);
+
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to access this functionality. Signup if you don't have an account",
+      });
+      setAuth(true);
     }
   }
 
@@ -546,7 +538,7 @@ export default function PostProduct({ navigation }, props) {
           <StaticAlert
             status="warning"
             title="Warning"
-            description="You have exceeded the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
+            description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
           />
         )}
 
