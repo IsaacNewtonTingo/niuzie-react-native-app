@@ -23,6 +23,7 @@ import styles from "../../../componets/styles/global-styles";
 import moment from "moment";
 import colors from "../../../componets/colors/colors";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import NoData from "../../../componets/Text/no-data";
 
 const { width } = Dimensions.get("window");
 
@@ -52,8 +53,13 @@ export default function NotificationsScreen({ navigation }) {
 
   navigation.addListener("focus", () => setLoading(!loading));
 
-  const handleNotification = () => {
+  const handleNotification = (notification) => {
     getNotifications();
+    // showMyToast({
+    //   status: "info",
+    //   title: notification.request.content.title,
+    //   description: notification.request.content.body,
+    // });
   };
 
   const handleNotificationResponse = (notification) => {
@@ -182,14 +188,17 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <View style={[styles.container, {}]}>
-      <View style={notificationStyles.topCont}>
-        <TouchableOpacity
-          onPress={markAsRead}
-          style={notificationStyles.markCont}
-        >
-          <Text style={notificationStyles.markText}>Mark all as read</Text>
-        </TouchableOpacity>
-      </View>
+      {notificationsList.length > 0 && (
+        <View style={notificationStyles.topCont}>
+          <TouchableOpacity
+            onPress={markAsRead}
+            style={notificationStyles.markCont}
+          >
+            <Text style={notificationStyles.markText}>Mark all as read</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {notificationsList.length < 1 && <NoData text="No nofications found" />}
 
       <FlatList
         data={notificationsList}

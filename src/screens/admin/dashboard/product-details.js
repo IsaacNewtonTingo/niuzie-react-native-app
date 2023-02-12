@@ -117,6 +117,10 @@ export default function AdminProductDetails({ route, navigation }) {
       />
 
       <View style={styles.section}>
+        <Text style={[styles.subText, { marginBottom: 20 }]}>
+          Product details
+        </Text>
+
         <View style={prodDetailsStyles.textsCont}>
           <Text style={prodDetailsStyles.sub}>Product name:</Text>
           <Text style={prodDetailsStyles.desc}>
@@ -147,14 +151,20 @@ export default function AdminProductDetails({ route, navigation }) {
 
         <View style={prodDetailsStyles.textsCont}>
           <Text style={prodDetailsStyles.sub}>Price:</Text>
-          <Text style={prodDetailsStyles.desc}>{route.params.item.price}</Text>
+          <Text style={prodDetailsStyles.desc}>
+            KSH. {route.params.item.price}
+          </Text>
         </View>
       </View>
 
       <View style={styles.section}>
+        <Text style={[styles.subText, { marginBottom: 20 }]}>User details</Text>
+
         <View style={prodDetailsStyles.textsCont}>
-          <Text>First name:</Text>
-          <Text>{route.params.item.user.firstName}</Text>
+          <Text style={prodDetailsStyles.sub}>First name:</Text>
+          <Text style={prodDetailsStyles.desc}>
+            {route.params.item.user.firstName}
+          </Text>
         </View>
 
         <View style={prodDetailsStyles.textsCont}>
@@ -202,12 +212,17 @@ export default function AdminProductDetails({ route, navigation }) {
 
 const prodDetailsStyles = StyleSheet.create({
   textsCont: {
-    flexDirection: "row",
+    flexDirection: "column",
+    marginBottom: 20,
+    borderBottomWidth: 0.2,
+    borderBottomColor: colors.gray,
+    paddingBottom: 20,
   },
   sub: {
     color: colors.gray,
     fontWeight: "800",
     marginRight: 10,
+    marginBottom: 10,
   },
   desc: {
     color: colors.lightBlue,

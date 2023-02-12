@@ -30,7 +30,7 @@ export default function SettingsNav() {
     >
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerTitle: "Settings",
         }}
         name="Settings"
         component={Settings}

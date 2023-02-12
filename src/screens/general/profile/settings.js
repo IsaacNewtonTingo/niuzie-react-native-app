@@ -23,7 +23,10 @@ import SettingsList, {
 import colors from "../../../componets/colors/colors";
 
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  NotificationContext,
+} from "../../../componets/context/credentials-context";
 
 import axios from "axios";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
@@ -41,10 +44,13 @@ import { Entypo } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import noImage from "../../../assets/data/noImage";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Settings({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { notifications, setNotifications } = useContext(NotificationContext);
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -428,6 +434,7 @@ export default function Settings({ navigation }) {
       .then(async () => {
         setLoadingData(false);
         setStoredCredentials("");
+        setNotifications(0);
 
         setPhoneNumber("");
         setPassword("");
@@ -557,20 +564,9 @@ export default function Settings({ navigation }) {
   }
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl
-          tintColor={colors.lightBlue}
-          colors={[colors.lightBlue]}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      }
+    <KeyboardAwareScrollView
       keyboardShouldPersistTaps="always"
-      style={[
-        styles.container,
-        { padding: 10, paddingTop: StatusBar.currentHeight + 20 },
-      ]}
+      style={[styles.container, {}]}
     >
       {!storedCredentials ? (
         <>
@@ -871,7 +867,7 @@ export default function Settings({ navigation }) {
           ))}
         </>
       )}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 const settingsStyls = StyleSheet.create({

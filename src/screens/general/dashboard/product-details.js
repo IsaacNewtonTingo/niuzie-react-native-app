@@ -431,9 +431,9 @@ export default function ProductDetails({ route, navigation }) {
     }
   }
 
-  // if (loadingData) {
-  //   return <LoadingIndicator />;
-  // }
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
 
   if (noProduct) {
     return <NoData text="Product not found. Might have been deleted" />;
