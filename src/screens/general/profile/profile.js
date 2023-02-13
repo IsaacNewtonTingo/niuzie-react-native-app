@@ -24,6 +24,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../../../componets/colors/colors";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 export default function Profile({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,10 @@ export default function Profile({ navigation }) {
         setLoadingData(false);
         console.log(err);
       });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
   }
   return (
     <ScrollView style={styles.container}>

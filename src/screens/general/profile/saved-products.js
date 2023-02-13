@@ -52,6 +52,13 @@ export default function SavedProducts({ navigation }) {
       });
   }
 
+  async function handleProductPressed(item) {
+    navigation.navigate("ProductDetails", {
+      productID: item.product._id,
+      productOwnerID: item.product.user._id,
+    });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
@@ -64,6 +71,7 @@ export default function SavedProducts({ navigation }) {
         renderItem={({ item }) => (
           <HorizontalCard
             key={item._id}
+            onPress={() => handleProductPressed(item)}
             productImage1={item.product.image1}
             productImage2={item.product.image2}
             productImage3={item.product.image3}
