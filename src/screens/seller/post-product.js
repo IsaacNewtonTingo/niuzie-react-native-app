@@ -11,13 +11,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
 
 import { RadioButton } from "react-native-paper";
-import { Text, Button, Modal } from "native-base";
+import { Text, Button, Modal, Flex, Divider, HStack } from "native-base";
 
 import styles from "../../componets/styles/global-styles";
 import colors from "../../componets/colors/colors";
@@ -49,6 +50,8 @@ import { BarIndicator } from "react-native-indicators";
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
+import NoData from "../../componets/Text/no-data";
+import HorizontalCard from "../../componets/cards/horizontal-card";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -63,7 +66,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-export default function PostProduct({ navigation }, props) {
+export default function PostProduct({ navigation }) {
   const [maxPosts, setMaxPosts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -107,6 +110,14 @@ export default function PostProduct({ navigation }, props) {
   const [token, setToken] = useState("");
   const [premiumUser, setPremiumUser] = useState(false);
 
+  const [pendingProductList, setPendingProductList] = useState([]);
+
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: "CreateProduct", title: "Post product" },
+    { key: "PendingProducts", title: "Pending products" },
+  ]);
+
   useEffect(() => {
     checkStoreCredentials();
   }, [(loading, navigation)]);
@@ -122,6 +133,7 @@ export default function PostProduct({ navigation }, props) {
 
       getUserData(data.userID, data.token);
       requestStoragePermission();
+      getPendingProducts(data.userID, data.token);
     } else {
       setUserID("");
       setToken("");
@@ -244,10 +256,63 @@ export default function PostProduct({ navigation }, props) {
 
   async function prePostProduct() {
     if (maxPosts == true && premiumUser == false) {
-      setPaymentModal(true);
+      submitProduct();
     } else {
       postProduct();
     }
+  }
+
+  async function submitProduct() {
+    const url = `${process.env.ENDPOINT}/product/submit-product`;
+    setSubmitting(true);
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    await axios
+      .post(
+        url,
+        {
+          userID,
+          phoneNumber,
+          productName,
+          category: categoryID,
+          subCategory: subCategoryID,
+          condition,
+          description,
+          price: parseInt(price),
+          image1: image1 !== null ? await uploadImage1() : null,
+          image2: image2 !== null ? await uploadImage2() : null,
+          image3: image3 !== null ? await uploadImage3() : null,
+          image4: image4 !== null ? await uploadImage4() : null,
+        },
+        { headers }
+      )
+      .then((response) => {
+        console.log(response.data);
+        setSubmitting(false);
+        if (response.data.status == "Success") {
+          getPendingProducts();
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
   }
 
   async function postProduct() {
@@ -291,6 +356,58 @@ export default function PostProduct({ navigation }, props) {
             description: response.data.message,
           });
         } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
+  async function publishManyProducts() {
+    const url = `${process.env.ENDPOINT}/product/insert-many-products`;
+    setSubmitting(true);
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    let accountNumber = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await axios
+      .post(
+        url,
+        {
+          userID,
+          phoneNumber,
+          amount: 2,
+          accountNumber,
+        },
+        { headers }
+      )
+      .then((response) => {
+        console.log(response.data);
+        setSubmitting(false);
+        if (response.data.status == "Success") {
+          setPaymentModal(false);
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {
@@ -524,389 +641,494 @@ export default function PostProduct({ navigation }, props) {
     }
   }
 
+  // const PostScreen = () => (
+
+  // );
+
+  const PendingProducts = () => (
+    <View>
+      {pendingProductList.length < 1 && <NoData text="No data" />}
+
+      {paymentModal == true && (
+        <Modal
+          backgroundColor={colors.dark}
+          isOpen={paymentModal}
+          onClose={() => setPaymentModal(false)}
+        >
+          <Modal.Content width={width - 40} maxWidth={width - 40}>
+            <Modal.CloseButton />
+            <Modal.Header>Pay to submit product for review</Modal.Header>
+
+            <Modal.Body>
+              <Text style={{ marginBottom: 20, color: colors.dark }}>
+                In order to post this product, you will have to pay KSH. 500.
+                Ensure the number provided below is your M-Pesa number and click
+                pay. You will recive an M-Pesa prompt to input your pin to
+                complete the payment process.
+              </Text>
+
+              <Text style={postStyles.label}>Phone number</Text>
+              <View style={styles.textInputContainer}>
+                <MaterialCommunityIcons
+                  style={styles.searchIcon}
+                  name="hand-coin-outline"
+                  size={18}
+                  color={colors.dark}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g 1200"
+                  keyboardType="numeric"
+                  value={phoneNumber.toString()}
+                  onChangeText={setPhoneNumber}
+                />
+              </View>
+
+              <Text style={postStyles.label}>Amount</Text>
+              <View style={styles.textInputContainer}>
+                <MaterialCommunityIcons
+                  style={styles.searchIcon}
+                  name="hand-coin-outline"
+                  size={18}
+                  color={colors.dark}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholderTextColor="gray"
+                  keyboardType="numeric"
+                  value="200"
+                  editable={false}
+                />
+              </View>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  width={100}
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    setPaymentModal(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  width={100}
+                  disabled={submitting}
+                  onPress={publishManyProducts}
+                >
+                  {submitting == false ? (
+                    "Pay"
+                  ) : (
+                    <BarIndicator color="white" size={20} />
+                  )}
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal>
+      )}
+
+      <ImageBackground
+        style={postStyles.topIMG}
+        source={require("../../assets/images/mt.jpg")}
+      >
+        <Image
+          style={postStyles.safLogo}
+          source={require("../../assets/images/safaricom.png")}
+        />
+        <Text style={postStyles.descText}>
+          In order to make the below product(s) live, please complete the
+          payment.
+        </Text>
+
+        <HStack>
+          <Text style={postStyles.amountText}>Ksh. 400 </Text>
+          <Divider bg="amber.500" thickness="2" mx="2" orientation="vertical" />
+          <Text style={postStyles.amountText}>Per product</Text>
+        </HStack>
+
+        <PrimaryButton
+          onPress={() => setPaymentModal(true)}
+          buttonTitle="Pay now"
+        />
+      </ImageBackground>
+
+      <FlatList
+        style={{ marginTop: 20 }}
+        data={pendingProductList}
+        renderItem={({ item }) => (
+          <HorizontalCard
+            onPress={() => handleProductPressed(item)}
+            key={item._id}
+            productImage1={item.image1}
+            productImage2={item.image2}
+            productImage3={item.image3}
+            productImage4={item.image4}
+            productName={item.productName}
+            price={item.price}
+            condition={item.condition}
+            description={item.description}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
+            rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+            premium={item.user.premium}
+          />
+        )}
+      />
+    </View>
+  );
+
+  async function handleProductPressed(item) {
+    navigation.push("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
+  }
+
+  const renderTabBar = (props) => (
+    <TabBar
+      {...props}
+      renderLabel={({ route, focused, color }) => (
+        <Text
+          style={{
+            color: focused ? colors.lightBlue : colors.gray,
+            margin: 8,
+          }}
+        >
+          {route.title}
+        </Text>
+      )}
+      indicatorStyle={{ backgroundColor: "white" }}
+      style={{ backgroundColor: colors.bar }}
+    />
+  );
+
+  async function getPendingProducts(userID, token) {
+    const url = `${process.env.ENDPOINT}/product/get-pending-products/${userID}`;
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setPendingProductList(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
 
   return (
-    <>
-      <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="always"
-        style={styles.container}
-      >
-        {maxPosts == true && premiumUser == false && (
-          <StaticAlert
-            status="warning"
-            title="Warning"
-            description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
-          />
-        )}
+    // <TabView
+    //   renderTabBar={renderTabBar}
+    //   style={[styles.container, {}]}
+    //   navigationState={{ index: index, routes: routes }}
+    //   renderScene={SceneMap({
+    //     CreateProduct: PostScreen,
+    //     PendingProducts: PendingProducts,
+    //   })}
+    //   onIndexChange={setIndex}
+    //   initialLayout={{ width: Dimensions.get("window").width }}
+    // />
 
-        {paymentModal == true && (
-          <Modal
-            backgroundColor={colors.dark}
-            isOpen={paymentModal}
-            onClose={() => setPaymentModal(false)}
-          >
-            <Modal.Content width={width - 40} maxWidth={width - 40}>
-              <Modal.CloseButton />
-              <Modal.Header>Pay to submit product for review</Modal.Header>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
+      {maxPosts == true && premiumUser == false && (
+        <StaticAlert
+          status="warning"
+          title="Warning"
+          description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
+        />
+      )}
 
-              <Modal.Body>
-                <Text style={{ marginBottom: 20, color: colors.dark }}>
-                  In order to post this product, you will have to pay KSH. 500.
-                  Ensure the number provided below is your M-Pesa number and
-                  click pay. You will recive an M-Pesa prompt to input your pin
-                  to complete the payment process.
-                </Text>
-
-                <Text style={postStyles.label}>Phone number</Text>
-                <View style={styles.textInputContainer}>
-                  <MaterialCommunityIcons
-                    style={styles.searchIcon}
-                    name="hand-coin-outline"
-                    size={18}
-                    color={colors.dark}
-                  />
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="e.g 1200"
-                    keyboardType="numeric"
-                    value={phoneNumber.toString()}
-                    onChangeText={setPhoneNumber}
-                  />
-                </View>
-
-                <Text style={postStyles.label}>Amount</Text>
-                <View style={styles.textInputContainer}>
-                  <MaterialCommunityIcons
-                    style={styles.searchIcon}
-                    name="hand-coin-outline"
-                    size={18}
-                    color={colors.dark}
-                  />
-                  <TextInput
-                    style={styles.textInput}
-                    placeholderTextColor="gray"
-                    keyboardType="numeric"
-                    value="200"
-                    editable={false}
-                  />
-                </View>
-              </Modal.Body>
-
-              <Modal.Footer>
-                <Button.Group space={2}>
-                  <Button
-                    width={100}
-                    variant="ghost"
-                    colorScheme="blueGray"
-                    onPress={() => {
-                      setPaymentModal(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    width={100}
-                    disabled={submitting}
-                    onPress={postProduct}
-                  >
-                    {submitting == false ? (
-                      "Pay"
-                    ) : (
-                      <BarIndicator color="white" size={20} />
-                    )}
-                  </Button>
-                </Button.Group>
-              </Modal.Footer>
-            </Modal.Content>
-          </Modal>
-        )}
-
-        <View style={postStyles.holdingContainer}>
-          <View style={styles.textComb}>
-            <Text style={styles.label}>Product name</Text>
-            <Text style={[styles.label, { color: "gray" }]}>
-              {productName.length}/30
-            </Text>
-          </View>
-
-          <View style={styles.textInputContainer}>
-            <FontAwesome
-              style={styles.searchIcon}
-              name="mobile-phone"
-              size={24}
-              color={colors.dark}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g iPhone 14 pro max"
-              placeholderTextColor="gray"
-              value={productName}
-              onChangeText={setProductName}
-              maxLength={30}
-            />
-          </View>
-          <Text style={styles.label}>Category</Text>
-          <TouchableOpacity
-            onPress={handleCategory}
-            style={[
-              styles.textInput,
-              { marginVertical: 10, justifyContent: "center" },
-            ]}
-          >
-            <Ionicons
-              style={styles.searchIcon}
-              name="shirt"
-              size={16}
-              color={colors.dark}
-            />
-            <Text style={postStyles.catText}>{category}</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.label}>Sub category</Text>
-          <TouchableOpacity
-            onPress={handleSubCategory}
-            style={[
-              styles.textInput,
-              { marginVertical: 10, justifyContent: "center" },
-            ]}
-          >
-            <MaterialCommunityIcons
-              style={styles.searchIcon}
-              name="shoe-sneaker"
-              size={20}
-              color={colors.dark}
-            />
-            <Text style={postStyles.catText}>{subCategory}</Text>
-          </TouchableOpacity>
-
-          <View style={styles.textComb}>
-            <Text style={styles.label}>Description</Text>
-            <Text style={[styles.label, { color: "gray" }]}>
-              {description.length}/200
-            </Text>
-          </View>
-
-          <View style={styles.textInputContainer}>
-            <Foundation
-              style={styles.searchIcon}
-              name="clipboard-notes"
-              size={18}
-              color={colors.dark}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g Perfect phone for..."
-              placeholderTextColor="gray"
-              value={description}
-              onChangeText={setDescription}
-              maxLength={200}
-            />
-          </View>
-
-          <Text style={styles.label}>Price (KSH.)</Text>
-          <View style={styles.textInputContainer}>
-            <MaterialCommunityIcons
-              style={styles.searchIcon}
-              name="hand-coin-outline"
-              size={18}
-              color={colors.dark}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g 1200"
-              placeholderTextColor="gray"
-              keyboardType="numeric"
-              value={price}
-              onChangeText={setPrice}
-            />
-          </View>
-        </View>
-
-        <View style={postStyles.holdingContainer}>
-          <Text style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}>
-            Condition
+      <View style={postStyles.holdingContainer}>
+        <View style={styles.textComb}>
+          <Text style={styles.label}>Product name</Text>
+          <Text style={[styles.label, { color: "gray" }]}>
+            {productName.length}/30
           </Text>
-
-          <View style={postStyles.radioContainer}>
-            <RadioButton
-              value="New"
-              status={condition === "New" ? "checked" : "unchecked"}
-              onPress={() => {
-                setCondition("New");
-              }}
-            />
-            <Text style={postStyles.radioText}>New</Text>
-          </View>
-
-          <View style={postStyles.radioContainer}>
-            <RadioButton
-              value="Used, in working conditions"
-              status={
-                condition === "Used, in working conditions"
-                  ? "checked"
-                  : "unchecked"
-              }
-              onPress={() => {
-                setCondition("Used, in working conditions");
-              }}
-            />
-            <Text style={postStyles.radioText}>
-              Used, in working conditions
-            </Text>
-          </View>
-
-          <View style={postStyles.radioContainer}>
-            <RadioButton
-              value="Used, with minor defects"
-              status={
-                condition === "Used, with minor defects"
-                  ? "checked"
-                  : "unchecked"
-              }
-              onPress={() => {
-                setCondition("Used, with minor defects");
-              }}
-            />
-            <Text style={postStyles.radioText}>Used, with minor defects</Text>
-          </View>
         </View>
 
-        <View style={postStyles.holdingContainer}>
-          <Text style={styles.label}>Add images</Text>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            style={postStyles.horImaCont}
-          >
-            <ImageBackground
-              style={postStyles.imageContainer}
-              source={{ uri: image1 }}
-            >
-              <TouchableOpacity onPress={openImage1Picker}>
-                <FontAwesome5 name="camera" size={24} color="black" />
-              </TouchableOpacity>
-            </ImageBackground>
+        <View style={styles.textInputContainer}>
+          <FontAwesome
+            style={styles.searchIcon}
+            name="mobile-phone"
+            size={24}
+            color={colors.dark}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="e.g iPhone 14 pro max"
+            placeholderTextColor="gray"
+            value={productName}
+            onChangeText={setProductName}
+            maxLength={30}
+          />
+        </View>
+        <Text style={styles.label}>Category</Text>
+        <TouchableOpacity
+          onPress={handleCategory}
+          style={[
+            styles.textInput,
+            { marginVertical: 10, justifyContent: "center" },
+          ]}
+        >
+          <Ionicons
+            style={styles.searchIcon}
+            name="shirt"
+            size={16}
+            color={colors.dark}
+          />
+          <Text style={postStyles.catText}>{category}</Text>
+        </TouchableOpacity>
 
-            <ImageBackground
-              style={postStyles.imageContainer}
-              source={{ uri: image2 }}
-            >
-              <TouchableOpacity onPress={openImage2Picker}>
-                <FontAwesome5 name="camera" size={24} color="black" />
-              </TouchableOpacity>
-            </ImageBackground>
+        <Text style={styles.label}>Sub category</Text>
+        <TouchableOpacity
+          onPress={handleSubCategory}
+          style={[
+            styles.textInput,
+            { marginVertical: 10, justifyContent: "center" },
+          ]}
+        >
+          <MaterialCommunityIcons
+            style={styles.searchIcon}
+            name="shoe-sneaker"
+            size={20}
+            color={colors.dark}
+          />
+          <Text style={postStyles.catText}>{subCategory}</Text>
+        </TouchableOpacity>
 
-            <ImageBackground
-              style={postStyles.imageContainer}
-              source={{ uri: image3 }}
-            >
-              <TouchableOpacity onPress={openImage3Picker}>
-                <FontAwesome5 name="camera" size={24} color="black" />
-              </TouchableOpacity>
-            </ImageBackground>
-
-            <ImageBackground
-              style={postStyles.imageContainer}
-              source={{ uri: image4 }}
-            >
-              <TouchableOpacity onPress={openImage4Picker}>
-                <FontAwesome5 name="camera" size={24} color="black" />
-              </TouchableOpacity>
-            </ImageBackground>
-          </ScrollView>
+        <View style={styles.textComb}>
+          <Text style={styles.label}>Description</Text>
+          <Text style={[styles.label, { color: "gray" }]}>
+            {description.length}/200
+          </Text>
         </View>
 
-        <View style={postStyles.holdingContainer}>
-          <Text style={styles.label}>Full name</Text>
-
-          <SecondaryButton iconName="user" buttonTitle={userName} />
-
-          <Text style={styles.label}>Phone number</Text>
-
-          <SecondaryButton iconName="phone-square" buttonTitle={phoneNumber} />
-
-          <Text style={styles.label}>County</Text>
-
-          <SecondaryButton iconName="address-book" buttonTitle={county} />
-
-          <Text style={styles.label}>Sub county</Text>
-
-          <SecondaryButton iconName="address-book-o" buttonTitle={subCounty} />
-
-          <PrimaryButton
-            disabled={submitting}
-            submitting={submitting}
-            onPress={validate}
-            buttonTitle="Post product"
+        <View style={styles.textInputContainer}>
+          <Foundation
+            style={styles.searchIcon}
+            name="clipboard-notes"
+            size={18}
+            color={colors.dark}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="e.g Perfect phone for..."
+            placeholderTextColor="gray"
+            value={description}
+            onChangeText={setDescription}
+            maxLength={200}
           />
         </View>
 
-        <BottomSheet
-          visible={showBottomSheet}
-          onBackButtonPress={() => setShowBottomSheet(false)}
-          onBackdropPress={() => setShowBottomSheet(false)}
-        >
-          <View style={postStyles.sheetContainer}>
-            {showCatSheet ? (
-              <View style={homeStyles.miniCatContainer}>
-                {loadingData == true && (
-                  <BarIndicator size={20} color="white" />
-                )}
-                {categories.map((category) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCategory(category.categoryName);
-                      setCategoryID(category._id);
+        <Text style={styles.label}>Price (KSH.)</Text>
+        <View style={styles.textInputContainer}>
+          <MaterialCommunityIcons
+            style={styles.searchIcon}
+            name="hand-coin-outline"
+            size={18}
+            color={colors.dark}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="e.g 1200"
+            placeholderTextColor="gray"
+            keyboardType="numeric"
+            value={price}
+            onChangeText={setPrice}
+          />
+        </View>
+      </View>
 
-                      setSubCatCategory("");
-                      setSubCatCategoryID("");
+      <View style={postStyles.holdingContainer}>
+        <Text style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}>
+          Condition
+        </Text>
+
+        <View style={postStyles.radioContainer}>
+          <RadioButton
+            value="New"
+            status={condition === "New" ? "checked" : "unchecked"}
+            onPress={() => {
+              setCondition("New");
+            }}
+          />
+          <Text style={postStyles.radioText}>New</Text>
+        </View>
+
+        <View style={postStyles.radioContainer}>
+          <RadioButton
+            value="Used, in working conditions"
+            status={
+              condition === "Used, in working conditions"
+                ? "checked"
+                : "unchecked"
+            }
+            onPress={() => {
+              setCondition("Used, in working conditions");
+            }}
+          />
+          <Text style={postStyles.radioText}>Used, in working conditions</Text>
+        </View>
+
+        <View style={postStyles.radioContainer}>
+          <RadioButton
+            value="Used, with minor defects"
+            status={
+              condition === "Used, with minor defects" ? "checked" : "unchecked"
+            }
+            onPress={() => {
+              setCondition("Used, with minor defects");
+            }}
+          />
+          <Text style={postStyles.radioText}>Used, with minor defects</Text>
+        </View>
+      </View>
+
+      <View style={postStyles.holdingContainer}>
+        <Text style={styles.label}>Add images</Text>
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          style={postStyles.horImaCont}
+        >
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image1 }}
+          >
+            <TouchableOpacity onPress={openImage1Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
+
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image2 }}
+          >
+            <TouchableOpacity onPress={openImage2Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
+
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image3 }}
+          >
+            <TouchableOpacity onPress={openImage3Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
+
+          <ImageBackground
+            style={postStyles.imageContainer}
+            source={{ uri: image4 }}
+          >
+            <TouchableOpacity onPress={openImage4Picker}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </ImageBackground>
+        </ScrollView>
+      </View>
+
+      <View style={postStyles.holdingContainer}>
+        <Text style={styles.label}>Full name</Text>
+
+        <SecondaryButton iconName="user" buttonTitle={userName} />
+
+        <Text style={styles.label}>Phone number</Text>
+
+        <SecondaryButton iconName="phone-square" buttonTitle={phoneNumber} />
+
+        <Text style={styles.label}>County</Text>
+
+        <SecondaryButton iconName="address-book" buttonTitle={county} />
+
+        <Text style={styles.label}>Sub county</Text>
+
+        <SecondaryButton iconName="address-book-o" buttonTitle={subCounty} />
+
+        <PrimaryButton
+          disabled={submitting}
+          submitting={submitting}
+          onPress={validate}
+          buttonTitle="Post product"
+        />
+      </View>
+
+      <BottomSheet
+        visible={showBottomSheet}
+        onBackButtonPress={() => setShowBottomSheet(false)}
+        onBackdropPress={() => setShowBottomSheet(false)}
+      >
+        <View style={postStyles.sheetContainer}>
+          {showCatSheet ? (
+            <View style={homeStyles.miniCatContainer}>
+              {loadingData == true && <BarIndicator size={20} color="white" />}
+              {categories.map((category) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setCategory(category.categoryName);
+                    setCategoryID(category._id);
+
+                    setSubCatCategory("");
+                    setSubCatCategoryID("");
+                    setShowBottomSheet(false);
+                  }}
+                  style={homeStyles.miniCatItem}
+                  key={category._id}
+                >
+                  <Image
+                    style={homeStyles.categoryImage}
+                    source={{ uri: category.categoryImage }}
+                  />
+                  <Text style={homeStyles.categoryText}>
+                    {category.categoryName}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : showSubCatSheet ? (
+            <>
+              {loadingData == true && <BarIndicator size={20} color="white" />}
+
+              <FlatList
+                data={subCategories}
+                renderItem={({ item }) => (
+                  <PostSubCategoryList
+                    key={item._id}
+                    onPress={() => {
+                      setSubCatCategory(item.subCategoryName);
+                      setSubCatCategoryID(item._id);
                       setShowBottomSheet(false);
                     }}
-                    style={homeStyles.miniCatItem}
-                    key={category._id}
-                  >
-                    <Image
-                      style={homeStyles.categoryImage}
-                      source={{ uri: category.categoryImage }}
-                    />
-                    <Text style={homeStyles.categoryText}>
-                      {category.categoryName}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ) : showSubCatSheet ? (
-              <>
-                {loadingData == true && (
-                  <BarIndicator size={20} color="white" />
+                    subCategoryID={item._id}
+                    subCategoryName={item.subCategoryName}
+                  />
                 )}
-
-                <FlatList
-                  data={subCategories}
-                  renderItem={({ item }) => (
-                    <PostSubCategoryList
-                      key={item._id}
-                      onPress={() => {
-                        setSubCatCategory(item.subCategoryName);
-                        setSubCatCategoryID(item._id);
-                        setShowBottomSheet(false);
-                      }}
-                      subCategoryID={item._id}
-                      subCategoryName={item.subCategoryName}
-                    />
-                  )}
-                />
-              </>
-            ) : (
-              <></>
-            )}
-          </View>
-        </BottomSheet>
-      </KeyboardAwareScrollView>
-    </>
+              />
+            </>
+          ) : (
+            <></>
+          )}
+        </View>
+      </BottomSheet>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -972,5 +1194,25 @@ export const postStyles = StyleSheet.create({
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
     paddingHorizontal: 10,
+  },
+  topIMG: {
+    width: width,
+    height: width / 1.7,
+    borderRadius: 10,
+    padding: 20,
+  },
+  safLogo: {
+    width: 100,
+    height: 40,
+  },
+  descText: {
+    color: colors.gray,
+    fontWeight: "800",
+    marginVertical: 20,
+  },
+  amountText: {
+    color: colors.lightBlue,
+    fontWeight: "800",
+    fontSize: 20,
   },
 });
