@@ -684,7 +684,7 @@ export default function ProductDetails({ route, navigation }) {
       {otherProducts.length > 0 && (
         <View style={[styles.section, { minHeight: 200 }]}>
           <Text style={[styles.subText, { marginBottom: 20 }]}>
-            Other products by <B>{firstName}</B>
+            Other products
           </Text>
 
           <FlatList

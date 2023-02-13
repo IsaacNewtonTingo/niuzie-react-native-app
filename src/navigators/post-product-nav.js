@@ -6,6 +6,7 @@ import colors from "../componets/colors/colors";
 import PostProductRequest from "../screens/buyer/post-product-request";
 import PostOptions from "../screens/general/dashboard/post-options";
 import PayForProduct from "../screens/seller/pay-product";
+import ProductDetails from "../screens/general/dashboard/product-details";
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,14 @@ export default function PostProductNav() {
         options={{
           headerTitle: "Pay for product",
         }}
+      />
+
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetails}
+        options={({ route }) => ({
+          headerShown: false,
+        })}
       />
     </Stack.Navigator>
   );
