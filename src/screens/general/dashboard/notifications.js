@@ -12,6 +12,7 @@ import React, { useEffect, useState, useContext } from "react";
 import {
   CredentialsContext,
   NotificationContext,
+  AuthContext,
 } from "../../../componets/context/credentials-context";
 import { showMyToast } from "../../../functions/show-toast";
 import { Avatar } from "react-native-paper";
@@ -23,12 +24,15 @@ import styles from "../../../componets/styles/global-styles";
 import moment from "moment";
 import colors from "../../../componets/colors/colors";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import NoData from "../../../componets/Text/no-data";
 
 const { width } = Dimensions.get("window");
 
 export default function NotificationsScreen({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
   const { notifications, setNotifications } = useContext(NotificationContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
@@ -42,18 +46,33 @@ export default function NotificationsScreen({ navigation }) {
   const [allRead, setAllRead] = useState(false);
 
   useEffect(() => {
-    getNotifications();
+    if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
+      setAuth(true);
+    } else {
+      getNotifications();
 
-    Notifications.addNotificationReceivedListener(handleNotification);
-    Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
-    );
+      Notifications.addNotificationReceivedListener(handleNotification);
+      Notifications.addNotificationResponseReceivedListener(
+        handleNotificationResponse
+      );
+    }
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
-  const handleNotification = () => {
+  const handleNotification = (notification) => {
     getNotifications();
+    // showMyToast({
+    //   status: "info",
+    //   title: notification.request.content.title,
+    //   description: notification.request.content.body,
+    // });
   };
 
   const handleNotificationResponse = (notification) => {
@@ -182,14 +201,17 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <View style={[styles.container, {}]}>
-      <View style={notificationStyles.topCont}>
-        <TouchableOpacity
-          onPress={markAsRead}
-          style={notificationStyles.markCont}
-        >
-          <Text style={notificationStyles.markText}>Mark all as read</Text>
-        </TouchableOpacity>
-      </View>
+      {notificationsList.length > 0 && (
+        <View style={notificationStyles.topCont}>
+          <TouchableOpacity
+            onPress={markAsRead}
+            style={notificationStyles.markCont}
+          >
+            <Text style={notificationStyles.markText}>Mark all as read</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {notificationsList.length < 1 && <NoData text="No nofications found" />}
 
       <FlatList
         data={notificationsList}

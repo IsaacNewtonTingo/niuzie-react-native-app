@@ -13,7 +13,6 @@ import { LinearGradient } from "expo-linear-gradient";
 const { width } = Dimensions.get("window");
 
 import { FontAwesome } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
 import colors from "../colors/colors";
@@ -38,7 +37,7 @@ export default function ProductRequest(props) {
         end={[1.0, 0.5]}
         locations={[0.0, 1.0]}
         colors={["#78869F", "#001949"]}
-        style={gradientStyles.background}
+        style={[gradientStyles.background, props.styles]}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {profilePicture ? (

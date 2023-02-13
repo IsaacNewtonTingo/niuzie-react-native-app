@@ -24,9 +24,10 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../../../componets/colors/colors";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
-export default function Profile({ navigation }) {
-  const [loading, setLoading] = useState(true);
+export default function Profile({ route, navigation }) {
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -47,7 +48,7 @@ export default function Profile({ navigation }) {
 
   useEffect(() => {
     getProfile();
-  }, []);
+  }, [route]);
 
   async function getProfile() {
     setLoadingData(true);
@@ -83,6 +84,11 @@ export default function Profile({ navigation }) {
         console.log(err);
       });
   }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
   return (
     <ScrollView style={styles.container}>
       <ImageBackground
@@ -98,7 +104,7 @@ export default function Profile({ navigation }) {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate("EditAdminProfile", {
+            navigation.navigate("EditProfile", {
               firstName,
               lastName,
               phoneNumber,
@@ -106,6 +112,7 @@ export default function Profile({ navigation }) {
               county,
               subCounty,
               userID,
+              token,
             })
           }
           style={{ position: "absolute", bottom: -20, right: 20 }}

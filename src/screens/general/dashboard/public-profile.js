@@ -12,10 +12,7 @@ import {
 import { Avatar } from "react-native-paper";
 import noImage from "../../../assets/data/noImage";
 
-import {
-  CredentialsContext,
-  AuthContext,
-} from "../../../componets/context/credentials-context";
+import { CredentialsContext } from "../../../componets/context/credentials-context";
 
 import styles from "../../../componets/styles/global-styles";
 import { showMyToast } from "../../../functions/show-toast";
@@ -26,24 +23,22 @@ import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import * as SecureStore from "expo-secure-store";
-
 import colors from "../../../componets/colors/colors";
-import PrimaryButton from "../../../componets/buttons/primary-button";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import HorizontalCard from "../../../componets/cards/horizontal-card";
 
-export default function AdminProfile({ navigation }) {
-  const [loading, setLoading] = useState(true);
+export default function PublicProfile({ route, navigation }) {
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
-  const { auth, setAuth } = useContext(AuthContext);
 
-  const { data } = storedCredentials;
-  const userID = data.userID;
-  const token = data.token;
+  const userID = storedCredentials ? storedCredentials.data.userID : "";
+  const token = storedCredentials ? storedCredentials.data.token : "";
+
+  const productOwnerID = route.params.productOwnerID;
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -53,24 +48,17 @@ export default function AdminProfile({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
+  const [sellerProducts, setSellerProducts] = useState([]);
+
   useEffect(() => {
     getProfile();
-  }, [(loading, navigation)]);
-
-  navigation.addListener("focus", () => setLoading(!loading));
+  }, [route]);
 
   async function getProfile() {
     setLoadingData(true);
-    const url = `${process.env.ENDPOINT}/user/get-user-data/${userID}`;
-
-    const headers = {
-      "auth-token": token,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
+    const url = `${process.env.ENDPOINT}/product/get-seller-profile/${productOwnerID}`;
     await axios
-      .get(url, { headers: headers })
+      .get(url)
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
@@ -80,6 +68,8 @@ export default function AdminProfile({ navigation }) {
           setProfilePicture(response.data.data.profilePicture);
           setCounty(response.data.data.county);
           setSubCounty(response.data.data.subCounty);
+
+          getSellerProducts();
         } else {
           showMyToast({
             status: "error",
@@ -94,18 +84,31 @@ export default function AdminProfile({ navigation }) {
       });
   }
 
-  async function logout() {
-    setLoadingData(true);
-    await SecureStore.deleteItemAsync("loginCredentials")
-      .then(async () => {
-        setLoadingData(false);
-        setStoredCredentials("");
-        setAuth(true);
+  async function getSellerProducts() {
+    let url = `${process.env.ENDPOINT}/product/get-user-products/${productOwnerID}`;
+    await axios
+      .get(url)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setSellerProducts(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
       })
       .catch((err) => {
         console.log(err);
-        setLoadingData(false);
       });
+  }
+
+  async function handleProductPressed(item) {
+    navigation.navigate("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   if (loadingData) {
@@ -124,24 +127,6 @@ export default function AdminProfile({ navigation }) {
             uri: profilePicture ? profilePicture : noImage.noProfilePic,
           }}
         />
-
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("EditAdminProfile", {
-              firstName,
-              lastName,
-              phoneNumber,
-              profilePicture,
-              county,
-              subCounty,
-              userID,
-              token,
-            })
-          }
-          style={{ position: "absolute", bottom: -20, right: 20 }}
-        >
-          <FontAwesome name="edit" size={30} color={colors.linkText} />
-        </TouchableOpacity>
       </ImageBackground>
 
       <View style={profileStyles.cont}>
@@ -161,12 +146,41 @@ export default function AdminProfile({ navigation }) {
           </View>
         </View>
 
-        <View style={profileStyles.flee}>
-          <FontAwesome5 name="phone-square-alt" size={30} color={colors.gray} />
-          <View style={profileStyles.it}>
-            <Text style={profileStyles.label}>Phone number</Text>
-            <Text style={profileStyles.may}>{phoneNumber}</Text>
+        <View
+          style={[
+            styles.spaceBetween,
+
+            {
+              marginBottom: 20,
+              borderBottomWidth: 0.18,
+              paddingBottom: 20,
+              borderBottomColor: colors.gray,
+            },
+          ]}
+        >
+          <View style={profileStyles.comb}>
+            <FontAwesome5
+              name="phone-square-alt"
+              size={30}
+              color={colors.gray}
+            />
+            <View style={profileStyles.it}>
+              <Text style={profileStyles.label}>Phone number</Text>
+              <Text style={profileStyles.may}>
+                {userID
+                  ? phoneNumber
+                  : phoneNumber.toString().slice(0, 6) +
+                    "XXXXX" +
+                    phoneNumber.toString().slice(-1)}
+              </Text>
+            </View>
           </View>
+
+          {!userID && (
+            <TouchableOpacity>
+              <Text style={profileStyles.viewText}>View</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={profileStyles.flee}>
@@ -192,14 +206,31 @@ export default function AdminProfile({ navigation }) {
             <Text style={profileStyles.may}>{subCounty}</Text>
           </View>
         </View>
-
-        <PrimaryButton
-          buttonTitle="Logout"
-          submitting={submitting}
-          disabled={submitting}
-          onPress={logout}
-        />
       </View>
+
+      <Text style={[styles.subText, { marginLeft: 10, marginBottom: 20 }]}>
+        Products by {lastName}
+      </Text>
+
+      {sellerProducts.map((item) => (
+        <HorizontalCard
+          onPress={() => handleProductPressed(item)}
+          style={{ marginBottom: 10 }}
+          key={item._id}
+          productImage1={item.image1}
+          productImage2={item.image2}
+          productImage3={item.image3}
+          productImage4={item.image4}
+          productName={item.productName}
+          price={item.price}
+          condition={item.condition}
+          description={item.description}
+          county={item.user.county}
+          subCounty={item.user.subCounty}
+          rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+          premium={item.user.premium}
+        />
+      ))}
     </ScrollView>
   );
 }
@@ -232,5 +263,16 @@ const profileStyles = StyleSheet.create({
   },
   it: {
     marginLeft: 10,
+  },
+  viewText: {
+    fontWeight: "800",
+    color: colors.linkText,
+  },
+  comb: {
+    flexDirection: "row",
+    alignItems: "center",
+    // marginBottom: 20,
+    // borderBottomWidth: 0.18,
+    // paddingBottom: 20,
   },
 });

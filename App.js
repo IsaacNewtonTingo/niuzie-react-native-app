@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { LogBox, Platform } from "react-native";
+import { LogBox, Platform, Linking } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
-import TabNavigator from "./src/navigators/tab-navigator";
-
 import { NativeBaseProvider, extendTheme } from "native-base";
 
 import {
   CredentialsContext,
   NotificationContext,
+  AuthContext,
 } from "./src/componets/context/credentials-context";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import AppLoading from "expo-app-loading";
+import { Asset } from "expo-asset";
 
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
+
 import axios from "axios";
+import Decider from "./src/navigators/decider";
+
 import { showMyToast } from "./src/functions/show-toast";
+
+Linking.addEventListener("url", handleOpenURL);
+Linking.getInitialURL().then((url) => {
+  if (url) {
+    handleOpenURL({ url });
+  }
+});
+
+function handleOpenURL({ url }) {
+  const productID = url.split("/")[2];
+  // navigation.navigate("ProductDetails", { productID });
+}
 
 LogBox.ignoreAllLogs();
 
@@ -85,8 +102,11 @@ async function registerForPushNotificationsAsync(userID, authToken) {
 }
 
 export default function App() {
+  const [isLoadingComplete, setLoadingComplete] = useState(false);
+
   const [storedCredentials, setStoredCredentials] = useState("");
   const [notifications, setNotifications] = useState(0);
+  const [auth, setAuth] = useState(false);
 
   useEffect(() => {
     checkLoginCredentials();
@@ -142,16 +162,18 @@ export default function App() {
       <CredentialsContext.Provider
         value={{ storedCredentials, setStoredCredentials }}
       >
-        <NotificationContext.Provider
-          value={{ notifications, setNotifications }}
-        >
-          <NativeBaseProvider theme={theme}>
-            <NavigationContainer>
-              <TabNavigator />
-              <StatusBar style="light" />
-            </NavigationContainer>
-          </NativeBaseProvider>
-        </NotificationContext.Provider>
+        <AuthContext.Provider value={{ auth, setAuth }}>
+          <NotificationContext.Provider
+            value={{ notifications, setNotifications }}
+          >
+            <NativeBaseProvider theme={theme}>
+              <NavigationContainer>
+                <Decider />
+                <StatusBar style="light" />
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </NotificationContext.Provider>
+        </AuthContext.Provider>
       </CredentialsContext.Provider>
     </GestureHandlerRootView>
   );

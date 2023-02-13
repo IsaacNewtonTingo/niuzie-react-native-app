@@ -11,12 +11,12 @@ import PrimaryButton from "../../../componets/buttons/primary-button";
 import { postStyles } from "../../seller/post-product";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
-import LoginComponent from "../../../componets/auth/login";
 import { Modal } from "native-base";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import colors from "../../../componets/colors/colors";
 import { showMyToast } from "../../../functions/show-toast";
+
 import axios from "axios";
+import colors from "../../../componets/colors/colors";
 
 export default function ProductRequestDetails({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -161,33 +161,6 @@ export default function ProductRequestDetails({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      {!storedCredentials && (
-        <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{
-              alignItems: "flex-end",
-              right: 20,
-              marginBottom: 20,
-              width: Dimensions.get("window").width,
-            }}
-          >
-            <Text style={{ color: colors.orange, fontWeight: "800" }}>
-              Close
-            </Text>
-          </TouchableOpacity>
-
-          <LoginComponent
-            submitting={submitting}
-            loginPress={login}
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            password={password}
-            setPassword={setPassword}
-          />
-        </Modal>
-      )}
-
       {!premium && (
         <StaticAlert
           status="warning"
