@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function EmailOtp() {
+export default function NotificationSettings() {
   return (
     <View>
-      <Text>EmailOtp</Text>
+      <Text>NotificationSettings</Text>
     </View>
   );
 }

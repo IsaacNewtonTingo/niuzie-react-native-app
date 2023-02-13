@@ -8,14 +8,19 @@ import {
   Image,
   Dimensions,
   ImageBackground,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import styles from "../../../componets/styles/global-styles";
 import { LinearGradient } from "expo-linear-gradient";
 
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import * as ImagePicker from "expo-image-picker";
+
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
@@ -30,20 +35,40 @@ import { Avatar } from "react-native-paper";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
 import { discoverStyles } from "../../general/dashboard/discover";
 import { showMyToast } from "../../../functions/show-toast";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const countiesData = require("../../../assets/data/counties.json");
+const countiesData = require("../../../assets/data/counties2.json");
 
 const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
-export default function EditAdminProfile({ route }) {
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+export default function EditAdminProfile({ route, navigation }) {
   const [firstName, setFirstName] = useState(route.params.firstName);
   const [lastName, setLastName] = useState(route.params.lastName);
   const [phoneNumber, setPhoneNumber] = useState(route.params.phoneNumber);
   const [profilePicture, setProfilePicture] = useState(
     route.params.profilePicture
   );
+  const [newProfilePicture, setNewprofilePicture] = useState(null);
+
   const [county, setCounty] = useState(route.params.county);
   const [subCounty, setSubCounty] = useState(route.params.subCounty);
+
+  const token = route.params.token;
+  const userID = route.params.userID;
 
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -59,6 +84,10 @@ export default function EditAdminProfile({ route }) {
   const [countiesModal, setCountiesModal] = useState(false);
   const [subCountiesModal, setSubCountiesModal] = useState(false);
   const [subCounties, setSubCounties] = useState([]);
+
+  const headers = {
+    "auth-token": token,
+  };
 
   async function validate() {
     if (!firstName) {
@@ -99,24 +128,41 @@ export default function EditAdminProfile({ route }) {
         description:
           "Phone number is required. Please add a phone number then proceed",
       });
+    } else if (!password) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
     } else {
-      setOtpPassModal(true);
+      initiateOTP();
     }
   }
 
-  async function initiateOTP() {}
-
-  async function editProfile() {
-    setSubmitting(false);
-
+  async function initiateOTP() {
+    setSubmitting(true);
     const url = `${process.env.ENDPOINT}/user/edit-profile/${userID}`;
 
     await axios
-      .post(url, {}, { headers })
+      .post(url, { phoneNumber, password }, { headers })
       .then((response) => {
         setSubmitting(false);
-
         console.log(response.data);
+
+        if (response.data.status == "Success") {
+          setOtpPassModal(true);
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -124,10 +170,175 @@ export default function EditAdminProfile({ route }) {
       });
   }
 
-  async function changePassword() {}
+  async function editProfile() {
+    setSubmitting(true);
+
+    const url = `${process.env.ENDPOINT}/user/update-profile/${userID}`;
+
+    await axios
+      .put(
+        url,
+        {
+          firstName,
+          lastName,
+          county,
+          subCounty,
+          phoneNumber,
+          password,
+          otp,
+          profilePicture:
+            newProfilePicture !== null ? await uploadImage() : profilePicture,
+        },
+        { headers }
+      )
+      .then((response) => {
+        setSubmitting(false);
+        console.log(response.data);
+        if (response.data.status == "Success") {
+          setOtpPassModal(false);
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          setPassword("");
+          setOtp("");
+          setNewprofilePicture(null);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSubmitting(false);
+      });
+  }
+
+  async function changeDP() {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 0.5,
+    });
+
+    if (!pickerResult.canceled) {
+      setProfilePicture(pickerResult.assets[0].uri);
+      setNewprofilePicture(pickerResult.assets[0].uri);
+    }
+  }
+
+  async function uploadImage() {
+    if (newProfilePicture == null) {
+      return null;
+    } else {
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+          console.log(e);
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", newProfilePicture, true);
+        xhr.send(null);
+      });
+
+      let filename = newProfilePicture.substring(
+        newProfilePicture.lastIndexOf("/") + 1
+      );
+
+      const fileRef = ref(storage, `images/${filename}`);
+      const result = await uploadBytes(fileRef, blob);
+
+      // We're done with the blob, close and release it
+      blob.close();
+
+      return await getDownloadURL(fileRef);
+    }
+  }
+
+  async function changePassword() {
+    if (!oldPassword) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Your old password is required",
+      });
+    } else if (!newPassword) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "New password is required",
+      });
+    } else if (newPassword.length < 8) {
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Password is too short",
+      });
+    } else if (!confirmNewPassword) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Confirm new password is required",
+      });
+    } else if (newPassword !== confirmNewPassword) {
+      showMyToast({
+        status: "error",
+        title: "Failed",
+        description: "Passwords don't match",
+      });
+    } else {
+      setSubmitting(true);
+      const url = `${process.env.ENDPOINT}/user/update-password/${userID}`;
+      await axios
+        .put(
+          url,
+          {
+            oldPassword,
+            newPassword,
+          },
+          { headers }
+        )
+        .then((response) => {
+          setSubmitting(false);
+          console.log(response.data);
+          if (response.data.status == "Success") {
+            setChangePassModal(false);
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+            setNewPassword("");
+            setOldPassword("");
+            setConfirmNewPassword("");
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setSubmitting(false);
+        });
+    }
+  }
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       <ImageBackground
         style={editProfileStyles.bg}
         source={require("../../../assets/images/bg.jpg")}
@@ -138,6 +349,10 @@ export default function EditAdminProfile({ route }) {
             uri: profilePicture ? profilePicture : noImage.noProfilePic,
           }}
         />
+
+        <TouchableOpacity onPress={changeDP} style={{ position: "absolute" }}>
+          <Entypo name="camera" size={50} color={colors.dark} />
+        </TouchableOpacity>
       </ImageBackground>
 
       <View style={postStyles.holdingContainer}>
@@ -208,8 +423,8 @@ export default function EditAdminProfile({ route }) {
             <Text>{county}</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.label}>Sub county</Text>
 
+        <Text style={styles.label}>Sub county</Text>
         <View style={styles.textInputContainer}>
           <MaterialCommunityIcons
             name="city-variant"
@@ -228,7 +443,30 @@ export default function EditAdminProfile({ route }) {
           </TouchableOpacity>
         </View>
 
-        <PrimaryButton onPress={validate} buttonTitle="Edit profile" />
+        <Text style={styles.label}>Password</Text>
+        <View style={styles.textInputContainer}>
+          <FontAwesome5
+            name="lock"
+            size={18}
+            color="black"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            style={[styles.textInput, { color: colors.dark }]}
+            placeholder="*******"
+            placeholderTextColor="gray"
+            secureTextEntry={true}
+          />
+        </View>
+
+        <PrimaryButton
+          disabled={submitting}
+          submitting={submitting}
+          onPress={validate}
+          buttonTitle="Edit profile"
+        />
 
         <TouchableOpacity onPress={() => setChangePassModal(true)}>
           <Text
@@ -270,30 +508,19 @@ export default function EditAdminProfile({ route }) {
             />
           </View>
 
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.textInputContainer}>
-            <FontAwesome5
-              name="lock"
-              size={18}
-              color="black"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              style={[styles.textInput, { color: colors.dark }]}
-              placeholder="********"
-              placeholderTextColor="gray"
-              secureTextEntry={true}
-            />
-          </View>
-
           <PrimaryButton
             disabled={submitting}
             submitting={submitting}
             onPress={editProfile}
             buttonTitle="Submit"
           />
+
+          <View style={styles.optTextSign}>
+            <Text style={styles.firstText}>Didn't recieve code ?</Text>
+            <TouchableOpacity>
+              <Text style={styles.opt2Text}>Resend</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
       </BottomSheet>
 
@@ -369,60 +596,70 @@ export default function EditAdminProfile({ route }) {
         </LinearGradient>
       </BottomSheet>
 
-      {countiesModal == true && (
-        <View
-          setCountiesModal={setCountiesModal}
-          style={discoverStyles.backdrop}
-        >
+      <BottomSheet
+        onBackButtonPress={() => setCountiesModal(false)}
+        onBackdropPress={() => setCountiesModal(false)}
+        visible={countiesModal}
+      >
+        <View style={editProfileStyles.bottomSheet}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={editProfileStyles.cancel}
             onPress={() => setCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={editProfileStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
-          {countiesData.map((item) => (
-            <PostSubCategoryList
-              key={item.code}
-              onPress={() => {
-                setCounty(item.name);
-                setSubCounties(item.sub_counties);
-                setSubCounty("");
-                setCountiesModal(false);
-              }}
-              subCategoryName={item.name}
-            />
-          ))}
+          <FlatList
+            data={countiesData}
+            renderItem={({ item }) => (
+              <PostSubCategoryList
+                key={item.code}
+                onPress={() => {
+                  setCounty(item.name);
+                  setSubCounties(item.sub_counties);
+                  setSubCounty("");
+                  setCountiesModal(false);
+                }}
+                subCategoryName={item.name}
+              />
+            )}
+          />
 
           {countiesData.length < 1 && <NoData text="No data" />}
         </View>
-      )}
+      </BottomSheet>
 
-      {subCountiesModal == true && (
-        <View style={discoverStyles.backdrop}>
+      <BottomSheet
+        visible={subCountiesModal}
+        onBackButtonPress={() => setSubCountiesModal(false)}
+        onBackdropPress={() => setSubCountiesModal(false)}
+      >
+        <View style={editProfileStyles.bottomSheet}>
           <TouchableOpacity
-            style={discoverStyles.cancel}
+            style={editProfileStyles.cancel}
             onPress={() => setSubCountiesModal(false)}
           >
-            <Text style={discoverStyles.close}>Cancel</Text>
+            <Text style={editProfileStyles.close}>Cancel</Text>
           </TouchableOpacity>
 
-          {subCounties.map((item, i) => (
-            <PostSubCategoryList
-              key={i}
-              onPress={() => {
-                setSubCounty(item);
-                setSubCountiesModal(false);
-              }}
-              subCategoryName={item}
-            />
-          ))}
+          <FlatList
+            data={subCounties}
+            renderItem={({ item, i }) => (
+              <PostSubCategoryList
+                key={i}
+                onPress={() => {
+                  setSubCounty(item);
+                  setSubCountiesModal(false);
+                }}
+                subCategoryName={item}
+              />
+            )}
+          />
 
           {!county && <NoData text="Please select county first" />}
-          {subCounties.length < 1 && <NoData text="No data" />}
         </View>
-      )}
-    </ScrollView>
+      </BottomSheet>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -455,5 +692,25 @@ const editProfileStyles = StyleSheet.create({
     height: width / 1.7,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bottomSheet: {
+    backgroundColor: colors.cardColor,
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    bottom: 0,
+    height: height / 2,
+    alignSelf: "center",
+    position: "absolute",
+    zIndex: 2,
+  },
+  close: {
+    color: colors.orange,
+    fontWeight: "800",
+  },
+  cancel: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    padding: 20,
   },
 });

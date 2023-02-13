@@ -32,7 +32,12 @@ export default function TertiaryButton(props) {
       {submitting == true ? (
         <BarIndicator size={20} color="white" />
       ) : (
-        <Text style={{ color: colors.lightBlue, fontWeight: "800" }}>
+        <Text
+          style={[
+            { color: colors.lightBlue, fontWeight: "800" },
+            props.labelStyles,
+          ]}
+        >
           {title}
         </Text>
       )}

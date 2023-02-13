@@ -7,6 +7,9 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  Linking,
+  Share,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import styles from "../../../componets/styles/global-styles";
@@ -21,25 +24,31 @@ import colors from "../../../componets/colors/colors";
 
 import { verticalProductCardStyles } from "../../../componets/cards/vertical-product";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  FontAwesome,
+  MaterialCommunityIcons,
+  AntDesign,
+  MaterialIcons,
+  Feather,
+} from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
-import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 import ReviewComponent from "../../../componets/cards/reviews";
 import axios from "axios";
-import { FlatList } from "react-native";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import { showMyToast } from "../../../functions/show-toast";
 
 import dateFormat from "dateformat";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
 import NoData from "../../../componets/Text/no-data";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+
+import * as Sharing from "expo-sharing";
 
 const width = Dimensions.get("window").width;
 
@@ -49,6 +58,8 @@ const B = (props) => (
 export default function ProductDetails({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+
+  const { auth, setAuth } = useContext(AuthContext);
 
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
@@ -88,6 +99,8 @@ export default function ProductDetails({ route, navigation }) {
   const [subCounty, setSubCounty] = useState("");
 
   const [saved, setSaved] = useState(false);
+
+  const [noProduct, setNoProduct] = useState(false);
 
   const [review, setReview] = useState("");
   const [defaultRating, setDefaultRating] = useState(0);
@@ -145,6 +158,8 @@ export default function ProductDetails({ route, navigation }) {
           setSubCounty(response.data.data.user.subCounty);
 
           getSimilarProducts(response.data.data.category._id);
+        } else if (response.data.message == "Product not found") {
+          setNoProduct(true);
         } else {
           showMyToast({
             status: "error",
@@ -201,18 +216,28 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function handleSave() {
-    setSaved(!saved);
-
-    const url = `${process.env.ENDPOINT}/product/save-product/${productID}`;
-
-    await axios
-      .post(url, { userID }, { headers })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
+    if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
       });
+      setAuth(true);
+    } else {
+      setSaved(!saved);
+
+      const url = `${process.env.ENDPOINT}/product/save-product/${productID}`;
+
+      await axios
+        .post(url, { userID }, { headers })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   const starImgFilled = () => {
@@ -297,44 +322,53 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function reviewProduct() {
-    setSubmitting(true);
-
-    await axios
-      .post(
-        `${process.env.ENDPOINT}/product/review-product/${productID}`,
-        {
-          userID,
-          rating: defaultRating,
-          reviewMessage: review,
-        },
-        { headers }
-      )
-      .then((response) => {
-        setSubmitting(false);
-        console.log(response.data);
-
-        if (response.data.status == "Failed") {
-          showMyToast({
-            status: "error",
-            title: response.data.status,
-            description: response.data.message,
-          });
-        } else {
-          showMyToast({
-            status: "success",
-            title: response.data.status,
-            description: response.data.message,
-          });
-          getReviews();
-          getProducts();
-          setReview("");
-          setDefaultRating(0);
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
+    if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
       });
+      setAuth(true);
+    } else {
+      setSubmitting(true);
+      await axios
+        .post(
+          `${process.env.ENDPOINT}/product/review-product/${productID}`,
+          {
+            userID,
+            rating: defaultRating,
+            reviewMessage: review,
+          },
+          { headers }
+        )
+        .then((response) => {
+          setSubmitting(false);
+          console.log(response.data);
+
+          if (response.data.status == "Failed") {
+            showMyToast({
+              status: "error",
+              title: response.data.status,
+              description: response.data.message,
+            });
+          } else {
+            showMyToast({
+              status: "success",
+              title: response.data.status,
+              description: response.data.message,
+            });
+            getReviews();
+            getProducts();
+            setReview("");
+            setDefaultRating(0);
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
   }
 
   async function deleteReview(reviewID) {
@@ -364,8 +398,72 @@ export default function ProductDetails({ route, navigation }) {
       });
   }
 
+  async function handlePhoneAction(action) {
+    if (userID) {
+      if (action == "call") {
+        await Linking.openURL(`tel:+${phoneNumber}`);
+      } else {
+        await Linking.openURL(`sms:+${phoneNumber}`);
+      }
+    } else {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to perform this operation. Signup if you don't have an account",
+      });
+      setAuth(true);
+      console.log(auth);
+    }
+  }
+
+  async function shareProduct() {
+    try {
+      // const deepLink = `../../../assets/images/bg.jpg`;
+
+      // Linking.canOpenURL(deepLink).then(async (supported) => {
+      //   if (supported) {
+      //     const result = await Sharing.isAvailableAsync();
+      //     const shareOptions = {
+      //       message: "Hello world",
+      //     };
+      //     if (result) {
+      //       await Sharing.shareAsync(deepLink, shareOptions);
+      //     } else {
+      //       showMyToast({
+      //         status: "error",
+      //         title: "Failed",
+      //         description: "An error occured while trying to share product",
+      //       });
+      //     }
+
+      //     // if (result.action === Share.sharedAction) {
+      //     //   console.log("Link shared successfully");
+      //     // } else if (result.action === Share.dismissedAction) {
+      //     //   console.log("Link sharing dismissed");
+      //     // }
+      //   } else {
+      //     console.error(`Cannot open deep link: ${deepLink}`);
+      //   }
+      // });
+
+      const shareOptions = {
+        message:
+          "Hello. Look at my product on the niuzie mobile application by clicking on the link below.",
+      };
+
+      await Share.share(shareOptions);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
+  }
+
+  if (noProduct) {
+    return <NoData text="Product not found. Might have been deleted" />;
   }
 
   return (
@@ -406,23 +504,21 @@ export default function ProductDetails({ route, navigation }) {
         <View style={styles.spaceBetween}>
           <Text style={productDetailStyles.prodNameText}>{productName}</Text>
 
-          {userID && (
-            <TouchableOpacity onPress={handleSave}>
-              {saved ? (
-                <MaterialCommunityIcons
-                  name="heart-multiple"
-                  size={24}
-                  color={colors.linkText}
-                />
-              ) : (
-                <MaterialCommunityIcons
-                  name="heart-multiple-outline"
-                  size={24}
-                  color={colors.linkText}
-                />
-              )}
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={handleSave}>
+            {saved ? (
+              <MaterialCommunityIcons
+                name="heart-multiple"
+                size={24}
+                color={colors.linkText}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="heart-multiple-outline"
+                size={24}
+                color={colors.linkText}
+              />
+            )}
+          </TouchableOpacity>
         </View>
 
         <Text style={productDetailStyles.priceText}>KSH. {price}</Text>
@@ -444,62 +540,98 @@ export default function ProductDetails({ route, navigation }) {
         <Text style={productDetailStyles.descriptionText}>{description}</Text>
       </View>
 
-      <View style={[productDetailStyles.prodData, productDetailStyles.hr]}>
+      <View
+        style={[
+          productDetailStyles.prodData,
+          productDetailStyles.hr,
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          },
+        ]}
+      >
         <View style={productDetailStyles.profileContainer}>
-          <Image
-            style={productDetailStyles.profileImage}
-            source={{
-              uri: profilePicture ? profilePicture : noImage.noProfilePic,
+          <TouchableOpacity
+            onPress={() => {
+              if (productOwnerID == userID) {
+                navigation.navigate("Profile");
+              } else {
+                navigation.navigate("PublicProfile", { productOwnerID });
+              }
             }}
-          />
+            style={productDetailStyles.profileContainer}
+          >
+            <Image
+              style={productDetailStyles.profileImage}
+              source={{
+                uri: profilePicture ? profilePicture : noImage.noProfilePic,
+              }}
+            />
 
-          <View>
-            <Text style={productDetailStyles.nameText}>
-              {firstName} {lastName}
-            </Text>
+            <View>
+              <Text style={productDetailStyles.nameText}>
+                {firstName} {lastName}
+              </Text>
 
-            <Text style={productDetailStyles.locationText}>
-              {county} {subCounty}
-            </Text>
-          </View>
+              <Text style={productDetailStyles.locationText}>
+                {county}, {subCounty}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-          <TouchableOpacity style={productDetailStyles.actionIcons}>
+          <TouchableOpacity
+            onPress={() => handlePhoneAction("call")}
+            style={productDetailStyles.actionIcons}
+          >
             <Feather name="phone-call" size={18} color={colors.lightBlue} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={productDetailStyles.actionIcons}>
-            <FontAwesome5 name="sms" size={18} color={colors.lightBlue} />
+          <TouchableOpacity
+            onPress={() => handlePhoneAction("sms")}
+            style={productDetailStyles.actionIcons}
+          >
+            <FontAwesome5 name="sms" size={20} color={colors.lightBlue} />
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          onPress={shareProduct}
+          style={productDetailStyles.actionIcons}
+        >
+          <FontAwesome name="share-square-o" size={25} color={colors.gray} />
+        </TouchableOpacity>
       </View>
 
-      <View style={[styles.section, { marginTop: 40 }]}>
-        <View style={[styles.textComb, { marginBottom: 20 }]}>
-          <Text style={styles.subText}>
-            Reviews <B>({reviewList.length})</B>
-          </Text>
+      {reviewList.length > 0 && (
+        <View style={[styles.section, { marginTop: 40 }]}>
+          <View style={[styles.textComb, { marginBottom: 20 }]}>
+            <Text style={styles.subText}>
+              Reviews <B>({reviewList.length})</B>
+            </Text>
 
-          {reviewList.length > 0 && (
-            <TouchableOpacity>
-              <Text style={styles.viewAll}>View all</Text>
-            </TouchableOpacity>
-          )}
+            {reviewList.length > 0 && (
+              <TouchableOpacity>
+                <Text style={styles.viewAll}>View all</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {reviewList.map((review) => (
+            <ReviewComponent
+              key={review._id}
+              productOwnerID={productOwnerID}
+              firstName={review.user.firstName}
+              lastName={review.user.lastName}
+              profilePicture={review.user.profilePicture}
+              date={dateFormat(review.createdAt, "mediumDate")}
+              rating={review.rating.toFixed(1)}
+              reviewMessage={review.reviewMessage}
+              onPress={() => deleteReview(review._id)}
+            />
+          ))}
         </View>
-
-        {reviewList.map((review) => (
-          <ReviewComponent
-            key={review._id}
-            productOwnerID={productOwnerID}
-            firstName={review.user.firstName}
-            lastName={review.user.lastName}
-            profilePicture={review.user.profilePicture}
-            date={dateFormat(review.createdAt, "mediumDate")}
-            rating={review.rating.toFixed(1)}
-            reviewMessage={review.reviewMessage}
-            onPress={() => deleteReview(review._id)}
-          />
-        ))}
-      </View>
+      )}
 
       {userID !== productOwnerID && (
         <View style={[styles.section, {}]}>
@@ -549,67 +681,69 @@ export default function ProductDetails({ route, navigation }) {
         </View>
       )}
 
-      <View style={[styles.section, { minHeight: 200 }]}>
-        <Text style={[styles.subText, { marginBottom: 20 }]}>
-          Other products by <B>{firstName}</B>
-        </Text>
+      {otherProducts.length > 0 && (
+        <View style={[styles.section, { minHeight: 200 }]}>
+          <Text style={[styles.subText, { marginBottom: 20 }]}>
+            Other products by <B>{firstName}</B>
+          </Text>
 
-        {otherProducts.length < 1 && <NoData text="No other products found" />}
+          <FlatList
+            horizontal
+            data={otherProducts}
+            renderItem={({ item }) => (
+              <HorizontalCard
+                onPress={() => handleProductPressed(item)}
+                style={{ width: width - 40, marginRight: 10 }}
+                myKey={item._id}
+                productImage1={item.image1}
+                productImage2={item.image2}
+                productImage3={item.image3}
+                productImage4={item.image4}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                premium={item.user.premium}
+                rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+              />
+            )}
+          />
+        </View>
+      )}
 
-        <FlatList
-          horizontal
-          data={otherProducts}
-          renderItem={({ item }) => (
-            <HorizontalCard
-              onPress={() => handleProductPressed(item)}
-              style={{ width: width - 40, marginRight: 10 }}
-              myKey={item._id}
-              productImage1={item.image1}
-              productImage2={item.image2}
-              productImage3={item.image3}
-              productImage4={item.image4}
-              productName={item.productName}
-              price={item.price}
-              condition={item.condition}
-              description={item.description}
-              county={item.user.county}
-              subCounty={item.user.subCounty}
-              premium={item.user.premium}
-              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
-            />
-          )}
-        />
-      </View>
+      {similarProducts.length > 0 && (
+        <View style={[styles.section, {}]}>
+          <Text style={[styles.subText, { marginBottom: 20 }]}>
+            Similar products
+          </Text>
 
-      <View style={[styles.section, {}]}>
-        <Text style={[styles.subText, { marginBottom: 20 }]}>
-          Similar products
-        </Text>
-
-        <FlatList
-          horizontal
-          data={similarProducts}
-          renderItem={({ item }) => (
-            <HorizontalCard
-              onPress={() => handleProductPressed(item)}
-              style={{ width: width - 40, marginRight: 10 }}
-              key={item._id}
-              productImage1={item.image1}
-              productImage2={item.image2}
-              productImage3={item.image3}
-              productImage4={item.image4}
-              productName={item.productName}
-              price={item.price}
-              condition={item.condition}
-              description={item.description}
-              county={item.user.county}
-              subCounty={item.user.subCounty}
-              premium={item.user.premium}
-              rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
-            />
-          )}
-        />
-      </View>
+          <FlatList
+            horizontal
+            data={similarProducts}
+            renderItem={({ item }) => (
+              <HorizontalCard
+                onPress={() => handleProductPressed(item)}
+                style={{ width: width - 40, marginRight: 10 }}
+                key={item._id}
+                productImage1={item.image1}
+                productImage2={item.image2}
+                productImage3={item.image3}
+                productImage4={item.image4}
+                productName={item.productName}
+                price={item.price}
+                condition={item.condition}
+                description={item.description}
+                county={item.user.county}
+                subCounty={item.user.subCounty}
+                premium={item.user.premium}
+                rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+              />
+            )}
+          />
+        </View>
+      )}
 
       {userID == productOwnerID && (
         <View style={[styles.section, {}]}>

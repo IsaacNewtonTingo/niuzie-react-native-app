@@ -12,14 +12,8 @@ import ContactUs from "../screens/general/profile/contact-us";
 import SavedProducts from "../screens/general/profile/saved-products";
 import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
-import AdminDashboard from "../screens/admin/dashboard/admin-dashboard";
-import Products from "../screens/admin/dashboard/products";
-import Users from "../screens/admin/dashboard/users";
-import AdminProfile from "../screens/admin/dashboard/admin-profile";
-import Messages from "../screens/admin/dashboard/messages";
-import AdminProductDetails from "../screens/admin/dashboard/product-details";
-import EditAdminProfile from "../screens/admin/dashboard/edit-profile";
-import AddCategories from "../screens/admin/dashboard/add-categories";
+import MyProductRequests from "../screens/general/profile/my-product-requests";
+import NotificationSettings from "../screens/general/profile/notification-settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +30,7 @@ export default function SettingsNav() {
     >
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerTitle: "Settings",
         }}
         name="Settings"
         component={Settings}
@@ -54,6 +48,14 @@ export default function SettingsNav() {
         component={MyProducts}
         options={{
           headerTitle: "My products",
+        }}
+      />
+
+      <Stack.Screen
+        name="MyProductRequests"
+        component={MyProductRequests}
+        options={{
+          headerTitle: "My product requests",
         }}
       />
 
@@ -99,66 +101,10 @@ export default function SettingsNav() {
       />
 
       <Stack.Screen
-        name="AdminDashboard"
-        component={AdminDashboard}
+        name="NotificationSettings"
+        component={NotificationSettings}
         options={{
-          headerTitle: "Admin dashboard",
-        }}
-      />
-
-      <Stack.Screen
-        name="Products"
-        component={Products}
-        options={{
-          headerTitle: "Products",
-        }}
-      />
-
-      <Stack.Screen
-        name="Users"
-        component={Users}
-        options={{
-          headerTitle: "Users",
-        }}
-      />
-
-      <Stack.Screen
-        name="Messages"
-        component={Messages}
-        options={{
-          headerTitle: "Messages",
-        }}
-      />
-
-      <Stack.Screen
-        name="AdminProfile"
-        component={AdminProfile}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="AdminProductDetails"
-        component={AdminProductDetails}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="EditAdminProfile"
-        component={EditAdminProfile}
-        options={{
-          headerTitle: "Edit profile",
-        }}
-      />
-
-      <Stack.Screen
-        name="AddCategories"
-        component={AddCategories}
-        options={{
-          headerTitle: "Categories",
+          headerTitle: "Notification settings",
         }}
       />
     </Stack.Navigator>

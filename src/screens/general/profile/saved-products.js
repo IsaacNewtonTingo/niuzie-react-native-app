@@ -1,5 +1,12 @@
-import { ScrollView, StyleSheet, Text, FlatList, View } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  FlatList,
+  View,
+  RefreshControl,
+} from "react-native";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 
 import styles from "../../../componets/styles/global-styles";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
@@ -8,6 +15,8 @@ import { CredentialsContext } from "../../../componets/context/credentials-conte
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import axios from "axios";
 import NoData from "../../../componets/Text/no-data";
+import colors from "../../../componets/colors/colors";
+import { showMyToast } from "../../../functions/show-toast";
 
 export default function SavedProducts({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -18,8 +27,10 @@ export default function SavedProducts({ navigation }) {
   const userID = data.userID;
   const token = data.token;
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [savedItems, setSavedItems] = useState([]);
 
@@ -42,8 +53,15 @@ export default function SavedProducts({ navigation }) {
       .get(url, { headers })
       .then((response) => {
         setLoadingData(false);
+
         if (response.data.status == "Success") {
           setSavedItems(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {
@@ -55,9 +73,17 @@ export default function SavedProducts({ navigation }) {
   async function handleProductPressed(item) {
     navigation.navigate("ProductDetails", {
       productID: item.product._id,
-      productOwnerID: item.product.user._id,
+      productOwnerID: item.user._id,
     });
   }
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getSavedItems();
+      setRefreshing(false);
+    }, 5000);
+  }, []);
 
   if (loadingData) {
     return <LoadingIndicator />;
@@ -67,6 +93,14 @@ export default function SavedProducts({ navigation }) {
     <View style={styles.container}>
       {savedItems.length < 1 && <NoData text="No saved items" />}
       <FlatList
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.lightBlue}
+            colors={[colors.lightBlue]}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
         data={savedItems}
         renderItem={({ item }) => (
           <HorizontalCard
@@ -80,8 +114,8 @@ export default function SavedProducts({ navigation }) {
             price={item.product.price}
             condition={item.product.condition}
             description={item.product.description}
-            county={item.product.user.county}
-            subCounty={item.product.user.subCounty}
+            county={item.user.county}
+            subCounty={item.user.subCounty}
             rating={parseFloat(item.product.rating.$numberDecimal).toFixed(1)}
             premium={item.product.user.premium}
           />

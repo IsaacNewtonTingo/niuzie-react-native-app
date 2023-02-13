@@ -7,6 +7,7 @@ import { CredentialsContext } from "../../../componets/context/credentials-conte
 import axios from "axios";
 import Transaction from "../../../componets/cards/transaction";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import NoData from "../../../componets/Text/no-data";
 
 export default function Payments({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -57,6 +58,7 @@ export default function Payments({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {transactions.length < 1 && <NoData text="No data found" />}
       <FlatList
         data={transactions}
         renderItem={({ item }) => <Transaction item={item} key={item._id} />}

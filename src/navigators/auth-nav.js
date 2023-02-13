@@ -3,21 +3,25 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignUp from "../screens/general/auth/signup";
 import Login from "../screens/general/auth/login";
 import PhoneOtp from "../screens/general/auth/phone-otp";
-import EmailOtp from "../screens/general/auth/email-otp";
 import ResetPassword from "../screens/general/auth/reset-password";
 import colors from "../componets/colors/colors";
+import ConfirmOtp from "../screens/general/auth/phone-otp";
+import CancelAuth from "../componets/buttons/cancel-auth";
+import NewPassword from "../screens/general/auth/new-password";
 
 const Stack = createNativeStackNavigator();
 
 export default function AuthNav() {
   return (
     <Stack.Navigator
+      initialRouteName="Login"
       screenOptions={{
         headerTintColor: colors.lightBlue,
         headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: colors.bar,
         },
+        headerRight: () => <CancelAuth />,
       }}
     >
       <Stack.Screen
@@ -37,16 +41,28 @@ export default function AuthNav() {
       />
 
       <Stack.Screen
-        name="PhoneOtp"
-        component={PhoneOtp}
+        name="ConfirmOtp"
+        component={ConfirmOtp}
         options={{
           headerTitle: "Verify phone number",
         }}
       />
 
-      <Stack.Screen name="EmailOtp" component={EmailOtp} />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPassword}
+        options={{
+          headerTitle: "Reset password",
+        }}
+      />
 
-      <Stack.Screen name="ResetPassword" component={ResetPassword} />
+      <Stack.Screen
+        name="NewPassword"
+        component={NewPassword}
+        options={{
+          headerTitle: "Reset password",
+        }}
+      />
     </Stack.Navigator>
   );
 }

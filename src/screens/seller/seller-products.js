@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function SetLocation() {
+export default function SellerProducts({ route, navigation }) {
   return (
     <View>
-      <Text>SetLocation</Text>
+      <Text>SellerProducts</Text>
     </View>
   );
 }

@@ -1,86 +1,135 @@
 import {
   StyleSheet,
   TextInput,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
+  Dimensions,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
+import { BottomSheet } from "react-native-btr";
 
 import styles from "../../../componets/styles/global-styles";
-import { postStyles } from "../../seller/post-product";
 
-import { FontAwesome5 } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Entypo,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import colors from "../../../componets/colors/colors";
 import axios from "axios";
 
-import { BottomSheet } from "react-native-btr";
-import CenteredAlert from "../../../componets/alerts/centered-alert";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { showMyToast } from "../../../functions/show-toast";
 
-import { ENDPOINT } from "@env";
+import Checkbox from "expo-checkbox";
+import { HStack } from "native-base";
+import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
+import NoData from "../../../componets/Text/no-data";
+
+const countiesData = require("../../../assets/data/counties2.json");
+
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [county, setCounty] = useState("");
+  const [subCounty, setSubCounty] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
-  const [visible, setVisible] = useState(false);
+  const [isChecked, setChecked] = useState(false);
 
-  const [alert, setAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [subCounties, setSubCounties] = useState([]);
 
-  const [otp, setOtp] = useState("");
+  const [countiesModal, setCountiesModal] = useState(false);
+  const [subCountiesModal, setSubCountiesModal] = useState(false);
 
   async function signUp() {
     //validate
     if (!firstName) {
-      setAlert(true);
-      setAlertMessage("First name is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "First name is required. Please add a name then proceed",
+      });
     } else if (!lastName) {
-      setAlert(true);
-      setAlertMessage("Last name is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Last name is required. Please add a name then proceed",
+      });
     } else if (!/^[a-zA-Z ]*$/.test(firstName, lastName)) {
-      setAlert(true);
-      setAlertMessage("Invalid name format");
-    } else if (!email) {
-      setAlert(true);
-      setAlertMessage("Email is required");
-    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setAlert(true);
-      setAlertMessage("Invalid email address");
+      showMyToast({
+        status: "error",
+        title: "Inavlid format",
+        description: "Name shoult only contain characters",
+      });
+    } else if (!county) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "County is required. Please add your county then proceed",
+      });
+    } else if (!subCounty) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description:
+          "Sub county is required. Please add your subcounty then proceed.",
+      });
     } else if (!phoneNumber) {
-      setAlert(true);
-      setAlertMessage("Phone number is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description:
+          "Phone number is required. Please add a phone number then proceed",
+      });
     } else if (!phoneNumber.startsWith(254)) {
-      setAlert(true);
-      setAlertMessage("Invalid phone number");
+      showMyToast({
+        status: "error",
+        title: "Invalid format",
+        description: "Phone number must start with 254. No +",
+      });
     } else if (!password) {
-      setAlert(true);
-      setAlertMessage("Password is required");
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Password is required. Please add a password then proceed",
+      });
     } else if (password.length < 8) {
-      setAlert(true);
-      setAlertMessage("Password is too short. Use at least 8 characters");
+      showMyToast({
+        status: "error",
+        title: "Invalid field",
+        description: "Password should be at least 8 characters long",
+      });
     } else if (password != confirmPassword) {
-      setAlert(true);
-      setAlertMessage("Passwords don't match");
+      showMyToast({
+        status: "error",
+        title: "Non matching fields",
+        description: "Passwords don't match",
+      });
+    } else if (isChecked == false) {
+      showMyToast({
+        status: "error",
+        title: "Terms and conditions",
+        description:
+          "You must accept terms and conditions to complete the signup process",
+      });
     } else {
       const url = `${process.env.ENDPOINT}/user/signup`;
-      console.log(url);
       setSubmitting(true);
 
       await axios
         .post(url, {
-          email,
           phoneNumber,
         })
         .then((response) => {
@@ -88,10 +137,25 @@ export default function SignUp({ navigation }) {
           setSubmitting(false);
 
           if (response.data.status == "Success") {
-            setVisible(true);
+            navigation.navigate("ConfirmOtp", {
+              firstName,
+              lastName,
+              phoneNumber,
+              password,
+              county,
+              subCounty,
+            });
+            showMyToast({
+              status: "succes",
+              title: "Success",
+              description: response.data.messsage,
+            });
           } else {
-            setAlert(true);
-            setAlertMessage(response.data.message);
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
           }
         })
         .catch((err) => {
@@ -101,49 +165,12 @@ export default function SignUp({ navigation }) {
     }
   }
 
-  async function verifyCode() {
-    setSubmitting(true);
-    const url = `${process.env.ENDPOINT}/user/verify-code`;
-
-    await axios
-      .post(url, {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        password,
-        verificationCode: otp,
-      })
-      .then((response) => {
-        console.log(response.data);
-        setSubmitting(false);
-        if (response.data.status == "Success") {
-          navigation.navigate("Login", {
-            alertMessage: "Code verified successfuly. Please login",
-            alertStatus: "success",
-          });
-          setVisible(false);
-        } else {
-          setAlert(true);
-          setAlertMessage(response.data.message);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setSubmitting(false);
-      });
-  }
-
   return (
-    <ScrollView style={styles.container}>
-      {alert && (
-        <CenteredAlert
-          onPress={() => setAlert(false)}
-          alertMessage={alertMessage}
-          alertStatus="error"
-        />
-      )}
-      <View style={postStyles.holdingContainer}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
+      <View style={signStyles.holdingContainer}>
         <Text style={styles.label}>First name</Text>
         <View style={styles.textInputContainer}>
           <FontAwesome5
@@ -159,7 +186,6 @@ export default function SignUp({ navigation }) {
             placeholder="e.g John"
           />
         </View>
-
         <Text style={styles.label}>Last name</Text>
         <View style={styles.textInputContainer}>
           <FontAwesome5
@@ -175,7 +201,42 @@ export default function SignUp({ navigation }) {
             placeholder="e.g Doe"
           />
         </View>
-
+        <Text style={styles.label}>County</Text>
+        <View style={styles.textInputContainer}>
+          <MaterialCommunityIcons
+            name="city"
+            size={18}
+            color="black"
+            style={styles.searchIcon}
+          />
+          <TouchableOpacity
+            style={[
+              styles.textInput,
+              { color: colors.dark, justifyContent: "center" },
+            ]}
+            onPress={() => setCountiesModal(true)}
+          >
+            <Text>{county}</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.label}>Sub county</Text>
+        <View style={styles.textInputContainer}>
+          <MaterialCommunityIcons
+            name="city-variant"
+            size={18}
+            color="black"
+            style={styles.searchIcon}
+          />
+          <TouchableOpacity
+            style={[
+              styles.textInput,
+              { color: colors.dark, justifyContent: "center" },
+            ]}
+            onPress={() => setSubCountiesModal(true)}
+          >
+            <Text>{subCounty}</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.label}>Phone number</Text>
         <View style={styles.textInputContainer}>
           <Entypo
@@ -192,25 +253,6 @@ export default function SignUp({ navigation }) {
             keyboardType="phone-pad"
           />
         </View>
-
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.textInputContainer}>
-          <Entypo
-            name="mail"
-            size={18}
-            color="black"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g johndoe@gmail.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
         <Text style={styles.label}>Password</Text>
         <View style={styles.textInputContainer}>
           <FontAwesome5
@@ -227,7 +269,6 @@ export default function SignUp({ navigation }) {
             secureTextEntry={true}
           />
         </View>
-
         <Text style={styles.label}>Confirm password</Text>
         <View style={styles.textInputContainer}>
           <FontAwesome5
@@ -245,72 +286,102 @@ export default function SignUp({ navigation }) {
           />
         </View>
 
+        <View style={signStyles.section}>
+          <Checkbox
+            style={signStyles.checkbox}
+            value={isChecked}
+            onValueChange={setChecked}
+            color={isChecked ? "#4630EB" : undefined}
+          />
+          <HStack>
+            <Text style={signStyles.paragraph}>I accept </Text>
+
+            <TouchableOpacity>
+              <Text style={[signStyles.paragraph, { color: colors.linkText }]}>
+                terms & conditions
+              </Text>
+            </TouchableOpacity>
+          </HStack>
+        </View>
+
         <PrimaryButton
           disabled={submitting}
           onPress={signUp}
           buttonTitle="Signup"
           submitting={submitting}
         />
-
         <View style={styles.optTextSign}>
           <Text style={styles.firstText}>Already have an account ?</Text>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Login", {
-                alertMessage: "",
-                alertStatus: "",
-              })
-            }
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={styles.opt2Text}>Login</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      <BottomSheet
-        visible={visible}
-        onBackButtonPress={() => setVisible(false)}
-        onBackdropPress={() => setVisible(false)}
-      >
-        <View style={signStyles.bottomNavigationView}>
-          <Text
-            style={[styles.label, { textAlign: "center", marginVertical: 20 }]}
-          >
-            Enter verification code sent to your phone number to finish setting
-            up your account
-          </Text>
-          <View style={styles.textInputContainer}>
-            <FontAwesome
-              name="qrcode"
-              size={18}
-              color="black"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              value={otp}
-              onChangeText={setOtp}
-              style={[styles.textInput, { color: colors.dark, width: "100%" }]}
-              placeholder="e.g 2763"
-              keyboardType="numeric"
-            />
-          </View>
-
-          <PrimaryButton
-            disabled={submitting}
-            submitting={submitting}
-            onPress={verifyCode}
-            buttonTitle="Submit"
-          />
-
-          <View style={styles.optTextSign}>
-            <Text style={styles.firstText}>Didn't recieve code ?</Text>
-            <TouchableOpacity>
-              <Text style={styles.opt2Text}>Resend</Text>
+        <BottomSheet
+          onBackButtonPress={() => setCountiesModal(false)}
+          onBackdropPress={() => setCountiesModal(false)}
+          visible={countiesModal}
+        >
+          <View style={signStyles.bottomSheet}>
+            <TouchableOpacity
+              style={signStyles.cancel}
+              onPress={() => setCountiesModal(false)}
+            >
+              <Text style={signStyles.close}>Cancel</Text>
             </TouchableOpacity>
+
+            <FlatList
+              data={countiesData}
+              renderItem={({ item }) => (
+                <PostSubCategoryList
+                  key={item.code}
+                  onPress={() => {
+                    setCounty(item.name);
+                    setSubCounties(item.sub_counties);
+                    setSubCounty("");
+                    setCountiesModal(false);
+                  }}
+                  subCategoryName={item.name}
+                />
+              )}
+            />
+
+            {countiesData.length < 1 && <NoData text="No data" />}
           </View>
-        </View>
-      </BottomSheet>
-    </ScrollView>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={subCountiesModal}
+          onBackButtonPress={() => setSubCountiesModal(false)}
+          onBackdropPress={() => setSubCountiesModal(false)}
+        >
+          <View style={signStyles.bottomSheet}>
+            <TouchableOpacity
+              style={signStyles.cancel}
+              onPress={() => setSubCountiesModal(false)}
+            >
+              <Text style={signStyles.close}>Cancel</Text>
+            </TouchableOpacity>
+
+            <FlatList
+              data={subCounties}
+              renderItem={({ item, i }) => (
+                <PostSubCategoryList
+                  key={i}
+                  onPress={() => {
+                    setSubCounty(item);
+                    setSubCountiesModal(false);
+                  }}
+                  subCategoryName={item}
+                />
+              )}
+            />
+
+            {!county && <NoData text="Please select county first" />}
+          </View>
+        </BottomSheet>
+      </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -318,7 +389,47 @@ const signStyles = StyleSheet.create({
   bottomNavigationView: {
     backgroundColor: colors.cardColor,
     width: "100%",
-    height: 300,
+    padding: 20,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  holdingContainer: {
+    backgroundColor: colors.cardColor,
+    padding: 40,
+    borderRadius: 10,
+    width: "100%",
+    alignSelf: "center",
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  paragraph: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: colors.lightBlue,
+  },
+  checkbox: {
+    margin: 8,
+  },
+  bottomSheet: {
+    backgroundColor: colors.cardColor,
+    width: width,
+    borderRadius: 10,
+    padding: 10,
+    bottom: 0,
+    height: height / 2,
+    alignSelf: "center",
+    position: "absolute",
+    zIndex: 2,
+  },
+  close: {
+    color: colors.orange,
+    fontWeight: "800",
+  },
+  cancel: {
+    width: "100%",
+    flexDirection: "row-reverse",
     padding: 20,
   },
 });

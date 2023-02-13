@@ -7,22 +7,14 @@ import {
   Dimensions,
   FlatList,
   Image,
-  KeyboardAvoidingView,
-  ActivityIndicator,
-  Share,
   ImageBackground,
 } from "react-native";
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
-import { getApps, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
-import * as Clipboard from "expo-clipboard";
-
-import { v4 as uuidv4 } from "uuid";
-
-import * as SecureStore from "expo-secure-store";
 
 import { RadioButton } from "react-native-paper";
 import { Text, Button, Modal } from "native-base";
@@ -40,20 +32,23 @@ import PrimaryButton from "../../componets/buttons/primary-button";
 import SecondaryButton from "../../componets/buttons/secondary-button";
 import axios from "axios";
 
-import { CredentialsContext } from "../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../componets/context/credentials-context";
 
 import { BottomSheet } from "react-native-btr";
 
 const { width } = Dimensions.get("window");
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { homeStyles } from "../general/dashboard/home";
 import { showMyToast } from "../../functions/show-toast";
+import { BarIndicator } from "react-native-indicators";
 
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
-import { BarIndicator } from "react-native-indicators";
-import LoginComponent from "../../componets/auth/login";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -74,8 +69,6 @@ export default function PostProduct({ navigation }, props) {
   const [loading, setLoading] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
 
-  const [uploading, setUploading] = useState(false);
-
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [categoryID, setCategoryID] = useState("");
@@ -95,8 +88,6 @@ export default function PostProduct({ navigation }, props) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
 
-  const [password, setPassword] = useState("");
-
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [showCatSheet, setShowCatSheet] = useState(false);
   const [showSubCatSheet, setShowSubCatSheet] = useState(false);
@@ -110,76 +101,17 @@ export default function PostProduct({ navigation }, props) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
+  const { auth, setAuth } = useContext(AuthContext);
+
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
   const [premiumUser, setPremiumUser] = useState(false);
-
-  const onSignupPress = props.onSignupPress;
 
   useEffect(() => {
     checkStoreCredentials();
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
-
-  async function login() {
-    if (!phoneNumber) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "First name is required. Please add a name then proceed",
-      });
-    } else if (!password) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "Password is required. Please add a password then proceed",
-      });
-    } else {
-      setSubmitting(true);
-      const url = `${process.env.ENDPOINT}/user/login`;
-      await axios
-        .post(url, {
-          phoneNumber: parseInt(phoneNumber),
-          password,
-        })
-        .then((response) => {
-          setSubmitting(false);
-          if (response.data.status == "Success") {
-            showMyToast({
-              status: "success",
-              title: "Success",
-              description: response.data.message,
-            });
-
-            const { data } = response.data;
-            storeCredentials({ data });
-          } else {
-            showMyToast({
-              status: "error",
-              title: "Failed",
-              description: response.data.message,
-            });
-          }
-        })
-        .catch((err) => {
-          setSubmitting(false);
-          console.log(err);
-        });
-    }
-  }
-
-  async function storeCredentials(values) {
-    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
-      .then(() => {
-        setStoredCredentials(values);
-        getUserData(values.data.userID, values.data.token);
-        setPassword("");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   async function checkStoreCredentials() {
     const { data } = storedCredentials ? storedCredentials : "";
@@ -194,6 +126,14 @@ export default function PostProduct({ navigation }, props) {
       setUserID("");
       setToken("");
       setLoadingData(false);
+
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to access this functionality. Signup if you don't have an account",
+      });
+      setAuth(true);
     }
   }
 
@@ -590,33 +530,15 @@ export default function PostProduct({ navigation }, props) {
 
   return (
     <>
-      <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
-        {!storedCredentials && (
-          <Modal backgroundColor={colors.almostDark} width="100%" isOpen={true}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{ alignSelf: "flex-end", right: 20, marginBottom: 20 }}
-            >
-              <Text style={{ color: colors.orange, fontWeight: "800" }}>
-                Close
-              </Text>
-            </TouchableOpacity>
-            <LoginComponent
-              submitting={submitting}
-              loginPress={login}
-              phoneNumber={phoneNumber}
-              setPhoneNumber={setPhoneNumber}
-              password={password}
-              setPassword={setPassword}
-            />
-          </Modal>
-        )}
-
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="always"
+        style={styles.container}
+      >
         {maxPosts == true && premiumUser == false && (
           <StaticAlert
             status="warning"
             title="Warning"
-            description="You have exceeded the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
+            description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
           />
         )}
 
@@ -983,7 +905,7 @@ export default function PostProduct({ navigation }, props) {
             )}
           </View>
         </BottomSheet>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </>
   );
 }
