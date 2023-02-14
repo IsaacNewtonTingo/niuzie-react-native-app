@@ -1,4 +1,11 @@
-import { StyleSheet, ScrollView, Text, View, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Text,
+  View,
+  Dimensions,
+  TextInput,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 
 import * as SecureStore from "expo-secure-store";
@@ -9,6 +16,7 @@ import FullProductRequest from "../../../componets/cards/full-product-request";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 
 import { postStyles } from "../../seller/post-product";
+import { Ionicons } from "@expo/vector-icons";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
 import { Modal } from "native-base";
@@ -17,6 +25,9 @@ import { showMyToast } from "../../../functions/show-toast";
 
 import axios from "axios";
 import colors from "../../../componets/colors/colors";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
+import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function ProductRequestDetails({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -30,12 +41,9 @@ export default function ProductRequestDetails({ route, navigation }) {
   const [token, setToken] = useState("");
   const [premium, setPremium] = useState(false);
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
-
   useEffect(() => {
     checkStoreCredentials();
-  }, [(loading, navigation)]);
+  }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
@@ -87,7 +95,9 @@ export default function ProductRequestDetails({ route, navigation }) {
   const location =
     route.params.item.user.county + ", " + route.params.item.user.subCounty;
   const date = route.params.item.createdAt;
-  const content = route.params.item.content;
+  const needID = route.params.item._id;
+  const needUserID = route.params.item.user._id;
+  const [content, setContent] = useState(route.params.item.content);
 
   const data = {
     buyerName,
@@ -100,67 +110,79 @@ export default function ProductRequestDetails({ route, navigation }) {
     premium,
   };
 
-  async function login() {
-    if (!phoneNumber) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "First name is required. Please add a name then proceed",
-      });
-    } else if (!password) {
-      showMyToast({
-        status: "error",
-        title: "Required field",
-        description: "Password is required. Please add a password then proceed",
-      });
-    } else {
-      setSubmitting(true);
-      const url = `${process.env.ENDPOINT}/user/login`;
-      await axios
-        .post(url, {
-          phoneNumber: parseInt(phoneNumber),
-          password,
-        })
-        .then((response) => {
-          setSubmitting(false);
-          if (response.data.status == "Success") {
-            showMyToast({
-              status: "success",
-              title: "Success",
-              description: response.data.message,
-            });
+  const headers = {
+    "auth-token": token,
+  };
 
-            const { data } = response.data;
-            storeCredentials({ data });
-          } else {
-            showMyToast({
-              status: "error",
-              title: "Failed",
-              description: response.data.message,
-            });
-          }
-        })
-        .catch((err) => {
-          setSubmitting(false);
-          console.log(err);
-        });
-    }
-  }
+  async function updateRequest() {
+    const url = `${process.env.ENDPOINT}/buyer-needs/edit-need/${needID}`;
+    setSubmitting(true);
 
-  async function storeCredentials(values) {
-    await SecureStore.setItemAsync("loginCredentials", JSON.stringify(values))
-      .then(() => {
-        setPassword("");
-        setStoredCredentials(values);
-        setPremium(values.data.premium);
+    await axios
+      .put(url, { userID, content }, { headers })
+      .then((response) => {
+        setSubmitting(false);
+
+        if (response.data.status == "Failed") {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          navigation.goBack();
+        }
       })
       .catch((err) => {
+        setSubmitting(false);
         console.log(err);
       });
   }
 
+  async function deleteRequest() {
+    const url = `${process.env.ENDPOINT}/buyer-needs/delete-need/${needID}?userID=${userID}`;
+    setSubmitting(true);
+
+    await axios
+      .delete(url, { headers })
+      .then((response) => {
+        setSubmitting(false);
+
+        if (response.data.status == "Failed") {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          navigation.goBack();
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       {!premium && (
         <StaticAlert
           status="warning"
@@ -172,9 +194,49 @@ export default function ProductRequestDetails({ route, navigation }) {
       <View style={postStyles.holdingContainer}>
         <FullProductRequest data={data} />
 
+        {userID == needUserID && (
+          <>
+            <Text style={[styles.label, { marginTop: 40 }]}>
+              Edit products request
+            </Text>
+
+            <View style={styles.textInputContainer}>
+              <Ionicons
+                name="shirt"
+                size={18}
+                color={colors.gray}
+                style={styles.searchIcon}
+              />
+              <TextInput
+                value={content}
+                onChangeText={setContent}
+                style={[
+                  styles.textInput,
+                  { color: colors.dark, width: "100%" },
+                ]}
+                placeholder="e.g Sneakers"
+              />
+            </View>
+
+            <PrimaryButton
+              buttonTitle="Update"
+              disabled={submitting}
+              submitting={submitting}
+              onPress={updateRequest}
+            />
+
+            <TertiaryButton
+              buttonTitle="Delete"
+              disabled={submitting}
+              submitting={submitting}
+              onPress={deleteRequest}
+            />
+          </>
+        )}
+
         {!premium && <PrimaryButton buttonTitle="Join premium" />}
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 
