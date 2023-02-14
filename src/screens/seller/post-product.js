@@ -36,6 +36,7 @@ import axios from "axios";
 import {
   CredentialsContext,
   AuthContext,
+  PendingProductsContext,
 } from "../../componets/context/credentials-context";
 
 import { BottomSheet } from "react-native-btr";
@@ -50,8 +51,6 @@ import { BarIndicator } from "react-native-indicators";
 import PostSubCategoryList from "../../componets/subcategories/post-sub-cat-list";
 import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 import StaticAlert from "../../componets/alerts/static-alert";
-import NoData from "../../componets/Text/no-data";
-import HorizontalCard from "../../componets/cards/horizontal-card";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -105,12 +104,13 @@ export default function PostProduct({ navigation }) {
     useContext(CredentialsContext);
 
   const { auth, setAuth } = useContext(AuthContext);
+  const { pendingProducts, setPendingProducts } = useContext(
+    PendingProductsContext
+  );
 
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
   const [premiumUser, setPremiumUser] = useState(false);
-
-  const [pendingProductList, setPendingProductList] = useState([]);
 
   useEffect(() => {
     checkStoreCredentials();
@@ -588,20 +588,13 @@ export default function PostProduct({ navigation }) {
     }
   }
 
-  async function handleProductPressed(item) {
-    navigation.push("ProductDetails", {
-      productID: item._id,
-      productOwnerID: item.user._id,
-    });
-  }
-
   async function getPendingProducts(userID, token) {
     const url = `${process.env.ENDPOINT}/product/get-pending-products/${userID}`;
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
         if (response.data.status == "Success") {
-          setPendingProductList(response.data.data);
+          setPendingProducts(response.data.data.length);
         } else {
           showMyToast({
             status: "error",

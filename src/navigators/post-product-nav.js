@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
@@ -13,9 +13,15 @@ import PayForProduct from "../screens/seller/pay-product";
 import ProductDetails from "../screens/general/dashboard/product-details";
 import PendingProducts from "../screens/seller/pending-products";
 
+import { PendingProductsContext } from "../componets/context/credentials-context";
+
 const Stack = createNativeStackNavigator();
 
 export default function PostProductNav({ navigation }) {
+  const { pendingProducts, setPendingProducts } = useContext(
+    PendingProductsContext
+  );
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -56,7 +62,9 @@ export default function PostProductNav({ navigation }) {
               <AntDesign name="shoppingcart" size={25} color={colors.orange} />
 
               <View style={pendingStyles.pendingCountContainer}>
-                <Text style={pendingStyles.pendingCountText}>0</Text>
+                <Text style={pendingStyles.pendingCountText}>
+                  {pendingProducts}
+                </Text>
               </View>
             </TouchableOpacity>
           ),

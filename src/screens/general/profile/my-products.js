@@ -52,7 +52,12 @@ export default function MyProducts({ navigation }) {
 
           const products = response.data.data;
           const activeProductsList = products.filter(function (product) {
-            if (product.active == true) {
+            if (
+              product.pending == false &&
+              product.reviewed == true &&
+              product.verified == true &&
+              product.active == true
+            ) {
               return true;
             }
           });
@@ -61,6 +66,7 @@ export default function MyProducts({ navigation }) {
           //---------------------------------------
           const underReviewProductsList = products.filter(function (product) {
             if (
+              product.pending == false &&
               product.reviewed == false &&
               product.verified == false &&
               product.active == false
@@ -74,6 +80,7 @@ export default function MyProducts({ navigation }) {
 
           const inactiveProductsList = products.filter(function (product) {
             if (
+              product.pending == false &&
               product.reviewed == true &&
               product.verified == false &&
               product.active == false

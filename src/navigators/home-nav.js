@@ -12,6 +12,8 @@ import ProductRequestDetails from "../screens/general/dashboard/product-request-
 import EditProduct from "../screens/seller/edit-product";
 import PublicProfile from "../screens/general/dashboard/public-profile";
 import SellerProducts from "../screens/seller/seller-products";
+import AllProductRequests from "../screens/general/dashboard/all-product-requests";
+import AllFeaturedProducts from "../screens/general/dashboard/all-featured-products";
 
 const Stack = createNativeStackNavigator();
 
@@ -99,6 +101,22 @@ export default function HomeNav() {
         component={SellerProducts}
         options={{
           headerTitle: "Products and reviews",
+        }}
+      />
+
+      <Stack.Screen
+        name="AllProductRequests"
+        component={AllProductRequests}
+        options={{
+          headerTitle: "All product requests",
+        }}
+      />
+
+      <Stack.Screen
+        name="AllFeaturedProducts"
+        component={AllFeaturedProducts}
+        options={{
+          headerTitle: "All featured products",
         }}
       />
     </Stack.Navigator>
