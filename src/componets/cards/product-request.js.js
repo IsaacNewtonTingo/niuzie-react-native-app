@@ -40,6 +40,9 @@ export default function ProductRequest(props) {
           width: width / 1.5,
           marginRight: 10,
           borderWidth: 1,
+          borderRadius: 10,
+          borderLeftWidth: 1,
+          borderLeftColor: colors.orange,
         },
         style,
       ]}
@@ -116,5 +119,7 @@ const gradientStyles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     justifyContent: "space-between",
+    borderLeftWidth: 2,
+    borderLeftColor: colors.orange,
   },
 });

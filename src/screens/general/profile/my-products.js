@@ -12,6 +12,7 @@ import axios from "axios";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import colors from "../../../componets/colors/colors";
 import NoData from "../../../componets/Text/no-data";
+import { showMyToast } from "../../../functions/show-toast";
 
 export default function MyProducts({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -50,46 +51,17 @@ export default function MyProducts({ navigation }) {
         if (response.data.status == "Success") {
           setProducts(response.data.data);
 
-          const products = response.data.data;
-          const activeProductsList = products.filter(function (product) {
-            if (
-              product.pending == false &&
-              product.reviewed == true &&
-              product.verified == true &&
-              product.active == true
-            ) {
-              return true;
-            }
+          setActiveProductsList(response.data.data.activeProducts);
+
+          setUnderReviewProductsList(response.data.data.underReviewProducts);
+
+          setInactiveProductsList(response.data.data.inactiveProducts);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
           });
-
-          setActiveProductsList(activeProductsList);
-          //---------------------------------------
-          const underReviewProductsList = products.filter(function (product) {
-            if (
-              product.pending == false &&
-              product.reviewed == false &&
-              product.verified == false &&
-              product.active == false
-            ) {
-              return true;
-            }
-          });
-
-          setUnderReviewProductsList(underReviewProductsList);
-          //---------------------------------------
-
-          const inactiveProductsList = products.filter(function (product) {
-            if (
-              product.pending == false &&
-              product.reviewed == true &&
-              product.verified == false &&
-              product.active == false
-            ) {
-              return true;
-            }
-          });
-
-          setInactiveProductsList(inactiveProductsList);
         }
       })
       .catch((err) => {

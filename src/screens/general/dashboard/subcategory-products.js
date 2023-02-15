@@ -9,8 +9,9 @@ import {
   StatusBar,
   Image,
   Modal,
+  RefreshControl,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import HorizontalCard from "../../../componets/cards/horizontal-card";
 import styles from "../../../componets/styles/global-styles";
@@ -22,32 +23,31 @@ import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import { Input, Icon } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { BottomSheet } from "react-native-btr";
-import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { RadioButton } from "react-native-paper";
 import { postStyles } from "../../seller/post-product";
 
 import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
-import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
-import SettingsList from "../../../componets/cards/settings-list";
+
 import FilterList from "../../../componets/lists/filter";
 import NoData from "../../../componets/Text/no-data";
 import PostSubCategoryList from "../../../componets/subcategories/post-sub-cat-list";
+import { showMyToast } from "../../../functions/show-toast";
+import { ActivityIndicator } from "react-native";
 
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");
 
 const countiesData = require("../../../assets/data/counties.json");
 
-export default function SubCategoryProducts({ route, navigation }) {
+export default function SubCategoryProducts({ navigation, route }) {
   let [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,12 +57,13 @@ export default function SubCategoryProducts({ route, navigation }) {
   const [subCategory, setSubCategory] = useState("");
   const [condition, setCondition] = useState("");
 
-  const categoryID = route.params.item.category;
-  const subCategoryID = route.params.item._id;
+  const [categoryID, setCategoryID] = useState(route.params.item.category);
+  const [subCategoryID, setSubCategoryID] = useState(route.params.item._id);
 
-  const [price, setPrice] = useState("-1");
-  const [rating, setRating] = useState("1");
-  const [date, setDate] = useState("1");
+  const [price, setPrice] = useState(""); // 1 = Low to high
+  const [rating, setRating] = useState(""); // -1 = Highest to lowest
+  const [createdAt, setCreatedAt] = useState(""); // -1 = Latest to oldest
+  const [promoted, setPromoted] = useState(""); // -1 = Promoted true first
 
   const [filterModal, setFilterModal] = useState(false);
   const [categoriesModal, setCategoriesModal] = useState(false);
@@ -76,25 +77,36 @@ export default function SubCategoryProducts({ route, navigation }) {
 
   const [submitting, setSubmitting] = useState(false);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [reachedEnd, setReachedEnd] = useState(false);
+
   useEffect(() => {
     getAllProducts();
   }, [(loading, navigation)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getAllProducts();
+      setRefreshing(false);
+    }, 5000);
+  }, []);
+
   const filters = [
-    {
-      title: "Category",
-      iconType: "Ionicons",
-      iconName: "md-shirt-sharp",
-      navTo: "category",
-    },
-    {
-      title: "Sub category",
-      iconType: "MaterialCommunityIcons",
-      iconName: "shoe-sneaker",
-      navTo: "subCategory",
-    },
+    // {
+    //   title: "Category",
+    //   iconType: "Ionicons",
+    //   iconName: "md-shirt-sharp",
+    //   navTo: "category",
+    // },
+    // {
+    //   title: "Sub category",
+    //   iconType: "MaterialCommunityIcons",
+    //   iconName: "shoe-sneaker",
+    //   navTo: "subCategory",
+    // },
     {
       title: "County",
       iconType: "MaterialCommunityIcons",
@@ -116,13 +128,18 @@ export default function SubCategoryProducts({ route, navigation }) {
     setCategory("");
     setSubCategory("");
     setCondition("");
+    setCategoryID("");
+    setSubCategoryID("");
     setPrice("");
     setRating("");
-    setDate("");
+    setCreatedAt("");
   }
 
+  let pageNumber = 0;
+  let limit = 20;
+
   async function getAllProducts() {
-    let url = `${ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&date=${date}`;
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
     setLoadingData(true);
     setSubmitting(true);
 
@@ -135,6 +152,19 @@ export default function SubCategoryProducts({ route, navigation }) {
 
         if (response.data.status == "Success") {
           setAllProducts(response.data.data);
+          if (response.data.data.length < 1) {
+            setReachedEnd(true);
+          } else {
+            if (response.data.data.length < 20) {
+              setReachedEnd(true);
+            }
+          }
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {
@@ -144,8 +174,28 @@ export default function SubCategoryProducts({ route, navigation }) {
       });
   }
 
+  async function getMoreProducts() {
+    pageNumber += 1;
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
+
+    if (reachedEnd == true) {
+      return;
+    } else {
+      await axios.get(url).then((response) => {
+        if (response.data.data.length === allProducts.length) {
+          setReachedEnd(true);
+        } else {
+          setAllProducts([...allProducts, ...response.data.data]);
+        }
+      });
+    }
+  }
+
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", { item });
+    navigation.navigate("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   async function handleItemClicked(navTo) {
@@ -208,7 +258,7 @@ export default function SubCategoryProducts({ route, navigation }) {
     <SafeAreaView
       style={[styles.container, { paddingTop: StatusBar.currentHeight }]}
     >
-      {allProducts.length > 0 && (
+      {allProducts.length > 1 && (
         <View style={discoverStyles.searchContainer}>
           <Input
             w={{
@@ -267,8 +317,19 @@ export default function SubCategoryProducts({ route, navigation }) {
       )}
 
       <FlatList
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.lightBlue}
+            colors={[colors.lightBlue]}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+        onEndReached={() => {
+          getMoreProducts();
+        }}
+        onEndReachedThreshold={0}
         style={styles.flatlist}
-        // numColumns={2}
         data={allProducts}
         renderItem={({ item }) => (
           <HorizontalCard
@@ -289,6 +350,13 @@ export default function SubCategoryProducts({ route, navigation }) {
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
+        ListFooterComponent={() => {
+          return !reachedEnd ? (
+            <ActivityIndicator size="large" color="white" />
+          ) : (
+            <></>
+          );
+        }}
       />
 
       {allProducts.length < 1 && <NoData text="No data" />}
@@ -412,13 +480,13 @@ export default function SubCategoryProducts({ route, navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={price === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={price === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setPrice("-1");
+                    setPrice("");
                   }}
                 />
-                <Text style={postStyles.radioText}>Low to high</Text>
+                <Text style={postStyles.radioText}>All</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -427,6 +495,17 @@ export default function SubCategoryProducts({ route, navigation }) {
                   status={price === "1" ? "checked" : "unchecked"}
                   onPress={() => {
                     setPrice("1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={price === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setPrice("-1");
                   }}
                 />
                 <Text style={postStyles.radioText}>High to low</Text>
@@ -442,13 +521,13 @@ export default function SubCategoryProducts({ route, navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={rating === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={rating === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setRating("-1");
+                    setRating("");
                   }}
                 />
-                <Text style={postStyles.radioText}>Low to high</Text>
+                <Text style={postStyles.radioText}>All</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -459,6 +538,17 @@ export default function SubCategoryProducts({ route, navigation }) {
                     setRating("1");
                   }}
                 />
+                <Text style={postStyles.radioText}>Low to high</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={rating === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setRating("-1");
+                  }}
+                />
                 <Text style={postStyles.radioText}>High to low</Text>
               </View>
             </View>
@@ -467,15 +557,26 @@ export default function SubCategoryProducts({ route, navigation }) {
               <Text
                 style={[styles.label, { marginLeft: 10, marginBottom: 10 }]}
               >
-                Date
+                Date posted
               </Text>
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="-1"
-                  status={date === "-1" ? "checked" : "unchecked"}
+                  value=""
+                  status={createdAt === "" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("-1");
+                    setCreatedAt("");
+                  }}
+                />
+                <Text style={postStyles.radioText}>All</Text>
+              </View>
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="1"
+                  status={createdAt === "1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCreatedAt("1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Oldest</Text>
@@ -483,10 +584,10 @@ export default function SubCategoryProducts({ route, navigation }) {
 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
-                  value="1"
-                  status={date === "1" ? "checked" : "unchecked"}
+                  value="-1"
+                  status={createdAt === "-1" ? "checked" : "unchecked"}
                   onPress={() => {
-                    setDate("1");
+                    setCreatedAt("-1");
                   }}
                 />
                 <Text style={postStyles.radioText}>Newest</Text>
@@ -520,8 +621,10 @@ export default function SubCategoryProducts({ route, navigation }) {
                     onPress={() => {
                       setCategoriesModal(false);
                       setCategory(item.categoryName);
+                      setCategoryID(item._id);
 
                       setSubCategory("");
+                      setSubCategoryID("");
                     }}
                     key={item._id}
                     subCategoryName={item.categoryName}

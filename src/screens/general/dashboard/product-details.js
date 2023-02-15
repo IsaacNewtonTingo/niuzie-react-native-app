@@ -271,7 +271,7 @@ export default function ProductDetails({ route, navigation }) {
   }
 
   async function getOtherProducts() {
-    let url = `${ENDPOINT}/product/get-user-products/${productOwnerID}?productID=${productID}`;
+    let url = `${ENDPOINT}/product/get-other-user-products/${productOwnerID}?productID=${productID}`;
     await axios
       .get(url)
       .then((response) => {
