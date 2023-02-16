@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
-  Linking,
   Share,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
@@ -49,6 +48,7 @@ import NoData from "../../../componets/Text/no-data";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import * as Sharing from "expo-sharing";
+import * as Linking from "expo-linking";
 
 const width = Dimensions.get("window").width;
 
@@ -73,8 +73,8 @@ export default function ProductDetails({ route, navigation }) {
 
   const [reviewList, setReviewList] = useState([]);
 
-  let productID = route.params.productID;
-  let productOwnerID = route.params.productOwnerID;
+  let productID = route.params.item._id;
+  let productOwnerID = route.params.item.user._id;
 
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
@@ -419,37 +419,12 @@ export default function ProductDetails({ route, navigation }) {
 
   async function shareProduct() {
     try {
-      // const deepLink = `../../../assets/images/bg.jpg`;
-
-      // Linking.canOpenURL(deepLink).then(async (supported) => {
-      //   if (supported) {
-      //     const result = await Sharing.isAvailableAsync();
-      //     const shareOptions = {
-      //       message: "Hello world",
-      //     };
-      //     if (result) {
-      //       await Sharing.shareAsync(deepLink, shareOptions);
-      //     } else {
-      //       showMyToast({
-      //         status: "error",
-      //         title: "Failed",
-      //         description: "An error occured while trying to share product",
-      //       });
-      //     }
-
-      //     // if (result.action === Share.sharedAction) {
-      //     //   console.log("Link shared successfully");
-      //     // } else if (result.action === Share.dismissedAction) {
-      //     //   console.log("Link sharing dismissed");
-      //     // }
-      //   } else {
-      //     console.error(`Cannot open deep link: ${deepLink}`);
-      //   }
-      // });
+      const redirectUrl = Linking.createURL("product", {
+        queryParams: { productID: productID },
+      });
 
       const shareOptions = {
-        message:
-          "Hello. Look at my product on the niuzie mobile application by clicking on the link below.",
+        message: redirectUrl,
       };
 
       await Share.share(shareOptions);

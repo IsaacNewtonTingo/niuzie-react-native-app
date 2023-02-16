@@ -163,10 +163,7 @@ export default function PendingProducts({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", {
-      productID: item._id,
-      productOwnerID: item.user._id,
-    });
+    navigation.navigate("ProductDetails", { item });
   }
 
   return (

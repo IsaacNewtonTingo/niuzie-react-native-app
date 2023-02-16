@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "niuzie",
+    "sheme":"niuzie",
     "slug": "niuzie",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,12 +17,19 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "lyft"
+        ]
+      },
       "bundleIdentifier": "com.niuzie.app",
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:niuzie.ape30technologies.com"
+        "applinks:niuzie.com"
       ]
     },
     "android": {
@@ -37,8 +45,8 @@
           "data": [
             {
               "scheme": "https",
-              "host": "*.ape30technologies.com",
-              "pathPrefix": "/api"
+              "host": "*.niuzie.com",
+              "pathPrefix": "/product"
             }
           ],
           "category": [
@@ -46,7 +54,11 @@
             "DEFAULT"
           ]
         }
-      ]
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.niuzie.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -58,6 +70,11 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7384df5c-b9fa-4e11-9ebe-f8477a291a32"
+      }
+    }
   }
 }

@@ -25,18 +25,6 @@ import Decider from "./src/navigators/decider";
 
 import { showMyToast } from "./src/functions/show-toast";
 
-Linking.addEventListener("url", handleOpenURL);
-Linking.getInitialURL().then((url) => {
-  if (url) {
-    handleOpenURL({ url });
-  }
-});
-
-function handleOpenURL({ url }) {
-  const productID = url.split("/")[2];
-  // navigation.navigate("ProductDetails", { productID });
-}
-
 LogBox.ignoreAllLogs();
 
 const newColorTheme = {

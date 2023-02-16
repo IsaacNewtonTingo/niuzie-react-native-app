@@ -192,10 +192,7 @@ export default function SubCategoryProducts({ navigation, route }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", {
-      productID: item._id,
-      productOwnerID: item.user._id,
-    });
+    navigation.navigate("ProductDetails", { item });
   }
 
   async function handleItemClicked(navTo) {
