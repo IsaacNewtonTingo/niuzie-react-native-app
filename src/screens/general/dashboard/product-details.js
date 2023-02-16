@@ -419,9 +419,7 @@ export default function ProductDetails({ route, navigation }) {
 
   async function shareProduct() {
     try {
-      const redirectUrl = Linking.createURL("product", {
-        queryParams: { productID: productID },
-      });
+      const redirectUrl = Linking.createURL();
 
       const shareOptions = {
         message: redirectUrl,
