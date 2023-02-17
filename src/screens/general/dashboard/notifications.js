@@ -201,7 +201,7 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <View style={[styles.container, {}]}>
-      {notificationsList.length > 0 && (
+      {notifications !== 0 && (
         <View style={notificationStyles.topCont}>
           <TouchableOpacity
             onPress={markAsRead}
@@ -211,6 +211,7 @@ export default function NotificationsScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       )}
+
       {notificationsList.length < 1 && <NoData text="No nofications found" />}
 
       <FlatList

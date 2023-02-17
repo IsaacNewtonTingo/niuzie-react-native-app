@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
+import * as Linking from "expo-linking";
+
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
 
@@ -35,9 +37,41 @@ export default function Home({ navigation }) {
     getCategories();
     getPremiumProducts();
     getProductRequests();
+
+    grabLinkOpeningApp();
+    setLinkListenerWhenOpeningApp();
+
+    // Linking.addEventListener("url", handleOpenURL);
+    // Linking.getInitialURL().then((url) => {
+    //   if (url) {
+    //     handleOpenURL({ url });
+    //   }
+    // });
+
+    // function handleOpenURL({ url }) {
+    //   const productID = url.split("/")[2];
+    //   // navigation.navigate("ProductDetails", { productID });
+    // }
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  const grabLinkOpeningApp = () => {
+    //Handles link when the link is clicked and the app was already open
+    Linking.addEventListener("url", handleUrl());
+  };
+
+  const setLinkListenerWhenOpeningApp = () => {
+    //Handles link when app is closed:
+    Linking.getInitialURL()
+      .then((url) => handleUrl(url))
+      .catch((err) => console.log(err));
+  };
+
+  function handleUrl(url) {
+    //Handle your link here
+    console.log(url);
+  }
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;
@@ -92,10 +126,7 @@ export default function Home({ navigation }) {
   }
 
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", {
-      productID: item._id,
-      productOwnerID: item.user._id,
-    });
+    navigation.navigate("ProductDetails", { item });
   }
 
   if (loadingData) {
@@ -108,7 +139,12 @@ export default function Home({ navigation }) {
         <View style={styles.section}>
           <View style={[styles.textComb, { marginBottom: 20 }]}>
             <Text style={styles.subText}>Buyer requests</Text>
-            <Text style={styles.viewAll}>View all</Text>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AllProductRequests")}
+            >
+              <Text style={styles.viewAll}>View all</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={homeStyles.miniCatContainer}>
@@ -169,7 +205,11 @@ export default function Home({ navigation }) {
         <View style={styles.section}>
           <View style={[styles.textComb, { marginBottom: 20 }]}>
             <Text style={styles.subText}>Featured products</Text>
-            <Text style={styles.viewAll}>View all</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AllFeaturedProducts")}
+            >
+              <Text style={styles.viewAll}>View all</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={homeStyles.miniCatContainer}>

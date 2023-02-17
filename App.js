@@ -9,6 +9,7 @@ import {
   CredentialsContext,
   NotificationContext,
   AuthContext,
+  PendingProductsContext,
 } from "./src/componets/context/credentials-context";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -23,18 +24,6 @@ import axios from "axios";
 import Decider from "./src/navigators/decider";
 
 import { showMyToast } from "./src/functions/show-toast";
-
-Linking.addEventListener("url", handleOpenURL);
-Linking.getInitialURL().then((url) => {
-  if (url) {
-    handleOpenURL({ url });
-  }
-});
-
-function handleOpenURL({ url }) {
-  const productID = url.split("/")[2];
-  // navigation.navigate("ProductDetails", { productID });
-}
 
 LogBox.ignoreAllLogs();
 
@@ -107,6 +96,7 @@ export default function App() {
   const [storedCredentials, setStoredCredentials] = useState("");
   const [notifications, setNotifications] = useState(0);
   const [auth, setAuth] = useState(false);
+  const [pendingProducts, setPendingProducts] = useState(0);
 
   useEffect(() => {
     checkLoginCredentials();
@@ -166,12 +156,16 @@ export default function App() {
           <NotificationContext.Provider
             value={{ notifications, setNotifications }}
           >
-            <NativeBaseProvider theme={theme}>
-              <NavigationContainer>
-                <Decider />
-                <StatusBar style="light" />
-              </NavigationContainer>
-            </NativeBaseProvider>
+            <PendingProductsContext.Provider
+              value={{ pendingProducts, setPendingProducts }}
+            >
+              <NativeBaseProvider theme={theme}>
+                <NavigationContainer>
+                  <Decider />
+                  <StatusBar style="light" />
+                </NavigationContainer>
+              </NativeBaseProvider>
+            </PendingProductsContext.Provider>
           </NotificationContext.Provider>
         </AuthContext.Provider>
       </CredentialsContext.Provider>

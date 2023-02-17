@@ -15,3 +15,8 @@ export const AuthContext = createContext({
   auth: {},
   setAuth: () => {},
 });
+
+export const PendingProductsContext = createContext({
+  pendingProducts: {},
+  setPendingProducts: () => {},
+});

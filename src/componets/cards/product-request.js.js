@@ -29,9 +29,24 @@ export default function ProductRequest(props) {
   const location = props.item.user.county + ", " + props.item.user.subCounty;
   const date = props.item.createdAt;
   const onPress = props.onPress;
+  const style = props.style;
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        {
+          height: 140,
+          width: width / 1.5,
+          marginRight: 10,
+          borderWidth: 1,
+          borderRadius: 10,
+          borderLeftWidth: 1,
+          borderLeftColor: colors.orange,
+        },
+        style,
+      ]}
+    >
       <LinearGradient
         start={[0.0, 0.5]}
         end={[1.0, 0.5]}
@@ -100,12 +115,11 @@ export default function ProductRequest(props) {
 
 const gradientStyles = StyleSheet.create({
   background: {
-    minHeight: 140,
-    width: width / 1.5,
-    marginRight: 10,
+    height: "100%",
     padding: 20,
-    borderWidth: 1,
     borderRadius: 10,
     justifyContent: "space-between",
+    borderLeftWidth: 2,
+    borderLeftColor: colors.orange,
   },
 });

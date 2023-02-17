@@ -1,17 +1,38 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useContext } from "react";
-import { Modal } from "native-base";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Dimensions,
+} from "react-native";
+import React, { useEffect, useContext, useState } from "react";
+import { Button, Divider, HStack, Modal } from "native-base";
 
 import { CredentialsContext } from "../../componets/context/credentials-context";
-import axios from "axios";
+import { postStyles } from "./post-product";
 import { showMyToast } from "../../functions/show-toast";
+import { BarIndicator } from "react-native-indicators";
 
-export default function PendingProducts() {
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import axios from "axios";
+import NoData from "../../componets/Text/no-data";
+import PrimaryButton from "../../componets/buttons/primary-button";
+import HorizontalCard from "../../componets/cards/horizontal-card";
+import styles from "../../componets/styles/global-styles";
+import colors from "../../componets/colors/colors";
+
+const { width } = Dimensions.get("window");
+
+export default function PendingProducts({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
-  const userID = storedCredentials.data.userID;
-  const token = storedCredentials.data.token;
+  const [userID, setUserID] = useState("");
+  const [token, setToken] = useState("");
 
   const [paymentModal, setPaymentModal] = useState(false);
   const [pendingProductList, setPendingProductList] = useState([]);
@@ -21,20 +42,65 @@ export default function PendingProducts() {
   const [loadingData, setLoadingData] = useState(true);
 
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [price, setPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    getPendingProducts();
+    checkStoreCredentials();
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
-  async function getPendingProducts(userID, token) {
+  async function checkStoreCredentials() {
+    const { data } = storedCredentials ? storedCredentials : "";
+
+    if (data) {
+      getSetPrice(data.userID, data.token);
+      setUserID(data.userID);
+      setToken(data.token);
+    } else {
+      setUserID("");
+      setToken("");
+
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to access this functionality. Signup if you don't have an account",
+      });
+    }
+  }
+
+  async function getSetPrice(userID, token) {
+    const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.EXTRA_PRODUCT_PAY_ID}`;
+
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setPrice(response.data.data.amount);
+          getPendingProducts(userID, token, response.data.data.amount);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function getPendingProducts(userID, token, price) {
     const url = `${process.env.ENDPOINT}/product/get-pending-products/${userID}`;
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
         if (response.data.status == "Success") {
           setPendingProductList(response.data.data);
+          setTotalPrice(price * response.data.data.length);
         } else {
           showMyToast({
             status: "error",
@@ -66,7 +132,7 @@ export default function PendingProducts() {
         {
           userID,
           phoneNumber,
-          amount: 2,
+          amount: totalPrice,
           accountNumber,
         },
         { headers }
@@ -76,6 +142,7 @@ export default function PendingProducts() {
         setSubmitting(false);
         if (response.data.status == "Success") {
           setPaymentModal(false);
+          getPendingProducts();
           showMyToast({
             status: "success",
             title: "Success",
@@ -95,9 +162,15 @@ export default function PendingProducts() {
       });
   }
 
+  async function handleProductPressed(item) {
+    navigation.navigate("ProductDetails", { item });
+  }
+
   return (
-    <View>
-      {pendingProductList.length < 1 && <NoData text="No data" />}
+    <View style={styles.container}>
+      {pendingProductList.length < 1 && (
+        <NoData text="No pending products found" />
+      )}
 
       {paymentModal == true && (
         <Modal
@@ -107,7 +180,10 @@ export default function PendingProducts() {
         >
           <Modal.Content width={width - 40} maxWidth={width - 40}>
             <Modal.CloseButton />
-            <Modal.Header>Pay to submit product for review</Modal.Header>
+
+            <Modal.Header color={colors.lightBlue}>
+              Pay to submit product for review
+            </Modal.Header>
 
             <Modal.Body>
               <Text style={{ marginBottom: 20, color: colors.dark }}>
@@ -146,7 +222,7 @@ export default function PendingProducts() {
                   style={styles.textInput}
                   placeholderTextColor="gray"
                   keyboardType="numeric"
-                  value="200"
+                  value={totalPrice.toString()}
                   editable={false}
                 />
               </View>
@@ -181,30 +257,41 @@ export default function PendingProducts() {
         </Modal>
       )}
 
-      <ImageBackground
-        style={postStyles.topIMG}
-        source={require("../../assets/images/mt.jpg")}
-      >
-        <Image
-          style={postStyles.safLogo}
-          source={require("../../assets/images/safaricom.png")}
-        />
-        <Text style={postStyles.descText}>
-          In order to make the below product(s) live, please complete the
-          payment.
-        </Text>
+      {totalPrice !== 0 && (
+        <ImageBackground
+          style={postStyles.topIMG}
+          source={require("../../assets/images/mt.jpg")}
+        >
+          <Image
+            style={postStyles.safLogo}
+            source={require("../../assets/images/safaricom.png")}
+          />
+          <Text style={postStyles.descText}>
+            In order to make the below product(s) live, please complete the
+            payment.
+          </Text>
 
-        <HStack>
-          <Text style={postStyles.amountText}>Ksh. 400 </Text>
-          <Divider bg="amber.500" thickness="2" mx="2" orientation="vertical" />
-          <Text style={postStyles.amountText}>Per product</Text>
-        </HStack>
+          <HStack>
+            <Text style={postStyles.amountText}>
+              Ksh. {totalPrice.toFixed(2)}
+            </Text>
+            <Divider
+              bg="amber.500"
+              thickness="2"
+              mx="2"
+              orientation="vertical"
+            />
+            <Text style={postStyles.amountText}>
+              Ksh. {price.toFixed(2)} per product
+            </Text>
+          </HStack>
 
-        <PrimaryButton
-          onPress={() => setPaymentModal(true)}
-          buttonTitle="Pay now"
-        />
-      </ImageBackground>
+          <PrimaryButton
+            onPress={() => setPaymentModal(true)}
+            buttonTitle="Pay now"
+          />
+        </ImageBackground>
+      )}
 
       <FlatList
         style={{ marginTop: 20 }}
