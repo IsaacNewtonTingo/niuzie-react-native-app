@@ -175,18 +175,15 @@ export default function Discover({ navigation }) {
   }
 
   async function getMoreProducts() {
-    pageNumber += 1;
+    pageNumber++;
+    console.log(pageNumber);
     let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
 
     if (reachedEnd == true) {
       return;
     } else {
       await axios.get(url).then((response) => {
-        if (response.data.data.length === allProducts.length) {
-          setReachedEnd(true);
-        } else {
-          setAllProducts([...allProducts, ...response.data.data]);
-        }
+        setAllProducts([...allProducts, ...response.data.data]);
       });
     }
   }
@@ -349,7 +346,9 @@ export default function Discover({ navigation }) {
           return !reachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <></>
+            <>
+              <NoData text="No more data" />
+            </>
           );
         }}
       />
