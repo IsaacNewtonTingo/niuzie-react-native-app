@@ -45,42 +45,74 @@ export default function Products({ navigation }) {
   const token = storedCredentials ? data.token : "";
 
   useEffect(() => {
-    getProducts();
+    getNewProducts();
+    getApprovedProducts();
+    getRejectedProducts();
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
 
-  async function getProducts() {
-    const url = `${process.env.ENDPOINT}/admin/get-products`;
+  async function getNewProducts() {
+    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-new-products`;
     setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
         setLoadingData(false);
-
         if (response.data.status == "Success") {
-          const products = response.data.data;
-
-          const newProducts = products.filter(function (product) {
-            if (product.reviewed == false) {
-              return true;
-            }
+          setNewProducts(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
           });
-          setNewProducts(newProducts);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
 
-          const approvedProducts = products.filter(function (product) {
-            if (product.reviewed == true && product.verified == true) {
-              return true;
-            }
+  async function getApprovedProducts() {
+    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-approved-products`;
+    setLoadingData(true);
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setApprovedProductsList(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
           });
-          setApprovedProductsList(approvedProducts);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
 
-          const rejectedProducts = products.filter(function (product) {
-            if (product.reviewed == true && product.verified == false) {
-              return true;
-            }
+  async function getRejectedProducts() {
+    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-rejected-products`;
+    setLoadingData(true);
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setRejectedProductsList(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
           });
-          setRejectedProductsList(rejectedProducts);
         }
       })
       .catch((err) => {

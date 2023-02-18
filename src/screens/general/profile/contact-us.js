@@ -20,6 +20,7 @@ import { CredentialsContext } from "../../../componets/context/credentials-conte
 
 import { Divider, Flex } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function ContactUs({ route }) {
   const { storedCredentials, setStoredCredentials } =
@@ -84,7 +85,10 @@ export default function ContactUs({ route }) {
   }
 
   return (
-    <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       <LinearGradient
         start={[0.0, 0.5]}
         end={[1.0, 0.5]}
@@ -172,7 +176,7 @@ export default function ContactUs({ route }) {
           onPress={sendMessage}
         />
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 

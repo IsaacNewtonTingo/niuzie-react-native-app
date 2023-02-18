@@ -73,7 +73,7 @@ export default function SavedProducts({ navigation }) {
   async function handleProductPressed(item) {
     navigation.navigate("ProductDetails", {
       productID: item.product._id,
-      productOwnerID: item.user._id,
+      productOwnerID: item.product.user._id,
     });
   }
 
@@ -114,8 +114,8 @@ export default function SavedProducts({ navigation }) {
             price={item.product.price}
             condition={item.product.condition}
             description={item.product.description}
-            county={item.user.county}
-            subCounty={item.user.subCounty}
+            county={item.product.user.county}
+            subCounty={item.product.user.subCounty}
             rating={parseFloat(item.product.rating.$numberDecimal).toFixed(1)}
             premium={item.product.user.premium}
           />

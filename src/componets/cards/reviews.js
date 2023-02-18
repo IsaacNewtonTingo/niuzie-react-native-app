@@ -22,6 +22,7 @@ export default function ReviewComponent(props) {
   const { data } = storedCredentials ? storedCredentials : "";
   const userID = storedCredentials ? data.userID : "";
 
+  const reviewer = props.reviewer;
   const firstName = props.firstName;
   const lastName = props.lastName;
   const profilePicture = props.profilePicture;
@@ -81,7 +82,7 @@ export default function ReviewComponent(props) {
           {reviewMessage}
         </Text>
 
-        {userID == productOwnerID && (
+        {userID == reviewer && (
           <TouchableOpacity onPress={onPress}>
             <Entypo name="trash" size={25} color={colors.gray} />
           </TouchableOpacity>

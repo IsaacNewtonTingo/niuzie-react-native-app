@@ -135,13 +135,14 @@ export default function Discover({ navigation }) {
     setCreatedAt("");
   }
 
-  let pageNumber = 0;
+  let [pageNumber, setPageNumber] = useState(0);
   let limit = 20;
 
   async function getAllProducts() {
-    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
     setLoadingData(true);
     setSubmitting(true);
+
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
 
     await axios
       .get(url)
@@ -175,21 +176,36 @@ export default function Discover({ navigation }) {
   }
 
   async function getMoreProducts() {
-    pageNumber++;
-    console.log(pageNumber);
-    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
+    setPageNumber(pageNumber + 1);
+
+    let url = `${
+      process.env.ENDPOINT
+    }/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${
+      pageNumber + 1
+    }&limit=${limit}`;
 
     if (reachedEnd == true) {
       return;
     } else {
       await axios.get(url).then((response) => {
-        setAllProducts([...allProducts, ...response.data.data]);
+        if (response.data.status == "Success") {
+          setAllProducts([...allProducts, ...response.data.data]);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
       });
     }
   }
 
   async function handleProductPressed(item) {
-    navigation.navigate("ProductDetails", { item });
+    navigation.navigate("ProductDetails", {
+      productID: item._id,
+      productOwnerID: item.user._id,
+    });
   }
 
   async function handleItemClicked(navTo) {

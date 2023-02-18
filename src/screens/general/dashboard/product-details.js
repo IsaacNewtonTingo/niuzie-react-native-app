@@ -73,8 +73,8 @@ export default function ProductDetails({ route, navigation }) {
 
   const [reviewList, setReviewList] = useState([]);
 
-  let productID = route.params.item._id;
-  let productOwnerID = route.params.item.user._id;
+  let productID = route.params.productID;
+  let productOwnerID = route.params.productOwnerID;
 
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
@@ -595,6 +595,7 @@ export default function ProductDetails({ route, navigation }) {
               key={review._id}
               productOwnerID={productOwnerID}
               firstName={review.user.firstName}
+              reviewer={review.user._id}
               lastName={review.user.lastName}
               profilePicture={review.user.profilePicture}
               date={dateFormat(review.createdAt, "mediumDate")}
