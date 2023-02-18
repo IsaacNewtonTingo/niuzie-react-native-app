@@ -54,7 +54,7 @@ export default function AdminProductDetails({ route, navigation }) {
   };
 
   async function approveOrReject() {
-    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/approve-product/${route.params.item._id}?userID=${userID}`;
 
     setSubmitting(true);
     await axios
@@ -201,9 +201,14 @@ export default function AdminProductDetails({ route, navigation }) {
           onPress={approveOrReject}
           submitting={submitting}
           disabled={submitting}
-          buttonTitle={
-            route.params.item.verified == false ? "Approve" : "Reject"
-          }
+          buttonTitle="Approve"
+        />
+
+        <TertiaryButton
+          onPress={approveOrReject}
+          submitting={submitting}
+          disabled={submitting}
+          buttonTitle="Reject"
         />
       </View>
     </ScrollView>
