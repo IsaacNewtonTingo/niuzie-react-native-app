@@ -289,7 +289,7 @@ export default function PostProduct({ navigation }) {
         console.log(response.data);
         setSubmitting(false);
         if (response.data.status == "Success") {
-          getPendingProducts();
+          setPendingProducts(pendingProducts + 1);
           showMyToast({
             status: "success",
             title: "Success",

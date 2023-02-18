@@ -108,7 +108,11 @@ export default function Home({ navigation }) {
         <View style={styles.section}>
           <View style={[styles.textComb, { marginBottom: 20 }]}>
             <Text style={styles.subText}>Buyer requests</Text>
-            <Text style={styles.viewAll}>View all</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AllProductRequests")}
+            >
+              <Text style={styles.viewAll}>View all</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={homeStyles.miniCatContainer}>
@@ -169,7 +173,12 @@ export default function Home({ navigation }) {
         <View style={styles.section}>
           <View style={[styles.textComb, { marginBottom: 20 }]}>
             <Text style={styles.subText}>Featured products</Text>
-            <Text style={styles.viewAll}>View all</Text>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AllFeaturedProducts")}
+            >
+              <Text style={styles.viewAll}>View all</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={homeStyles.miniCatContainer}>

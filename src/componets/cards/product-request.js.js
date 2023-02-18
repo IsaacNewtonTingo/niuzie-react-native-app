@@ -104,8 +104,17 @@ export default function ProductRequest(props) {
             </Text>
           </View>
 
-          <Text style={{ fontWeight: "800", color: "#A8B8D8", fontSize: 10 }}>
+          <Text
+            style={{
+              fontWeight: "800",
+              textAlign: "right",
+              color: "#A8B8D8",
+              fontSize: 10,
+            }}
+          >
             {dateFormat(date, "mediumDate")}
+            {"\n"}
+            {dateFormat(date, "shortTime")}
           </Text>
         </View>
       </LinearGradient>

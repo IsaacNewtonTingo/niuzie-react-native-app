@@ -24,6 +24,7 @@ import PrimaryButton from "../../componets/buttons/primary-button";
 import HorizontalCard from "../../componets/cards/horizontal-card";
 import styles from "../../componets/styles/global-styles";
 import colors from "../../componets/colors/colors";
+import LoadingIndicator from "../../componets/preloader/loadingIndicator";
 
 const { width } = Dimensions.get("window");
 
@@ -98,10 +99,12 @@ export default function PendingProducts({ navigation }) {
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
+        setLoadingData(false);
         if (response.data.status == "Success") {
           setPendingProductList(response.data.data);
           setTotalPrice(price * response.data.data.length);
         } else {
+          setLoadingData(false);
           showMyToast({
             status: "error",
             title: "Failed",
@@ -167,6 +170,10 @@ export default function PendingProducts({ navigation }) {
       productID: item._id,
       productOwnerID: item.user._id,
     });
+  }
+
+  if (loadingData) {
+    return <LoadingIndicator />;
   }
 
   return (

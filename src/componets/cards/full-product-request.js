@@ -109,7 +109,7 @@ export default function FullProductRequest(props) {
           fontSize: 14,
         }}
       >
-        {content.length <= 60 ? content : content.slice(0, 59) + "..."}
+        {content}
       </Text>
 
       <View
@@ -133,8 +133,17 @@ export default function FullProductRequest(props) {
           </Text>
         </View>
 
-        <Text style={{ fontWeight: "800", color: colors.gray, fontSize: 10 }}>
+        <Text
+          style={{
+            fontWeight: "800",
+            textAlign: "right",
+            color: colors.gray,
+            fontSize: 10,
+          }}
+        >
           {dateFormat(date, "mediumDate")}
+          {"\n"}
+          {dateFormat(date, "shortTime")}
         </Text>
       </View>
     </LinearGradient>
