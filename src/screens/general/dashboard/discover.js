@@ -289,16 +289,14 @@ export default function Discover({ navigation }) {
             />
           }
           InputRightElement={
-            searchTerm.length > 0 && (
-              <TouchableOpacity onPress={() => getAllProducts()}>
-                <Icon
-                  as={<AntDesign name="arrowright" />}
-                  size={5}
-                  mr="2"
-                  color="muted.400"
-                />
-              </TouchableOpacity>
-            )
+            <TouchableOpacity onPress={() => getAllProducts()}>
+              <Icon
+                as={<AntDesign name="arrowright" />}
+                size={5}
+                mr="2"
+                color="muted.400"
+              />
+            </TouchableOpacity>
           }
           placeholder="Search product"
           value={searchTerm}

@@ -14,6 +14,8 @@ import PublicProfile from "../screens/general/dashboard/public-profile";
 import SellerProducts from "../screens/seller/seller-products";
 import AllProductRequests from "../screens/general/dashboard/all-product-requests";
 import AllFeaturedProducts from "../screens/general/dashboard/all-featured-products";
+import PremiumServices from "../screens/general/profile/premium-services";
+import AllReviews from "../screens/general/dashboard/all-reviews";
 
 const Stack = createNativeStackNavigator();
 
@@ -117,6 +119,23 @@ export default function HomeNav() {
         component={AllFeaturedProducts}
         options={{
           headerTitle: "All featured products",
+        }}
+      />
+
+      <Stack.Screen
+        name="PremiumServices"
+        component={PremiumServices}
+        options={{
+          headerTitle: "Premium services",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="AllReviews"
+        component={AllReviews}
+        options={{
+          headerTitle: "Reviews",
         }}
       />
     </Stack.Navigator>

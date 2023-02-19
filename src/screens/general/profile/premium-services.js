@@ -46,6 +46,7 @@ export default function PremiumServices({ navigation }) {
   const [loadingData, setLoadingData] = useState(true);
 
   const [paymentModal, setPaymentModal] = useState(false);
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
 
   useEffect(() => {
     getUserData();
@@ -117,6 +118,13 @@ export default function PremiumServices({ navigation }) {
         title: "Required field",
         description: "Phone number is required",
       });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
+      });
     } else {
       joinPremium();
     }
@@ -132,8 +140,14 @@ export default function PremiumServices({ navigation }) {
 
     setSubmitting(true);
 
+    const newPhoneNumber = phoneNumber.startsWith("+")
+      ? phoneNumber.substring(1)
+      : phoneNumber.startsWith("0")
+      ? "254" + phoneNumber.substring(1)
+      : phoneNumber;
+
     await axios
-      .post(url, { phoneNumber }, { headers: headers })
+      .post(url, { newPhoneNumber }, { headers: headers })
       .then((response) => {
         setSubmitting(false);
         console.log(response.data);

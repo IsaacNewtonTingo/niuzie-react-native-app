@@ -46,6 +46,8 @@ export default function PendingProducts({ navigation }) {
   const [price, setPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
+
   useEffect(() => {
     checkStoreCredentials();
   }, [(navigation, loading)]);
@@ -118,51 +120,73 @@ export default function PendingProducts({ navigation }) {
   }
 
   async function publishManyProducts() {
-    const url = `${process.env.ENDPOINT}/product/insert-many-products`;
-    setSubmitting(true);
-
-    const headers = {
-      "auth-token": token,
-      "Content-Type": "application/json",
-      Accept: "aSpplication/json",
-    };
-
-    let accountNumber = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await axios
-      .post(
-        url,
-        {
-          userID,
-          phoneNumber,
-          amount: totalPrice,
-          accountNumber,
-        },
-        { headers }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setSubmitting(false);
-        if (response.data.status == "Success") {
-          setPaymentModal(false);
-          getPendingProducts();
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-        } else {
-          showMyToast({
-            status: "error",
-            title: "Failed",
-            description: response.data.message,
-          });
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
+    if (!phoneNumber) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Phone number is required",
       });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
+      });
+    } else {
+      const url = `${process.env.ENDPOINT}/product/insert-many-products`;
+      setSubmitting(true);
+
+      const headers = {
+        "auth-token": token,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+
+      let accountNumber = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+      const newPhoneNumber = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(1)
+        : phoneNumber.startsWith("0")
+        ? "254" + phoneNumber.substring(1)
+        : phoneNumber;
+
+      await axios
+        .post(
+          url,
+          {
+            userID,
+            phoneNumber: newPhoneNumber,
+            amount: totalPrice,
+            accountNumber,
+          },
+          { headers }
+        )
+        .then((response) => {
+          console.log(response.data);
+          setSubmitting(false);
+          if (response.data.status == "Success") {
+            setPaymentModal(false);
+            getPendingProducts();
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
   }
 
   async function handleProductPressed(item) {

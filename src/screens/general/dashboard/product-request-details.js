@@ -18,7 +18,10 @@ import PrimaryButton from "../../../componets/buttons/primary-button";
 import { postStyles } from "../../seller/post-product";
 import { Ionicons } from "@expo/vector-icons";
 
-import { CredentialsContext } from "../../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  AuthContext,
+} from "../../../componets/context/credentials-context";
 import { Modal } from "native-base";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { showMyToast } from "../../../functions/show-toast";
@@ -32,6 +35,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 export default function ProductRequestDetails({ route, navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
+  const { auth, setAuth } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -174,6 +178,21 @@ export default function ProductRequestDetails({ route, navigation }) {
       });
   }
 
+  async function joinPremium() {
+    if (!userID) {
+      showMyToast({
+        status: "info",
+        title: "Requirement",
+        description:
+          "You need to login to access this page. Signup if you don't have an account",
+      });
+
+      setAuth(true);
+    } else {
+      navigation.navigate("PremiumServices");
+    }
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
@@ -234,7 +253,9 @@ export default function ProductRequestDetails({ route, navigation }) {
           </>
         )}
 
-        {!premium && <PrimaryButton buttonTitle="Join premium" />}
+        {!premium && (
+          <PrimaryButton buttonTitle="Join premium" onPress={joinPremium} />
+        )}
       </View>
     </KeyboardAwareScrollView>
   );

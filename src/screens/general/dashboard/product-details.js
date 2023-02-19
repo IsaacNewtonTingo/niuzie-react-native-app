@@ -584,7 +584,15 @@ export default function ProductDetails({ route, navigation }) {
             </Text>
 
             {reviewList.length > 0 && (
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("AllReviews", {
+                    productID,
+                    userID,
+                    productOwnerID,
+                  })
+                }
+              >
                 <Text style={styles.viewAll}>View all</Text>
               </TouchableOpacity>
             )}
