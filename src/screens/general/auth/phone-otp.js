@@ -29,6 +29,7 @@ export default function ConfirmOtp({ route, navigation }) {
         firstName: route.params.firstName,
         lastName: route.params.lastName,
         phoneNumber: route.params.phoneNumber,
+
         password: route.params.password,
         county: route.params.county,
         subCounty: route.params.subCounty,

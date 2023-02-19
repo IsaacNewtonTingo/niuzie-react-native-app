@@ -49,6 +49,7 @@ import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import * as Sharing from "expo-sharing";
 import * as Linking from "expo-linking";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 
 const width = Dimensions.get("window").width;
 
@@ -183,7 +184,9 @@ export default function ProductDetails({ route, navigation }) {
 
   async function getReviews() {
     await axios
-      .get(`${process.env.ENDPOINT}/product/get-product-reviews/${productID}`)
+      .get(
+        `https://9c75-105-163-158-88.in.ngrok.io/api/product/get-product-reviews/${productID}`
+      )
       .then((response) => {
         if (response.data.status == "Success") {
           setReviewList(response.data.data);
@@ -754,6 +757,37 @@ export default function ProductDetails({ route, navigation }) {
               })
             }
             buttonTitle="Edit product"
+          />
+        </View>
+      )}
+
+      {userID == productOwnerID && (
+        <View style={[styles.section, {}]}>
+          <TertiaryButton
+            onPress={() =>
+              navigation.navigate("EditProduct", {
+                productID,
+                productName,
+                categoryName,
+                categoryID,
+                subCategoryName,
+                subCategoryID,
+                description,
+                price,
+                condition,
+                firstName,
+                lastName,
+                phoneNumber,
+                county,
+                subCounty,
+
+                image1,
+                image2,
+                image3,
+                image4,
+              })
+            }
+            buttonTitle="Republish product"
           />
         </View>
       )}

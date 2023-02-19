@@ -148,7 +148,7 @@ export default function SignUp({ navigation }) {
             navigation.navigate("ConfirmOtp", {
               firstName,
               lastName,
-              phoneNumber,
+              phoneNumber: parseInt(newPhoneNumber),
               password,
               county,
               subCounty,

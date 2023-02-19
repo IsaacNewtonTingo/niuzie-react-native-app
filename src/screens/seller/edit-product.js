@@ -229,7 +229,7 @@ export default function EditProduct({ navigation, route }, props) {
             title: "Success",
             description: response.data.message,
           });
-          navigation.popToTop();
+          navigation.goBack();
         } else {
         }
       })

@@ -11,7 +11,10 @@ import {
 import React, { useEffect, useContext, useState } from "react";
 import { Button, Divider, HStack, Modal } from "native-base";
 
-import { CredentialsContext } from "../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  PendingProductsContext,
+} from "../../componets/context/credentials-context";
 import { postStyles } from "./post-product";
 import { showMyToast } from "../../functions/show-toast";
 import { BarIndicator } from "react-native-indicators";
@@ -31,7 +34,9 @@ const { width } = Dimensions.get("window");
 export default function PendingProducts({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
-
+  const { pendingProducts, setPendingProducts } = useContext(
+    PendingProductsContext
+  );
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
 
@@ -45,7 +50,6 @@ export default function PendingProducts({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [price, setPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
-
   var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
 
   useEffect(() => {
@@ -146,6 +150,7 @@ export default function PendingProducts({ navigation }) {
       let accountNumber = Math.floor(
         100000 + Math.random() * 900000
       ).toString();
+
       const newPhoneNumber = phoneNumber.startsWith("+")
         ? phoneNumber.substring(1)
         : phoneNumber.startsWith("0")
@@ -168,7 +173,8 @@ export default function PendingProducts({ navigation }) {
           setSubmitting(false);
           if (response.data.status == "Success") {
             setPaymentModal(false);
-            getPendingProducts();
+            getPendingProducts(userID, token, price);
+            setPendingProducts(0);
             showMyToast({
               status: "success",
               title: "Success",

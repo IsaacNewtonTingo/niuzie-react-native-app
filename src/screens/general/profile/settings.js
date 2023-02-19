@@ -152,7 +152,7 @@ export default function Settings({ navigation }) {
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
-          setPhoneNumber(response.data.data.phoneNumber);
+          setPhoneNumber(`+${response.data.data.phoneNumber}`);
           setProfilePicture(response.data.data.profilePicture);
 
           setAdmin(response.data.data.admin);

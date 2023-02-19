@@ -63,7 +63,7 @@ export default function Discover({ navigation }) {
   const [price, setPrice] = useState(""); // 1 = Low to high
   const [rating, setRating] = useState(""); // -1 = Highest to lowest
   const [createdAt, setCreatedAt] = useState(""); // -1 = Latest to oldest
-  const [promoted, setPromoted] = useState(""); // -1 = Promoted true first
+  const [promoted, setPromoted] = useState("-1"); // -1 = Promoted true first
 
   const [filterModal, setFilterModal] = useState(false);
   const [categoriesModal, setCategoriesModal] = useState(false);
@@ -142,7 +142,9 @@ export default function Discover({ navigation }) {
     setLoadingData(true);
     setSubmitting(true);
 
-    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}`;
+    let url = `https://9c75-105-163-158-88.in.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}&promoted=${promoted}`;
+
+    console.log(url);
 
     await axios
       .get(url)
@@ -182,7 +184,7 @@ export default function Discover({ navigation }) {
       process.env.ENDPOINT
     }/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${
       pageNumber + 1
-    }&limit=${limit}`;
+    }&limit=${limit}&promoted=${promoted}`;
 
     if (reachedEnd == true) {
       return;

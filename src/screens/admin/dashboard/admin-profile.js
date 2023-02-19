@@ -76,7 +76,7 @@ export default function AdminProfile({ navigation }) {
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
-          setPhoneNumber(response.data.data.phoneNumber);
+          setPhoneNumber(`+${response.data.data.phoneNumber}`);
           setProfilePicture(response.data.data.profilePicture);
           setCounty(response.data.data.county);
           setSubCounty(response.data.data.subCounty);
