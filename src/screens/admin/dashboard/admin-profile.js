@@ -116,7 +116,7 @@ export default function AdminProfile({ navigation }) {
     <ScrollView style={styles.container}>
       <ImageBackground
         style={profileStyles.bg}
-        source={require("../../../assets/images/bg.jpg")}
+        source={require("../../../assets/images/background.jpg")}
       >
         <Avatar.Image
           size={200}

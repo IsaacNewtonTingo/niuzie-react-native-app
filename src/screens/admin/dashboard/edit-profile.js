@@ -360,7 +360,7 @@ export default function EditAdminProfile({ route, navigation }) {
     >
       <ImageBackground
         style={editProfileStyles.bg}
-        source={require("../../../assets/images/bg.jpg")}
+        source={require("../../../assets/images/background.jpg")}
       >
         <Avatar.Image
           size={200}
