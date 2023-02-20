@@ -184,9 +184,7 @@ export default function ProductDetails({ route, navigation }) {
 
   async function getReviews() {
     await axios
-      .get(
-        `https://9c75-105-163-158-88.in.ngrok.io/api/product/get-product-reviews/${productID}`
-      )
+      .get(`${process.env.ENDPOINT}/product/get-product-reviews/${productID}`)
       .then((response) => {
         if (response.data.status == "Success") {
           setReviewList(response.data.data);
@@ -764,6 +762,7 @@ export default function ProductDetails({ route, navigation }) {
       {userID == productOwnerID && (
         <View style={[styles.section, {}]}>
           <TertiaryButton
+            style={{ marginTop: 0 }}
             onPress={() =>
               navigation.navigate("EditProduct", {
                 productID,

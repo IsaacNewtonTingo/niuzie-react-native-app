@@ -133,7 +133,6 @@ export default function App() {
       .then((response) => {
         if (response.data.status == "Success") {
           setNotifications(response.data.data.unread);
-          console.log(response.data.data.unread);
         } else {
           showMyToast({
             status: "error",

@@ -142,9 +142,7 @@ export default function Discover({ navigation }) {
     setLoadingData(true);
     setSubmitting(true);
 
-    let url = `https://9c75-105-163-158-88.in.ngrok.io/api/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}&promoted=${promoted}`;
-
-    console.log(url);
+    let url = `${process.env.ENDPOINT}/product/get-all-products?county=${county}&subCounty=${subCounty}&category=${categoryID}&subCategory=${subCategoryID}&searchTerm=${searchTerm}&condition=${condition}&price=${price}&rating=${rating}&createdAt=${createdAt}&pageNumber=${pageNumber}&limit=${limit}&promoted=${promoted}`;
 
     await axios
       .get(url)

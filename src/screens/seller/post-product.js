@@ -311,7 +311,7 @@ export default function PostProduct({ navigation }) {
   }
 
   async function postProduct() {
-    const url = `https://9c75-105-163-158-88.in.ngrok.io/api/product/post-product`;
+    const url = `${process.env.ENDPOINT}/product/post-product`;
     setSubmitting(true);
 
     const headers = {
