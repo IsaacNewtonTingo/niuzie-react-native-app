@@ -570,7 +570,7 @@ export default function ProductDetails({ route, navigation }) {
         </View>
 
         <TouchableOpacity
-          onPress={shareProduct}
+          // onPress={shareProduct}
           style={productDetailStyles.actionIcons}
         >
           <FontAwesome name="share-square-o" size={25} color={colors.gray} />
