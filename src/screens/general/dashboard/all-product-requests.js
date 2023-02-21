@@ -45,7 +45,7 @@ export default function AllProductRequests({ navigation }) {
   const [county, setCounty] = useState("");
   const [subCounty, setSubCounty] = useState("");
   const [subCounties, setSubCounties] = useState([]);
-  const [createdAt, setCreatedAt] = useState("");
+  const [createdAt, setCreatedAt] = useState("-1");
   const [pageNumber, setPageNumber] = useState(0);
 
   let [productRequests, setProductRequests] = useState([]);
@@ -182,18 +182,15 @@ export default function AllProductRequests({ navigation }) {
     }, 5000);
   }, []);
 
-  if (loadingData) {
-    return <LoadingIndicator />;
-  }
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <View style={styles.container}>
-      <View style={discoverStyles.searchContainer}>
+      <View style={[discoverStyles.searchContainer, { paddingHorizontal: 20 }]}>
         <Input
-          w={{
-            base: width - 80,
-            // md: "25%",
-          }}
+          width={width - 100}
           h={{
             base: 50,
           }}
@@ -223,7 +220,6 @@ export default function AllProductRequests({ navigation }) {
           onChangeText={setSearchTerm}
           style={{
             color: colors.lightBlue,
-            borderRadius: 10,
           }}
         />
 
@@ -231,7 +227,7 @@ export default function AllProductRequests({ navigation }) {
           onPress={() => {
             setFilterModal(!filterModal);
           }}
-          style={discoverStyles.filterContainer}
+          // style={discoverStyles.filterContainer}
         >
           <MaterialCommunityIcons
             name="filter-menu-outline"
@@ -329,7 +325,7 @@ export default function AllProductRequests({ navigation }) {
               >
                 Sort by date posted
               </Text>
-
+              {/* 
               <View style={discoverStyles.radioContainer}>
                 <RadioButton
                   value=""
@@ -339,6 +335,17 @@ export default function AllProductRequests({ navigation }) {
                   }}
                 />
                 <Text style={postStyles.radioText}>All</Text>
+              </View> */}
+
+              <View style={discoverStyles.radioContainer}>
+                <RadioButton
+                  value="-1"
+                  status={createdAt === "-1" ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setCreatedAt("-1");
+                  }}
+                />
+                <Text style={postStyles.radioText}>Newest</Text>
               </View>
 
               <View style={discoverStyles.radioContainer}>
@@ -350,17 +357,6 @@ export default function AllProductRequests({ navigation }) {
                   }}
                 />
                 <Text style={postStyles.radioText}>Oldest</Text>
-              </View>
-
-              <View style={discoverStyles.radioContainer}>
-                <RadioButton
-                  value="-1"
-                  status={createdAt === "-1" ? "checked" : "unchecked"}
-                  onPress={() => {
-                    setCreatedAt("-1");
-                  }}
-                />
-                <Text style={postStyles.radioText}>Newest</Text>
               </View>
             </View>
           </ScrollView>

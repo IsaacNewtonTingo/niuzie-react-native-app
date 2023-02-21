@@ -30,6 +30,7 @@ export default function Login({ navigation, route }, props) {
     useContext(CredentialsContext);
 
   const { auth, setAuth } = useContext(AuthContext);
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
 
   async function login() {
     if (!phoneNumber) {
@@ -37,6 +38,13 @@ export default function Login({ navigation, route }, props) {
         status: "error",
         title: "Required field",
         description: "Phone number is required",
+      });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
       });
     } else if (!password) {
       showMyToast({
@@ -47,9 +55,15 @@ export default function Login({ navigation, route }, props) {
     } else {
       setSubmitting(true);
       const url = `${process.env.ENDPOINT}/user/login`;
+      const newPhoneNumber = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(1)
+        : phoneNumber.startsWith("0")
+        ? "254" + phoneNumber.substring(1)
+        : phoneNumber;
+
       await axios
         .post(url, {
-          phoneNumber: parseInt(phoneNumber),
+          phoneNumber: parseInt(newPhoneNumber),
           password,
         })
         .then((response) => {
@@ -107,7 +121,7 @@ export default function Login({ navigation, route }, props) {
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g +254724753175"
+            placeholder="e.g 0724678890"
             keyboardType="phone-pad"
           />
         </View>
@@ -137,7 +151,6 @@ export default function Login({ navigation, route }, props) {
         />
 
         <TertiaryButton
-          submitting={submitting}
           disabled={submitting}
           onPress={() => navigation.navigate("SignUp")}
           buttonTitle="Signup"

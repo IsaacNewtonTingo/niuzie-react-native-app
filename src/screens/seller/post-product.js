@@ -290,6 +290,7 @@ export default function PostProduct({ navigation }) {
         setSubmitting(false);
         if (response.data.status == "Success") {
           setPendingProducts(pendingProducts + 1);
+          checkUserProducts(userID, token);
           showMyToast({
             status: "success",
             title: "Success",
@@ -342,12 +343,17 @@ export default function PostProduct({ navigation }) {
         console.log(response.data);
         setSubmitting(false);
         if (response.data.status == "Success") {
-          checkUserProducts();
+          checkUserProducts(userID, token);
           setPaymentModal(false);
+          setPendingProducts(0);
           showMyToast({
             status: "success",
             title: "Success",
             description: response.data.message,
+          });
+          navigation.navigate("ProductDetails", {
+            productID: response.data.data.productID,
+            productOwnerID: response.data.data.productOwnerID,
           });
         } else {
           showMyToast({

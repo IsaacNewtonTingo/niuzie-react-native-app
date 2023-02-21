@@ -68,7 +68,7 @@ export default function TabNavigator() {
         name="NotificationsNav"
         component={NotificationsNav}
         options={{
-          tabBarBadge: notifications,
+          tabBarBadge: notifications ? notifications : 0,
           tabBarIcon: ({ focused, color, size }) => {
             return (
               <MaterialCommunityIcons

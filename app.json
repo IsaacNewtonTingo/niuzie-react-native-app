@@ -1,7 +1,6 @@
 {
   "expo": {
     "name": "niuzie",
-    "sheme": "com.niuzie.app",
     "slug": "niuzie",
     "version": "1.0.0",
     "orientation": "portrait",

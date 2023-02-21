@@ -53,8 +53,40 @@ export default function AdminProductDetails({ route, navigation }) {
     Accept: "application/json",
   };
 
-  async function approveOrReject() {
-    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+  async function approve() {
+    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+
+    setSubmitting(true);
+    await axios
+      .put(url, {}, { headers })
+      .then((response) => {
+        setSubmitting(false);
+        console.log(response.data);
+
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+
+          navigation.goBack();
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
+  async function reject() {
+    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
 
     setSubmitting(true);
     await axios
@@ -198,14 +230,14 @@ export default function AdminProductDetails({ route, navigation }) {
 
       <View style={styles.section}>
         <PrimaryButton
-          onPress={approveOrReject}
+          onPress={approve}
           submitting={submitting}
           disabled={submitting}
           buttonTitle="Approve"
         />
 
         <TertiaryButton
-          onPress={approveOrReject}
+          onPress={reject}
           submitting={submitting}
           disabled={submitting}
           buttonTitle="Reject"

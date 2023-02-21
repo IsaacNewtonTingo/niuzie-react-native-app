@@ -76,7 +76,7 @@ export default function AdminProfile({ navigation }) {
         if (response.data.status == "Success") {
           setFirstName(response.data.data.firstName);
           setLastName(response.data.data.lastName);
-          setPhoneNumber(response.data.data.phoneNumber);
+          setPhoneNumber(`+${response.data.data.phoneNumber}`);
           setProfilePicture(response.data.data.profilePicture);
           setCounty(response.data.data.county);
           setSubCounty(response.data.data.subCounty);
@@ -116,7 +116,7 @@ export default function AdminProfile({ navigation }) {
     <ScrollView style={styles.container}>
       <ImageBackground
         style={profileStyles.bg}
-        source={require("../../../assets/images/bg.jpg")}
+        source={require("../../../assets/images/background.jpg")}
       >
         <Avatar.Image
           size={200}

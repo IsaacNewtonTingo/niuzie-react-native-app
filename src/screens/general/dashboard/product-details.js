@@ -49,6 +49,7 @@ import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 
 import * as Sharing from "expo-sharing";
 import * as Linking from "expo-linking";
+import TertiaryButton from "../../../componets/buttons/tertiaryBtn";
 
 const width = Dimensions.get("window").width;
 
@@ -569,7 +570,7 @@ export default function ProductDetails({ route, navigation }) {
         </View>
 
         <TouchableOpacity
-          onPress={shareProduct}
+          // onPress={shareProduct}
           style={productDetailStyles.actionIcons}
         >
           <FontAwesome name="share-square-o" size={25} color={colors.gray} />
@@ -584,7 +585,15 @@ export default function ProductDetails({ route, navigation }) {
             </Text>
 
             {reviewList.length > 0 && (
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("AllReviews", {
+                    productID,
+                    userID,
+                    productOwnerID,
+                  })
+                }
+              >
                 <Text style={styles.viewAll}>View all</Text>
               </TouchableOpacity>
             )}
@@ -746,6 +755,38 @@ export default function ProductDetails({ route, navigation }) {
               })
             }
             buttonTitle="Edit product"
+          />
+        </View>
+      )}
+
+      {userID == productOwnerID && (
+        <View style={[styles.section, {}]}>
+          <TertiaryButton
+            style={{ marginTop: 0 }}
+            onPress={() =>
+              navigation.navigate("EditProduct", {
+                productID,
+                productName,
+                categoryName,
+                categoryID,
+                subCategoryName,
+                subCategoryID,
+                description,
+                price,
+                condition,
+                firstName,
+                lastName,
+                phoneNumber,
+                county,
+                subCounty,
+
+                image1,
+                image2,
+                image3,
+                image4,
+              })
+            }
+            buttonTitle="Republish product"
           />
         </View>
       )}

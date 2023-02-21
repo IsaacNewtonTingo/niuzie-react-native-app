@@ -18,7 +18,7 @@ import { postStyles } from "../../seller/post-product";
 import colors from "../../../componets/colors/colors";
 
 export default function NewPassword({ route, navigation }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(route.params.phoneNumber);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -55,7 +55,7 @@ export default function NewPassword({ route, navigation }) {
       });
     } else {
       await axios
-        .post(url, { phoneNumber: route.params.phoneNumber, otp, password })
+        .post(url, { phoneNumber, otp, password })
         .then((response) => {
           setSubmitting(false);
           console.log(response.data);

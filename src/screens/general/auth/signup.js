@@ -53,6 +53,8 @@ export default function SignUp({ navigation }) {
   const [countiesModal, setCountiesModal] = useState(false);
   const [subCountiesModal, setSubCountiesModal] = useState(false);
 
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
+
   async function signUp() {
     //validate
     if (!firstName) {
@@ -93,11 +95,12 @@ export default function SignUp({ navigation }) {
         description:
           "Phone number is required. Please add a phone number then proceed",
       });
-    } else if (!phoneNumber.startsWith(254)) {
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
       showMyToast({
         status: "error",
-        title: "Invalid format",
-        description: "Phone number must start with 254. No +",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
       });
     } else if (!password) {
       showMyToast({
@@ -127,10 +130,15 @@ export default function SignUp({ navigation }) {
     } else {
       const url = `${process.env.ENDPOINT}/user/signup`;
       setSubmitting(true);
+      const newPhoneNumber = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(1)
+        : phoneNumber.startsWith("0")
+        ? "254" + phoneNumber.substring(1)
+        : phoneNumber;
 
       await axios
         .post(url, {
-          phoneNumber,
+          phoneNumber: parseInt(newPhoneNumber),
         })
         .then((response) => {
           console.log(response.data);
@@ -140,7 +148,7 @@ export default function SignUp({ navigation }) {
             navigation.navigate("ConfirmOtp", {
               firstName,
               lastName,
-              phoneNumber,
+              phoneNumber: parseInt(newPhoneNumber),
               password,
               county,
               subCounty,

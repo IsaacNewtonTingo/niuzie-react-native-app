@@ -11,7 +11,10 @@ import {
 import React, { useEffect, useContext, useState } from "react";
 import { Button, Divider, HStack, Modal } from "native-base";
 
-import { CredentialsContext } from "../../componets/context/credentials-context";
+import {
+  CredentialsContext,
+  PendingProductsContext,
+} from "../../componets/context/credentials-context";
 import { postStyles } from "./post-product";
 import { showMyToast } from "../../functions/show-toast";
 import { BarIndicator } from "react-native-indicators";
@@ -31,7 +34,9 @@ const { width } = Dimensions.get("window");
 export default function PendingProducts({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
-
+  const { pendingProducts, setPendingProducts } = useContext(
+    PendingProductsContext
+  );
   const [userID, setUserID] = useState("");
   const [token, setToken] = useState("");
 
@@ -45,6 +50,7 @@ export default function PendingProducts({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [price, setPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
 
   useEffect(() => {
     checkStoreCredentials();
@@ -118,51 +124,75 @@ export default function PendingProducts({ navigation }) {
   }
 
   async function publishManyProducts() {
-    const url = `${process.env.ENDPOINT}/product/insert-many-products`;
-    setSubmitting(true);
-
-    const headers = {
-      "auth-token": token,
-      "Content-Type": "application/json",
-      Accept: "aSpplication/json",
-    };
-
-    let accountNumber = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await axios
-      .post(
-        url,
-        {
-          userID,
-          phoneNumber,
-          amount: totalPrice,
-          accountNumber,
-        },
-        { headers }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setSubmitting(false);
-        if (response.data.status == "Success") {
-          setPaymentModal(false);
-          getPendingProducts();
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-        } else {
-          showMyToast({
-            status: "error",
-            title: "Failed",
-            description: response.data.message,
-          });
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
+    if (!phoneNumber) {
+      showMyToast({
+        status: "error",
+        title: "Required field",
+        description: "Phone number is required",
       });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
+      });
+    } else {
+      const url = `${process.env.ENDPOINT}/product/insert-many-products`;
+      setSubmitting(true);
+
+      const headers = {
+        "auth-token": token,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+
+      let accountNumber = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+
+      const newPhoneNumber = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(1)
+        : phoneNumber.startsWith("0")
+        ? "254" + phoneNumber.substring(1)
+        : phoneNumber;
+
+      await axios
+        .post(
+          url,
+          {
+            userID,
+            phoneNumber: newPhoneNumber,
+            amount: totalPrice,
+            accountNumber,
+          },
+          { headers }
+        )
+        .then((response) => {
+          console.log(response.data);
+          setSubmitting(false);
+          if (response.data.status == "Success") {
+            setPaymentModal(false);
+            getPendingProducts(userID, token, price);
+            setPendingProducts(0);
+            showMyToast({
+              status: "success",
+              title: "Success",
+              description: response.data.message,
+            });
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          setSubmitting(false);
+          console.log(err);
+        });
+    }
   }
 
   async function handleProductPressed(item) {

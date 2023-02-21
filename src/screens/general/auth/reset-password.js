@@ -15,6 +15,7 @@ import { postStyles } from "../../seller/post-product";
 export default function ResetPassword({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
 
   async function resetPassword() {
     const url = `${process.env.ENDPOINT}/user/send-reset-pass-otp`;
@@ -25,16 +26,30 @@ export default function ResetPassword({ navigation }) {
         title: "Required field",
         description: "Please enter a phone number",
       });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
+      });
     } else {
       setSubmitting(true);
+      const newPhoneNumber = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(1)
+        : phoneNumber.startsWith("0")
+        ? "254" + phoneNumber.substring(1)
+        : phoneNumber;
       await axios
-        .post(url, { phoneNumber })
+        .post(url, { phoneNumber: parseInt(newPhoneNumber) })
         .then((response) => {
           setSubmitting(false);
           console.log(response.data);
 
           if (response.data.status == "Success") {
-            navigation.navigate("NewPassword", { phoneNumber });
+            navigation.navigate("NewPassword", {
+              phoneNumber: parseInt(newPhoneNumber),
+            });
             showMyToast({
               status: "success",
               title: "Success",

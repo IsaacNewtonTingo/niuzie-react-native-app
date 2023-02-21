@@ -22,14 +22,25 @@ import HorizontalCard from "../../../componets/cards/horizontal-card";
 import axios from "axios";
 import NoData from "../../../componets/Text/no-data";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import { ActivityIndicator } from "react-native";
 
 export default function Products({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
-  const [newProducts, setNewProducts] = useState([]);
-  const [approvedProductsList, setApprovedProductsList] = useState([]);
-  const [rejectedProductsList, setRejectedProductsList] = useState([]);
+  let [newProducts, setNewProducts] = useState([]);
+  let [approvedProductsList, setApprovedProductsList] = useState([]);
+  let [rejectedProductsList, setRejectedProductsList] = useState([]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  let [newReachedEnd, setNewReachedEnd] = useState(false);
+  let [approvedReachedEnd, setApprovedReachedEnd] = useState(false);
+  let [rejectedReachedEnd, setRejectedReachedEnd] = useState(false);
+
+  let [newPageNumber, setNewPageNumber] = useState(0);
+  let [approvedPageNumber, setApprovedPageNumber] = useState(0);
+  let [rejectedPageNumber, setRejectedPageNumber] = useState(0);
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -53,7 +64,9 @@ export default function Products({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getNewProducts() {
-    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-new-products`;
+    const url = `${
+      process.env.ENDPOINT
+    }/admin/get-new-products?pageNumber=${newPageNumber}&limit=${20}`;
     setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
@@ -76,7 +89,7 @@ export default function Products({ navigation }) {
   }
 
   async function getApprovedProducts() {
-    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-approved-products`;
+    const url = `${process.env.ENDPOINT}/admin/get-approved-products`;
     setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
@@ -99,7 +112,7 @@ export default function Products({ navigation }) {
   }
 
   async function getRejectedProducts() {
-    const url = `https://bdcd-105-163-158-88.in.ngrok.io/api/admin/get-rejected-products`;
+    const url = `${process.env.ENDPOINT}/admin/get-rejected-products`;
     setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
@@ -125,6 +138,117 @@ export default function Products({ navigation }) {
     navigation.push("AdminProductDetails", { item });
   }
 
+  //---------------------------------------------
+  async function getMoreNewProducts() {
+    setNewPageNumber(newPageNumber + 1);
+    let url = `${
+      process.env.ENDPOINT
+    }/admin/get-new-products?pageNumber=${newPageNumber}&limit=${20}`;
+
+    console.log(url);
+    if (newReachedEnd == true) {
+      return;
+    } else {
+      await axios
+        .get(url, { headers: { "auth-token": token } })
+        .then((response) => {
+          setLoadingData(false);
+
+          if (response.data.status == "Success") {
+            console.log(response.data.data[0].productName);
+            setNewProducts([...newProducts, ...response.data.data]);
+            if (response.data.data.length < 20) {
+              setNewReachedEnd(true);
+            }
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoadingData(false);
+        });
+    }
+  }
+
+  async function getMoreApprovedProducts() {
+    setApprovedPageNumber(approvedPageNumber + 1);
+    let url = `${process.env.ENDPOINT}/admin/get-approved-products?pageNumber=${
+      approvedPageNumber + 1
+    }&limit=${20}`;
+
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        setLoadingData(false);
+        if (approvedReachedEnd == true) {
+          return;
+        } else {
+          if (response.data.status == "Success") {
+            setApprovedProductsList([
+              ...approvedProductsList,
+              ...response.data.data,
+            ]);
+            if (response.data.data.length < 20) {
+              setApprovedReachedEnd(true);
+            }
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  async function getMoreRejectedProducts() {
+    setRejectedPageNumber(rejectedPageNumber + 1);
+    let url = `${process.env.ENDPOINT}/admin/get-approved-products?pageNumber=${
+      rejectedPageNumber + 1
+    }&limit=${20}`;
+
+    await axios
+      .get(url, { headers: { "auth-token": token } })
+      .then((response) => {
+        setLoadingData(false);
+
+        if (rejectedReachedEnd == true) {
+          return;
+        } else {
+          if (response.data.status == "Success") {
+            setRejectedProductsList([
+              ...rejectedProductsList,
+              ...response.data.data,
+            ]);
+            if (response.data.data.length < 20) {
+              setRejectedReachedEnd(true);
+            }
+          } else {
+            showMyToast({
+              status: "error",
+              title: "Failed",
+              description: response.data.message,
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+  //-----------------------------------
+
   const newlyAddedProducts = () => (
     <>
       {newProducts.length < 1 && <NoData text="No data" />}
@@ -149,6 +273,19 @@ export default function Products({ navigation }) {
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
+        onEndReached={() => {
+          getMoreNewProducts();
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={() => {
+          return !newReachedEnd ? (
+            <ActivityIndicator size="large" color="white" />
+          ) : (
+            <>
+              <NoData text="No more data" />
+            </>
+          );
+        }}
       />
     </>
   );
@@ -178,6 +315,19 @@ export default function Products({ navigation }) {
             premium={item.user.premium}
           />
         )}
+        onEndReached={() => {
+          getMoreApprovedProducts();
+        }}
+        onEndReachedThreshold={0}
+        ListFooterComponent={() => {
+          return !approvedReachedEnd ? (
+            <ActivityIndicator size="large" color="white" />
+          ) : (
+            <>
+              <NoData text="No more data" />
+            </>
+          );
+        }}
       />
     </>
   );
@@ -207,6 +357,19 @@ export default function Products({ navigation }) {
             premium={item.user.premium}
           />
         )}
+        onEndReached={() => {
+          getMoreRejectedProducts();
+        }}
+        onEndReachedThreshold={0}
+        ListFooterComponent={() => {
+          return !rejectedReachedEnd ? (
+            <ActivityIndicator size="large" color="white" />
+          ) : (
+            <>
+              <NoData text="No more data" />
+            </>
+          );
+        }}
       />
     </>
   );

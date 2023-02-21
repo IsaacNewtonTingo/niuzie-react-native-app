@@ -25,6 +25,7 @@ import noImage from "../../../assets/data/noImage";
 import { Modal } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
 import { Linking } from "react-native";
+import NoData from "../../../componets/Text/no-data";
 
 const { width } = Dimensions.get("window");
 
@@ -134,6 +135,7 @@ export default function Messages({ navigation }) {
 
   return (
     <>
+      {messageList.length < 1 && <NoData text="No data found" />}
       <FlatList
         style={[styles.container, {}]}
         data={messageList}

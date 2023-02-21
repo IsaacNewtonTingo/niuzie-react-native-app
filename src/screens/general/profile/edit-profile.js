@@ -83,6 +83,8 @@ export default function EditProfile({ route, navigation }) {
   const [subCountiesModal, setSubCountiesModal] = useState(false);
   const [subCounties, setSubCounties] = useState([]);
 
+  var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
+
   const headers = {
     "auth-token": token,
   };
@@ -126,6 +128,13 @@ export default function EditProfile({ route, navigation }) {
         description:
           "Phone number is required. Please add a phone number then proceed",
       });
+    } else if (!phoneNumberRegex.test(phoneNumber)) {
+      showMyToast({
+        status: "error",
+        title: "Invalid input",
+        description:
+          "Invalid phone number. Make sure phone number is in the format 07xxxxxxxx / 01xxxxxxxx / +2547xxxxxxxx / +2541xxxxxxxx",
+      });
     } else if (!password) {
       showMyToast({
         status: "error",
@@ -140,9 +149,14 @@ export default function EditProfile({ route, navigation }) {
   async function initiateOTP() {
     setSubmitting(true);
     const url = `${process.env.ENDPOINT}/user/edit-profile/${userID}`;
+    const newPhoneNumber = phoneNumber.startsWith("+")
+      ? phoneNumber.substring(1)
+      : phoneNumber.startsWith("0")
+      ? "254" + phoneNumber.substring(1)
+      : phoneNumber;
 
     await axios
-      .post(url, { phoneNumber, password }, { headers })
+      .post(url, { phoneNumber: newPhoneNumber, password }, { headers })
       .then((response) => {
         setSubmitting(false);
         console.log(response.data);
@@ -172,6 +186,11 @@ export default function EditProfile({ route, navigation }) {
     setSubmitting(true);
 
     const url = `${process.env.ENDPOINT}/user/update-profile/${userID}`;
+    const newPhoneNumber = phoneNumber.startsWith("+")
+      ? phoneNumber.substring(1)
+      : phoneNumber.startsWith("0")
+      ? "254" + phoneNumber.substring(1)
+      : phoneNumber;
 
     await axios
       .put(
@@ -181,7 +200,7 @@ export default function EditProfile({ route, navigation }) {
           lastName,
           county,
           subCounty,
-          phoneNumber,
+          phoneNumber: newPhoneNumber,
           password,
           otp,
           profilePicture:
@@ -339,7 +358,7 @@ export default function EditProfile({ route, navigation }) {
     >
       <ImageBackground
         style={editProfileStyles.bg}
-        source={require("../../../assets/images/bg.jpg")}
+        source={require("../../../assets/images/background.jpg")}
       >
         <Avatar.Image
           size={200}

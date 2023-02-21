@@ -14,6 +14,7 @@ import PremiumServices from "../screens/general/profile/premium-services";
 import Payments from "../screens/general/profile/payments";
 import MyProductRequests from "../screens/general/profile/my-product-requests";
 import NotificationSettings from "../screens/general/profile/notification-settings";
+import AllReviews from "../screens/general/dashboard/all-reviews";
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +106,14 @@ export default function SettingsNav() {
         component={NotificationSettings}
         options={{
           headerTitle: "Notification settings",
+        }}
+      />
+
+      <Stack.Screen
+        name="AllReviews"
+        component={AllReviews}
+        options={{
+          headerTitle: "Reviews",
         }}
       />
     </Stack.Navigator>
