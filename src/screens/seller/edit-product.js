@@ -271,6 +271,7 @@ export default function EditProduct({ navigation, route }, props) {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -282,6 +283,7 @@ export default function EditProduct({ navigation, route }, props) {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -293,6 +295,7 @@ export default function EditProduct({ navigation, route }, props) {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
