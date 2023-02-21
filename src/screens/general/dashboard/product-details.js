@@ -432,6 +432,37 @@ export default function ProductDetails({ route, navigation }) {
     }
   }
 
+  async function deleteProduct() {
+    const url = `${process.env.ENDPOINT}/product/delete-product/${productID}?userID=${userID}`;
+    setSubmitting(true);
+
+    const headers = {
+      "auth-token": token,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    await axios
+      .delete(url, { headers })
+      .then((response) => {
+        console.log(response.data);
+        setSubmitting(false);
+        if (response.data.status == "Success") {
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+          navigation.goBack();
+        } else {
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.log(err);
+      });
+  }
+
   if (loadingData) {
     return <LoadingIndicator />;
   }
@@ -756,37 +787,12 @@ export default function ProductDetails({ route, navigation }) {
             }
             buttonTitle="Edit product"
           />
-        </View>
-      )}
 
-      {userID == productOwnerID && (
-        <View style={[styles.section, {}]}>
           <TertiaryButton
-            style={{ marginTop: 0 }}
-            onPress={() =>
-              navigation.navigate("EditProduct", {
-                productID,
-                productName,
-                categoryName,
-                categoryID,
-                subCategoryName,
-                subCategoryID,
-                description,
-                price,
-                condition,
-                firstName,
-                lastName,
-                phoneNumber,
-                county,
-                subCounty,
-
-                image1,
-                image2,
-                image3,
-                image4,
-              })
-            }
-            buttonTitle="Republish product"
+            disabled={submitting}
+            submitting={submitting}
+            onPress={deleteProduct}
+            buttonTitle="Delete product"
           />
         </View>
       )}

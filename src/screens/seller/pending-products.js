@@ -102,12 +102,14 @@ export default function PendingProducts({ navigation }) {
 
   async function getPendingProducts(userID, token, price) {
     const url = `${process.env.ENDPOINT}/product/get-pending-products/${userID}`;
+    setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setPendingProductList(response.data.data);
+          setPendingProducts(response.data.data.length);
           setTotalPrice(price * response.data.data.length);
         } else {
           setLoadingData(false);
