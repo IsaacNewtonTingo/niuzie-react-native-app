@@ -153,12 +153,9 @@ export default function Discover({ navigation }) {
 
         if (response.data.status == "Success") {
           setAllProducts(response.data.data);
-          if (response.data.data.length < 1) {
+
+          if (response.data.data.length < 20) {
             setReachedEnd(true);
-          } else {
-            if (response.data.data.length < 20) {
-              setReachedEnd(true);
-            }
           }
         } else {
           showMyToast({
@@ -332,7 +329,9 @@ export default function Discover({ navigation }) {
           />
         }
         onEndReached={() => {
-          getMoreProducts();
+          if (!reachedEnd) {
+            getMoreProducts();
+          }
         }}
         onEndReachedThreshold={0}
         style={styles.flatlist}
@@ -361,9 +360,7 @@ export default function Discover({ navigation }) {
           return !reachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />

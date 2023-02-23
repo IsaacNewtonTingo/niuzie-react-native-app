@@ -8,7 +8,7 @@ import {
   FlatList,
   Image,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import colors from "../../../componets/colors/colors";
 import styles from "../../../componets/styles/global-styles";
@@ -20,9 +20,22 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import axios from "axios";
 import HorizontalCard from "../../../componets/cards/horizontal-card";
+
+import {
+  CredentialsContext,
+  NotificationContext,
+} from "../../../componets/context/credentials-context";
+
 const { width } = Dimensions.get("window");
 
 export default function Home({ navigation }) {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+  const { notifications, setNotifications } = useContext(NotificationContext);
+
+  const [userID, setUserID] = useState("");
+  const [token, setToken] = useState("");
+
   const [loadingData, setLoadingData] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -35,9 +48,47 @@ export default function Home({ navigation }) {
     getCategories();
     getPremiumProducts();
     getProductRequests();
+
+    checkUserData();
   }, [(navigation, loading)]);
 
   navigation.addListener("focus", () => setLoading(!loading));
+
+  function checkUserData() {
+    const { data } = storedCredentials ? storedCredentials : "";
+
+    if (data) {
+      setUserID(data.userID);
+      setToken(data.token);
+
+      getNotifications(data.userID, data.token);
+    }
+  }
+
+  async function getNotifications(userID, token) {
+    const url = `${process.env.ENDPOINT}/user/get-notifications/${userID}`;
+    const headers = {
+      "auth-token": token,
+    };
+
+    await axios
+      .get(url, { headers })
+      .then((response) => {
+        if (response.data.status == "Success") {
+          setNotifications(response.data.data.unread);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setLoadingData(false);
+        console.log(err);
+      });
+  }
 
   async function getCategories() {
     const url = `${process.env.ENDPOINT}/admin/get-categories`;

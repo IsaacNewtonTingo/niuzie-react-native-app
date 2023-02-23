@@ -154,10 +154,10 @@ export default function Products({ navigation }) {
       process.env.ENDPOINT
     }/admin/get-new-products?pageNumber=${newPageNumber}&limit=${20}`;
 
-    console.log(url);
     if (newReachedEnd == true) {
       return;
     } else {
+      console.log(url);
       await axios
         .get(url, { headers: { "auth-token": token } })
         .then((response) => {
@@ -287,7 +287,9 @@ export default function Products({ navigation }) {
           />
         )}
         onEndReached={() => {
-          getMoreNewProducts();
+          if (!newReachedEnd) {
+            getMoreNewProducts();
+          }
         }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={() => {
@@ -331,7 +333,9 @@ export default function Products({ navigation }) {
           />
         )}
         onEndReached={() => {
-          getMoreApprovedProducts();
+          if (!approvedReachedEnd) {
+            getMoreApprovedProducts();
+          }
         }}
         onEndReachedThreshold={0}
         ListFooterComponent={() => {
@@ -375,7 +379,9 @@ export default function Products({ navigation }) {
           />
         )}
         onEndReached={() => {
-          getMoreRejectedProducts();
+          if (!rejectedReachedEnd) {
+            getMoreApprovedProducts();
+          }
         }}
         onEndReachedThreshold={0}
         ListFooterComponent={() => {
