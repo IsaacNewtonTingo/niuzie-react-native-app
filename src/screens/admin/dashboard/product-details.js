@@ -58,7 +58,7 @@ export default function AdminProductDetails({ route, navigation }) {
   };
 
   async function approve() {
-    const url = `https://ccab-105-163-1-127.eu.ngrok.io/api/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
 
     setSubmitting(true);
     await axios
@@ -90,7 +90,7 @@ export default function AdminProductDetails({ route, navigation }) {
   }
 
   async function reject() {
-    const url = `https://ccab-105-163-1-127.eu.ngrok.io/api/admin/reject-product/${route.params.item._id}?userID=${userID}`;
+    const url = `${process.env.ENDPOINT}/admin/reject-product/${route.params.item._id}?userID=${userID}`;
 
     setSubmitting(true);
     await axios

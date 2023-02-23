@@ -111,6 +111,13 @@ export default function PendingProducts({ navigation }) {
           setPendingProductList(response.data.data);
           setPendingProducts(response.data.data.length);
           setTotalPrice(price * response.data.data.length);
+
+          if (response.data.data.length > 0) {
+            setPhoneNumber(
+              "0" +
+                response.data.data[0].user.phoneNumber.toString().substring(3)
+            );
+          }
         } else {
           setLoadingData(false);
           showMyToast({
@@ -229,10 +236,10 @@ export default function PendingProducts({ navigation }) {
 
             <Modal.Body>
               <Text style={{ marginBottom: 20, color: colors.dark }}>
-                In order to post this product, you will have to pay KSH. 500.
-                Ensure the number provided below is your M-Pesa number and click
-                pay. You will recive an M-Pesa prompt to input your pin to
-                complete the payment process.
+                In order to post this product, you will have to pay KSH.{" "}
+                {totalPrice.toFixed(2)}. Ensure the number provided below is
+                your M-Pesa number and click pay. You will recive an M-Pesa
+                prompt to input your pin to complete the payment process.
               </Text>
 
               <Text style={postStyles.label}>Phone number</Text>

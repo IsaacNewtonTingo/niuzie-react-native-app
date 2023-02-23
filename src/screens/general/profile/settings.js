@@ -80,12 +80,12 @@ export default function Settings({ navigation }) {
       iconName: "hand-coin",
       navTo: "Payments",
     },
-    {
-      title: "Notifications",
-      iconType: "Ionicons",
-      iconName: "notifications",
-      navTo: "NotificationSettings",
-    },
+    // {
+    //   title: "Notifications",
+    //   iconType: "Ionicons",
+    //   iconName: "notifications",
+    //   navTo: "NotificationSettings",
+    // },
     {
       title: "Support",
       iconType: "MaterialIcons",

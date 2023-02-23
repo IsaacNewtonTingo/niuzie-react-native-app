@@ -74,6 +74,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setNewProducts(response.data.data);
+          if (response.data.data.length < 20) {
+            setNewReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -97,6 +100,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setApprovedProductsList(response.data.data);
+          if (response.data.data.length < 20) {
+            setApprovedReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -120,6 +126,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setRejectedProductsList(response.data.data);
+          if (response.data.data.length < 20) {
+            setRejectedReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -285,9 +294,7 @@ export default function Products({ navigation }) {
           return !newReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
@@ -331,9 +338,7 @@ export default function Products({ navigation }) {
           return !approvedReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
@@ -377,9 +382,7 @@ export default function Products({ navigation }) {
           return !rejectedReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
