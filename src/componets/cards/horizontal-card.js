@@ -33,13 +33,14 @@ export default function HorizontalCard(props) {
   const onPress = props.onPress;
   const style = props.style;
   const premium = props.premium;
+  const promoted = props.promoted;
 
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[verticalProductCardStyles.card, style]}
     >
-      {premium && <PromotedCard />}
+      {promoted && <PromotedCard />}
 
       <Image
         style={verticalProductCardStyles.productImage}

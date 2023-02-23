@@ -245,7 +245,7 @@ export default function PendingProducts({ navigation }) {
                 />
                 <TextInput
                   style={styles.textInput}
-                  placeholder="e.g 1200"
+                  placeholder="e.g 0726776789"
                   keyboardType="numeric"
                   value={phoneNumber.toString()}
                   onChangeText={setPhoneNumber}
@@ -354,6 +354,7 @@ export default function PendingProducts({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
           />
         )}
       />

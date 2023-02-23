@@ -65,7 +65,7 @@ export default function Transaction(props) {
               ? "Product promotion"
               : extraProduct !== null
               ? "Product payment"
-              : "N/A"}
+              : "Product payment"}
           </Text>
         </View>
 
@@ -74,7 +74,9 @@ export default function Transaction(props) {
             ? productPromotion.productName
             : extraProduct !== null
             ? extraProduct.productName
-            : "Joined premium"}
+            : premium == true
+            ? "Joined premium"
+            : "..."}
         </Text>
       </View>
     </LinearGradient>

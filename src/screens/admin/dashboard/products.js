@@ -270,7 +270,11 @@ export default function Products({ navigation }) {
             county={item.user.county}
             subCounty={item.user.subCounty}
             premium={item.user.premium}
+            promoted={item.promoted}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
@@ -313,6 +317,10 @@ export default function Products({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
@@ -355,6 +363,10 @@ export default function Products({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
@@ -392,9 +404,9 @@ export default function Products({ navigation }) {
     />
   );
 
-  if (loadingData) {
-    return <LoadingIndicator />;
-  }
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <View style={styles.container}>

@@ -118,6 +118,7 @@ export default function SavedProducts({ navigation }) {
             subCounty={item.product.user.subCounty}
             rating={parseFloat(item.product.rating.$numberDecimal).toFixed(1)}
             premium={item.product.user.premium}
+            promoted={item.product.promoted}
           />
         )}
       />

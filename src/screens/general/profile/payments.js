@@ -8,6 +8,7 @@ import axios from "axios";
 import Transaction from "../../../componets/cards/transaction";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import NoData from "../../../componets/Text/no-data";
+import { showMyToast } from "../../../functions/show-toast";
 
 export default function Payments({ navigation }) {
   const { storedCredentials, setStoredCredentials } =
@@ -44,6 +45,12 @@ export default function Payments({ navigation }) {
 
         if (response.data.status == "Success") {
           setTransactions(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
         }
       })
       .catch((err) => {

@@ -98,6 +98,7 @@ export default function MyProducts({ navigation }) {
             county={item.user.county}
             subCounty={item.user.subCounty}
             premium={item.user.premium}
+            promoted={item.promoted}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
           />
         )}
@@ -128,6 +129,7 @@ export default function MyProducts({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
           />
         )}
       />
@@ -157,6 +159,7 @@ export default function MyProducts({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
           />
         )}
       />

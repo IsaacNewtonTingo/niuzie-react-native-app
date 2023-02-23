@@ -199,6 +199,7 @@ export default function Home({ navigation }) {
                 subCounty={item.user.subCounty}
                 rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
                 premium={item.user.premium}
+                promoted={item.promoted}
               />
             ))}
           </View>
