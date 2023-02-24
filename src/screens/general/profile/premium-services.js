@@ -37,7 +37,7 @@ export default function PremiumServices({ navigation }) {
   const token = data.token;
 
   const [premium, setPremium] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  let [phoneNumber, setPhoneNumber] = useState("");
 
   const [amount, setAmount] = useState(1);
 
@@ -92,7 +92,9 @@ export default function PremiumServices({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setPremium(response.data.data.premium);
-          setPhoneNumber(response.data.data.phoneNumber);
+          setPhoneNumber(
+            "0" + response.data.data.phoneNumber.toString().substring(3)
+          );
         } else {
           setPremium(false);
         }
@@ -147,7 +149,7 @@ export default function PremiumServices({ navigation }) {
       : phoneNumber;
 
     await axios
-      .post(url, { newPhoneNumber }, { headers: headers })
+      .post(url, { phoneNumber: newPhoneNumber }, { headers: headers })
       .then((response) => {
         setSubmitting(false);
         console.log(response.data);
@@ -185,7 +187,7 @@ export default function PremiumServices({ navigation }) {
     >
       {paymentModal == true && (
         <Modal
-          backgroundColor={colors.dark}
+          // backgroundColor={colors.dark}
           isOpen={paymentModal}
           onClose={() => setPaymentModal(false)}
         >

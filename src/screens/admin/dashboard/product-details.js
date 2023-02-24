@@ -29,8 +29,12 @@ export default function AdminProductDetails({ route, navigation }) {
   const token = storedCredentials ? data.token : "";
   const userID = storedCredentials ? data.userID : "";
 
+  const verified = route.params.item.verified;
+  const reviewed = route.params.item.reviewed;
+  const active = route.params.item.active;
+
   const [submitting, setSubmitting] = useState(false);
-  const [verified, setVerifies] = useState(false);
+  // const [verified, setVerified] = useState(false);
 
   const productImages = [
     route.params.item.image1
@@ -86,7 +90,7 @@ export default function AdminProductDetails({ route, navigation }) {
   }
 
   async function reject() {
-    const url = `${process.env.ENDPOINT}/admin/approve-product/${route.params.item._id}?userID=${userID}`;
+    const url = `${process.env.ENDPOINT}/admin/reject-product/${route.params.item._id}?userID=${userID}`;
 
     setSubmitting(true);
     await axios
@@ -229,19 +233,30 @@ export default function AdminProductDetails({ route, navigation }) {
       </View>
 
       <View style={styles.section}>
-        <PrimaryButton
-          onPress={approve}
-          submitting={submitting}
-          disabled={submitting}
-          buttonTitle="Approve"
-        />
+        {reviewed == true ? (
+          <PrimaryButton
+            onPress={!verified ? approve : reject}
+            submitting={submitting}
+            disabled={submitting}
+            buttonTitle={!verified ? "Approve" : "Reject"}
+          />
+        ) : (
+          <>
+            <PrimaryButton
+              onPress={approve}
+              submitting={submitting}
+              disabled={submitting}
+              buttonTitle="Approve"
+            />
 
-        <TertiaryButton
-          onPress={reject}
-          submitting={submitting}
-          disabled={submitting}
-          buttonTitle="Reject"
-        />
+            <TertiaryButton
+              onPress={reject}
+              submitting={submitting}
+              disabled={submitting}
+              buttonTitle="Reject"
+            />
+          </>
+        )}
       </View>
     </ScrollView>
   );

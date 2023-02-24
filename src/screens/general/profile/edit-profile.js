@@ -237,7 +237,7 @@ export default function EditProfile({ route, navigation }) {
 
   async function changeDP() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 4],
       quality: 0.5,
     });

@@ -428,7 +428,7 @@ export default function PostProduct({ navigation }) {
 
   async function openImage1Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 3],
       quality: 0.6,
     });
@@ -440,7 +440,7 @@ export default function PostProduct({ navigation }) {
 
   async function openImage2Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 3],
       quality: 0.6,
     });
@@ -452,7 +452,7 @@ export default function PostProduct({ navigation }) {
 
   async function openImage3Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 3],
       quality: 0.6,
     });
@@ -464,7 +464,7 @@ export default function PostProduct({ navigation }) {
 
   async function openImage4Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 3],
       quality: 0.6,
     });

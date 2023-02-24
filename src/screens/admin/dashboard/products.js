@@ -74,6 +74,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setNewProducts(response.data.data);
+          if (response.data.data.length < 20) {
+            setNewReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -97,6 +100,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setApprovedProductsList(response.data.data);
+          if (response.data.data.length < 20) {
+            setApprovedReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -120,6 +126,9 @@ export default function Products({ navigation }) {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setRejectedProductsList(response.data.data);
+          if (response.data.data.length < 20) {
+            setRejectedReachedEnd(true);
+          }
         } else {
           showMyToast({
             status: "error",
@@ -145,10 +154,10 @@ export default function Products({ navigation }) {
       process.env.ENDPOINT
     }/admin/get-new-products?pageNumber=${newPageNumber}&limit=${20}`;
 
-    console.log(url);
     if (newReachedEnd == true) {
       return;
     } else {
+      console.log(url);
       await axios
         .get(url, { headers: { "auth-token": token } })
         .then((response) => {
@@ -270,20 +279,24 @@ export default function Products({ navigation }) {
             county={item.user.county}
             subCounty={item.user.subCounty}
             premium={item.user.premium}
+            promoted={item.promoted}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
-          getMoreNewProducts();
+          if (!newReachedEnd) {
+            getMoreNewProducts();
+          }
         }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={() => {
           return !newReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
@@ -313,19 +326,23 @@ export default function Products({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
-          getMoreApprovedProducts();
+          if (!approvedReachedEnd) {
+            getMoreApprovedProducts();
+          }
         }}
         onEndReachedThreshold={0}
         ListFooterComponent={() => {
           return !approvedReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
@@ -355,19 +372,23 @@ export default function Products({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
+            verified={item.verified}
+            reviewed={item.reviewed}
+            active={item.active}
           />
         )}
         onEndReached={() => {
-          getMoreRejectedProducts();
+          if (!rejectedReachedEnd) {
+            getMoreApprovedProducts();
+          }
         }}
         onEndReachedThreshold={0}
         ListFooterComponent={() => {
           return !rejectedReachedEnd ? (
             <ActivityIndicator size="large" color="white" />
           ) : (
-            <>
-              <NoData text="No more data" />
-            </>
+            <>{/* <NoData text="No more data" /> */}</>
           );
         }}
       />
@@ -392,9 +413,9 @@ export default function Products({ navigation }) {
     />
   );
 
-  if (loadingData) {
-    return <LoadingIndicator />;
-  }
+  // if (loadingData) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <View style={styles.container}>

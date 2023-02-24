@@ -14,6 +14,7 @@ import ProductDetails from "../screens/general/dashboard/product-details";
 import PendingProducts from "../screens/seller/pending-products";
 
 import { PendingProductsContext } from "../componets/context/credentials-context";
+import EditProduct from "../screens/seller/edit-product";
 
 const Stack = createNativeStackNavigator();
 
@@ -94,6 +95,14 @@ export default function PostProductNav({ navigation }) {
           headerTitle: "Pending products",
         })}
       />
+
+      <Stack.Screen
+        name="EditProduct"
+        component={EditProduct}
+        options={({ route }) => ({
+          title: route.params.productName,
+        })}
+      />
     </Stack.Navigator>
   );
 }
@@ -112,6 +121,6 @@ const pendingStyles = StyleSheet.create({
   },
   pendingCountText: {
     color: colors.lightBlue,
-    fontSize: 12,
+    fontSize: 10,
   },
 });

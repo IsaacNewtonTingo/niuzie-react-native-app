@@ -102,13 +102,22 @@ export default function PendingProducts({ navigation }) {
 
   async function getPendingProducts(userID, token, price) {
     const url = `${process.env.ENDPOINT}/product/get-pending-products/${userID}`;
+    setLoadingData(true);
     await axios
       .get(url, { headers: { "auth-token": token } })
       .then((response) => {
         setLoadingData(false);
         if (response.data.status == "Success") {
           setPendingProductList(response.data.data);
+          setPendingProducts(response.data.data.length);
           setTotalPrice(price * response.data.data.length);
+
+          if (response.data.data.length > 0) {
+            setPhoneNumber(
+              "0" +
+                response.data.data[0].user.phoneNumber.toString().substring(3)
+            );
+          }
         } else {
           setLoadingData(false);
           showMyToast({
@@ -227,10 +236,10 @@ export default function PendingProducts({ navigation }) {
 
             <Modal.Body>
               <Text style={{ marginBottom: 20, color: colors.dark }}>
-                In order to post this product, you will have to pay KSH. 500.
-                Ensure the number provided below is your M-Pesa number and click
-                pay. You will recive an M-Pesa prompt to input your pin to
-                complete the payment process.
+                In order to post this product, you will have to pay KSH.{" "}
+                {totalPrice.toFixed(2)}. Ensure the number provided below is
+                your M-Pesa number and click pay. You will recive an M-Pesa
+                prompt to input your pin to complete the payment process.
               </Text>
 
               <Text style={postStyles.label}>Phone number</Text>
@@ -243,7 +252,7 @@ export default function PendingProducts({ navigation }) {
                 />
                 <TextInput
                   style={styles.textInput}
-                  placeholder="e.g 1200"
+                  placeholder="e.g 0726776789"
                   keyboardType="numeric"
                   value={phoneNumber.toString()}
                   onChangeText={setPhoneNumber}
@@ -352,6 +361,7 @@ export default function PendingProducts({ navigation }) {
             subCounty={item.user.subCounty}
             rating={parseFloat(item.rating.$numberDecimal).toFixed(1)}
             premium={item.user.premium}
+            promoted={item.promoted}
           />
         )}
       />

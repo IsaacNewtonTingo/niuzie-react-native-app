@@ -183,10 +183,10 @@ export default function EditProduct({ navigation, route }, props) {
           condition,
           description,
           price: parseInt(price),
-          image1,
-          image2,
-          image3,
-          image4,
+          image1: image1 !== null ? await uploadImage1() : null,
+          image2: image2 !== null ? await uploadImage2() : null,
+          image3: image3 !== null ? await uploadImage3() : null,
+          image4: image4 !== null ? await uploadImage4() : null,
         },
         { headers }
       )
@@ -199,37 +199,6 @@ export default function EditProduct({ navigation, route }, props) {
             title: "Success",
             description: response.data.message,
           });
-        } else {
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        console.log(err);
-      });
-  }
-
-  async function deleteProduct() {
-    const url = `${process.env.ENDPOINT}/product/delete-product/${productID}?userID=${userID}`;
-    setSubmitting(true);
-
-    const headers = {
-      "auth-token": token,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    await axios
-      .delete(url, { headers })
-      .then((response) => {
-        console.log(response.data);
-        setSubmitting(false);
-        if (response.data.status == "Success") {
-          showMyToast({
-            status: "success",
-            title: "Success",
-            description: response.data.message,
-          });
-          navigation.goBack();
         } else {
         }
       })
@@ -288,9 +257,9 @@ export default function EditProduct({ navigation, route }, props) {
 
   async function openImage1Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -300,9 +269,9 @@ export default function EditProduct({ navigation, route }, props) {
 
   async function openImage2Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -312,9 +281,9 @@ export default function EditProduct({ navigation, route }, props) {
 
   async function openImage3Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -324,9 +293,9 @@ export default function EditProduct({ navigation, route }, props) {
 
   async function openImage4Picker() {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
       aspect: [4, 3],
       quality: 0.6,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
     if (!pickerResult.canceled) {
@@ -661,13 +630,6 @@ export default function EditProduct({ navigation, route }, props) {
           submitting={submitting}
           onPress={validate}
           buttonTitle="Edit product"
-        />
-
-        <TertiaryButton
-          disabled={submitting}
-          submitting={submitting}
-          onPress={deleteProduct}
-          buttonTitle="Delete product"
         />
       </View>
 
