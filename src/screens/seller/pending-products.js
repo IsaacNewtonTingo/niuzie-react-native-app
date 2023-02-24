@@ -79,10 +79,10 @@ export default function PendingProducts({ navigation }) {
   }
 
   async function getSetPrice(userID, token) {
-    const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.EXTRA_PRODUCT_PAY_ID}`;
+    const url = `${process.env.ENDPOINT}/admin/get-charge/63d5490b0cfa4d7a6d95fcf1`;
 
     await axios
-      .get(url, { headers: { "auth-token": token } })
+      .get(url)
       .then((response) => {
         if (response.data.status == "Success") {
           setPrice(response.data.data.amount);

@@ -73,7 +73,7 @@ export default function SignUp({ navigation }) {
       showMyToast({
         status: "error",
         title: "Inavlid format",
-        description: "Name shoult only contain characters",
+        description: "Name should only contain characters",
       });
     } else if (!county) {
       showMyToast({
