@@ -57,6 +57,7 @@ export default function PremiumServices({ navigation }) {
 
   async function getAmount() {
     const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.PREMIUM_SUBSCRIPTION_AMOUNT_ID}`;
+    console.log(url);
     const headers = {
       "auth-token": token,
       Accept: "application/json",
