@@ -38,6 +38,7 @@
     "react-native-btr": "^2.2.0",
     "react-native-dotenv": "^3.4.7",
     "react-native-elements": "^3.4.3",
+    "react-native-floating-action": "^1.22.0",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-indicators": "^0.17.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
