@@ -39,7 +39,7 @@ export default function PremiumServices({ navigation }) {
   const [premium, setPremium] = useState(false);
   let [phoneNumber, setPhoneNumber] = useState("");
 
-  const [amount, setAmount] = useState(1);
+  const [amount, setAmount] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -56,7 +56,8 @@ export default function PremiumServices({ navigation }) {
   navigation.addListener("focus", () => setLoading(!loading));
 
   async function getAmount() {
-    const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.premiumSubscriptionID}`;
+    const url = `${process.env.ENDPOINT}/admin/get-charge/${process.env.PREMIUM_SUBSCRIPTION_AMOUNT_ID}`;
+    console.log(url);
     const headers = {
       "auth-token": token,
       Accept: "application/json",
@@ -272,7 +273,7 @@ export default function PremiumServices({ navigation }) {
         <Flex direction="row" h="58" p="4">
           <Text style={premiumStyles.subText}>7-Day plan</Text>
           <Divider bg="amber.500" thickness="2" mx="2" orientation="vertical" />
-          <Text style={premiumStyles.subText}>KSH. 200</Text>
+          <Text style={premiumStyles.subText}>KSH. {amount.toFixed(2)}</Text>
         </Flex>
 
         <Divider
