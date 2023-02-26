@@ -144,12 +144,12 @@ export default function AdminProfile({ navigation }) {
       position: 1,
     },
 
-    // {
-    //   text: "Edit an admin",
-    //   icon: <EditAdmin />,
-    //   name: "edit",
-    //   position: 3,
-    // },
+    {
+      text: "Edit an admin",
+      icon: <EditAdmin />,
+      name: "edit",
+      position: 3,
+    },
   ];
 
   var phoneNumberRegex = /^(\+254|0)[17]\d{8}$/;
