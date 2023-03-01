@@ -65,6 +65,7 @@ export default function Messages({ navigation }) {
       .get(url, { headers })
       .then((response) => {
         setLoadingData(false);
+
         if (response.data.status == "Success") {
           setMessageList(response.data.data);
         } else {
@@ -134,10 +135,9 @@ export default function Messages({ navigation }) {
   }
 
   return (
-    <>
-      {messageList.length < 1 && <NoData text="No data found" />}
+    <View style={[styles.container, {}]}>
+      {messageList.length == 0 && <NoData text="No data found" />}
       <FlatList
-        style={[styles.container, {}]}
         data={messageList}
         renderItem={({ item, i }) => (
           <TouchableOpacity
@@ -239,7 +239,7 @@ export default function Messages({ navigation }) {
           </Text>
         </LinearGradient>
       </Modal>
-    </>
+    </View>
   );
 }
 

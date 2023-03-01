@@ -33,6 +33,7 @@ export default function AdminDashboard({ navigation }) {
   const { data } = storedCredentials;
   const userID = data.userID;
   const token = data.token;
+  const roleID = data.roleID;
 
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [premiumRevenue, setPremiumRevenue] = useState(0);
@@ -122,7 +123,7 @@ export default function AdminDashboard({ navigation }) {
         <View style={{ opacity: 1, padding: 20 }}>
           <Text style={adminDashStyles.subText}>~Total revenue~</Text>
           <Text style={adminDashStyles.bigText}>
-            KSH. {totalRevenue.toFixed(2)}
+            KSH. {roleID == 0 ? totalRevenue.toFixed(2) : "XXXX"}
           </Text>
 
           <Flex direction="column">
@@ -135,7 +136,8 @@ export default function AdminDashboard({ navigation }) {
                 orientation="vertical"
               />
               <Text style={adminDashStyles.subText}>
-                Premium payments: <B>KSH.{premiumRevenue.toFixed(2)}</B>
+                Premium payments:{" "}
+                <B>KSH.{roleID == 0 ? premiumRevenue.toFixed(2) : "XXXX"}</B>
               </Text>
             </HStack>
 
@@ -149,7 +151,9 @@ export default function AdminDashboard({ navigation }) {
               />
               <Text style={adminDashStyles.subText}>
                 Product promo payments:{" "}
-                <B>KSH.{productPromoRevenue.toFixed(2)}</B>
+                <B>
+                  KSH.{roleID == 0 ? productPromoRevenue.toFixed(2) : "XXXX"}
+                </B>
               </Text>
             </HStack>
 
@@ -163,7 +167,9 @@ export default function AdminDashboard({ navigation }) {
               />
               <Text style={adminDashStyles.subText}>
                 Extra product payments:{" "}
-                <B>KSH.{extraProductRevenue.toFixed(2)}</B>
+                <B>
+                  KSH.{roleID == 0 ? extraProductRevenue.toFixed(2) : "XXXX"}
+                </B>
               </Text>
             </HStack>
           </Flex>
