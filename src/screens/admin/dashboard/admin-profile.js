@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
+  FlatList,
 } from "react-native";
 import { Avatar } from "react-native-paper";
 import { FloatingAction } from "react-native-floating-action";
@@ -37,6 +38,7 @@ import colors from "../../../componets/colors/colors";
 import PrimaryButton from "../../../componets/buttons/primary-button";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Admins from "../../../componets/lists/admins";
 
 export default function AdminProfile({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,8 @@ export default function AdminProfile({ navigation }) {
 
   const [addAdmin, setAddAdmin] = useState(false);
   const [editAdmin, setEditAdmin] = useState(false);
+
+  const [adminsList, setAdminsList] = useState([]);
 
   useEffect(() => {
     getProfile();
@@ -255,7 +259,60 @@ export default function AdminProfile({ navigation }) {
       setAddAdmin(true);
     } else {
       setEditAdmin(true);
+      getAdmins();
     }
+  }
+
+  async function getAdmins() {
+    setLoadingData(true);
+    const url = `https://4a8a-105-163-0-65.in.ngrok.io/api/admin/get-admins`;
+    await axios
+      .get(url, { headers })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          setAdminsList(response.data.data);
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingData(false);
+      });
+  }
+
+  async function deleteAdmin(toDeleteAdminID) {
+    setLoadingData(true);
+    const url = `https://4a8a-105-163-0-65.in.ngrok.io/api/admin/remove-admin/${toDeleteAdminID}?superAdminID=${userID}`;
+    console.log(url);
+    await axios
+      .delete(url, { headers })
+      .then((response) => {
+        setLoadingData(false);
+        if (response.data.status == "Success") {
+          getAdmins();
+          showMyToast({
+            status: "success",
+            title: "Success",
+            description: response.data.message,
+          });
+        } else {
+          showMyToast({
+            status: "error",
+            title: "Failed",
+            description: response.data.message,
+          });
+        }
+      })
+      .catch((err) => {
+        setLoadingData(false);
+        console.log(err);
+      });
   }
 
   if (loadingData) {
@@ -455,6 +512,26 @@ export default function AdminProfile({ navigation }) {
               submitting={submitting}
               onPress={handleAddAdmin}
               buttonTitle="Add"
+            />
+          </View>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={editAdmin}
+          onBackButtonPress={() => setEditAdmin(false)}
+          onBackdropPress={() => setEditAdmin(false)}
+        >
+          <View style={[profileStyles.btmSheet, { height: "70%" }]}>
+            <FlatList
+              data={adminsList}
+              renderItem={({ item }) => (
+                <Admins
+                  firstName={item.firstName}
+                  lastName={item.lastName}
+                  phoneNumber={item.phoneNumber}
+                  onPress={() => deleteAdmin(item._id)}
+                />
+              )}
             />
           </View>
         </BottomSheet>
