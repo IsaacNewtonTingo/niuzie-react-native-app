@@ -265,7 +265,7 @@ export default function AdminProfile({ navigation }) {
 
   async function getAdmins() {
     setLoadingData(true);
-    const url = `https://4a8a-105-163-0-65.in.ngrok.io/api/admin/get-admins`;
+    const url = `${process.env.ENDPOINT}/admin/get-admins`;
     await axios
       .get(url, { headers })
       .then((response) => {
@@ -288,7 +288,7 @@ export default function AdminProfile({ navigation }) {
 
   async function deleteAdmin(toDeleteAdminID) {
     setLoadingData(true);
-    const url = `https://4a8a-105-163-0-65.in.ngrok.io/api/admin/remove-admin/${toDeleteAdminID}?superAdminID=${userID}`;
+    const url = `${process.env.ENDPOINT}/admin/remove-admin/${toDeleteAdminID}?superAdminID=${userID}`;
     console.log(url);
     await axios
       .delete(url, { headers })
