@@ -136,10 +136,24 @@ export default function ProductDetails({ route, navigation }) {
         if (response.data.status == "Success") {
           setProductName(response.data.data.productName);
           setDescription(response.data.data.description);
-          setCategoryID(response.data.data.category._id);
-          setCategoryName(response.data.data.category.categoryName);
-          setSubCategoryID(response.data.data.subCategory._id);
-          setSubCategoryName(response.data.data.subCategory.subCategoryName);
+          setCategoryID(
+            response.data.data.category ? response.data.data.category._id : null
+          );
+          setCategoryName(
+            response.data.data.category
+              ? response.data.data.category.categoryName
+              : ""
+          );
+          setSubCategoryID(
+            response.data.data.subCategory
+              ? response.data.data.subCategory._id
+              : ""
+          );
+          setSubCategoryName(
+            response.data.data.subCategory
+              ? response.data.data.subCategory.subCategoryName
+              : ""
+          );
           setPrice(response.data.data.price);
           setCondition(response.data.data.condition);
           setRating(

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Avatar } from "react-native-paper";
+
 import noImage from "../../../assets/data/noImage";
 
 import { CredentialsContext } from "../../../componets/context/credentials-context";
@@ -25,6 +26,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../../../componets/colors/colors";
 import LoadingIndicator from "../../../componets/preloader/loadingIndicator";
+import { TextInput } from "react-native";
 
 export default function Profile({ route, navigation }) {
   const [loading, setLoading] = useState(false);
@@ -204,5 +206,11 @@ const profileStyles = StyleSheet.create({
   },
   it: {
     marginLeft: 10,
+  },
+  btmSheet: {
+    padding: 20,
+    backgroundColor: colors.cardColor,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
   },
 });

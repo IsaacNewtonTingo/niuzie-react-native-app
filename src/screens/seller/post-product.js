@@ -11,14 +11,13 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import * as ImagePicker from "expo-image-picker";
 
 import { RadioButton } from "react-native-paper";
-import { Text, Button, Modal, Flex, Divider, HStack } from "native-base";
+import { Text } from "native-base";
 
 import styles from "../../componets/styles/global-styles";
 import colors from "../../componets/colors/colors";
@@ -627,7 +626,7 @@ export default function PostProduct({ navigation }) {
         <StaticAlert
           status="warning"
           title="Warning"
-          description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 200 per product."
+          description="You have reached the limit of the number of free products you can post(2). Every other product you post will be at a cost of KSH. 50 per product."
         />
       )}
 

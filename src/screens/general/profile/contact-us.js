@@ -98,7 +98,7 @@ export default function ContactUs({ route }) {
         <Flex direction="row" h="58" p="4">
           <View style={contactStyles.rowItems}>
             <Feather name="phone-call" size={18} color={colors.gray} />
-            <Text style={contactStyles.leaText}>+254725667687</Text>
+            <Text style={contactStyles.leaText}>+254750925599</Text>
           </View>
 
           <Divider bg="amber.500" thickness="2" mx="2" orientation="vertical" />
@@ -123,7 +123,7 @@ export default function ContactUs({ route }) {
             value={firstName}
             editable={false}
             style={[styles.textInput, { color: colors.dark }]}
-            placeholder="e.g blah blah blah"
+            placeholder="Type your message here"
           />
         </View>
 
